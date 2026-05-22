@@ -1,0 +1,23 @@
+
+services:
+    postgresql:
+        container_name: postgresql
+        image: postgres:14.17
+        environment:
+            POSTGRES_DB: moviecluster_db
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            PGDATA: "/var/lib/postgresql/data/pgdata"
+        volumes:
+            - ../2. Init Database:/docker-entrypoint-initdb.d
+            - postgre-data:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+        networks:
+            - messenger
+            
+volumes:
+    postgre-data:
+
+networks:
+    messenger:
