@@ -46,4 +46,10 @@
 
     </changeSet>
 
+    <changeSet id="002-rename-password-column" author="walkername">
+        <sql>
+            alter table account rename column password to password_hash
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

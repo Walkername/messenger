@@ -9,22 +9,14 @@ import ru.walkername.backend.auth.dto.AuthRequest;
 import ru.walkername.backend.auth.dto.JWTResponse;
 import ru.walkername.backend.auth.entity.Account;
 import ru.walkername.backend.auth.entity.AccountRole;
-import ru.walkername.backend.auth.entity.RefreshToken;
 import ru.walkername.backend.auth.exception.AccountExistsException;
-import ru.walkername.backend.auth.exception.AccountNotFoundException;
 import ru.walkername.backend.auth.exception.InvalidCredentialsException;
 import ru.walkername.backend.auth.repository.AuthRepository;
-import ru.walkername.backend.auth.repository.RefreshTokenRepository;
 import ru.walkername.backend.common.security.TokenService;
 import ru.walkername.backend.user.entity.User;
 import ru.walkername.backend.user.service.UserService;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor

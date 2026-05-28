@@ -30,4 +30,10 @@
 
     </changeSet>
 
+    <changeSet id="002-change-name-column" author="walkername">
+        <sql>
+            alter table profile rename column name to first_name
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

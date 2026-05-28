@@ -30,8 +30,8 @@ public class User {
     @JoinColumn(name = "account_id", unique = true, nullable = false)
     private Account account;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "first_name")
+    private String firstName;
 
     @Column(name = "created_at")
     private Instant createdAt;

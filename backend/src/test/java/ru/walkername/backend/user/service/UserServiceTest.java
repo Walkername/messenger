@@ -11,6 +11,7 @@ import ru.walkername.backend.user.exception.UserExistsException;
 import ru.walkername.backend.user.exception.UserNotFoundException;
 import ru.walkername.backend.user.repository.UserRepository;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,14 +70,55 @@ public class UserServiceTest {
 
     @Test
     public void shouldThrowExceptionWhenUserNotFoundByFindOne() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        Long id = 1L;
+
+        when(userRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(
                 UserNotFoundException.class,
-                () -> userService.findOne(1L)
+                () -> userService.findOne(id)
         );
 
-        verify(userRepository).findById(1L);
+        verify(userRepository).findById(id);
+    }
+
+    @Test
+    public void shouldReturnUserByUpdateFirstName() {
+        Long id = 1L;
+        String newFirstName = "Michael";
+
+        User user = new User();
+        user.setId(id);
+        user.setFirstName(newFirstName);
+        Instant now = Instant.now();
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
+
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
+
+        User result = userService.updateFirstName(id, newFirstName);
+
+        assertEquals(user.getId(), result.getId());
+        assertEquals(user.getFirstName(), result.getFirstName());
+        assertEquals(user.getCreatedAt().toString(), result.getCreatedAt().toString());
+        assertEquals(user.getUpdatedAt().toString(), result.getUpdatedAt().toString());
+
+        verify(userRepository).findById(id);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenUserNotFoundByUpdateFirstName() {
+        Long id = 1L;
+        String newFirstName = "Michael";
+
+        when(userRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(
+                UserNotFoundException.class,
+                () -> userService.updateFirstName(id, newFirstName)
+        );
+
+        verify(userRepository).findById(id);
     }
 
 }

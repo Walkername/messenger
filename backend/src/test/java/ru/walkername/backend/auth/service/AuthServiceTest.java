@@ -96,7 +96,6 @@ public class AuthServiceTest {
         when(authRepository.findByUsername(authRequest.username())).thenReturn(Optional.of(account));
         when(passwordEncoder.matches(authRequest.password(), account.getPasswordHash())).thenReturn(true);
 
-
         JWTResponse jwtResponse = new JWTResponse("accessToken", "refreshToken");
         when(tokenService.generateTokensPair(account)).thenReturn(jwtResponse);
 

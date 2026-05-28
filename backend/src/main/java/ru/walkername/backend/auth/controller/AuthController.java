@@ -14,6 +14,7 @@ import ru.walkername.backend.auth.dto.AuthRequest;
 import ru.walkername.backend.auth.dto.JWTResponse;
 import ru.walkername.backend.auth.dto.RefreshTokenRequest;
 import ru.walkername.backend.auth.entity.Account;
+import ru.walkername.backend.auth.mapper.AccountMapper;
 import ru.walkername.backend.auth.service.AuthService;
 import ru.walkername.backend.auth.service.RefreshTokenService;
 
@@ -25,6 +26,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
+    private final AccountMapper accountMapper;
 
     @PostMapping("/register")
     public ResponseEntity<AccountResponse> register(
@@ -32,7 +34,7 @@ public class AuthController {
     ) {
         Account createdAccount = authService.register(authRequest);
 
-        AccountResponse accountResponse = new AccountResponse(createdAccount.getUsername());
+        AccountResponse accountResponse = accountMapper.toAccountResponse(createdAccount);
 
         return new ResponseEntity<>(accountResponse, HttpStatus.CREATED);
     }
