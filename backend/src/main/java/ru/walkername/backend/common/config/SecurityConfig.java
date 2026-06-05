@@ -33,7 +33,11 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register").permitAll()
+                        .requestMatchers(
+                                "/auth/login", "/auth/register", "/auth/refresh",
+                                "/swagger-ui/**", "/v3/api-docs/**"
+                        ).permitAll()
+                        .anyRequest().hasAnyAuthority("USER", "ADMIN")
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session ->
