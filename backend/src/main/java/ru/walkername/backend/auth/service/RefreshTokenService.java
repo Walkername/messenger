@@ -15,6 +15,7 @@ import ru.walkername.backend.auth.repository.AuthRepository;
 import ru.walkername.backend.auth.repository.RefreshTokenRepository;
 import ru.walkername.backend.common.security.TokenService;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Slf4j
@@ -36,6 +37,7 @@ public class RefreshTokenService {
             existingRefreshToken.setTokenHash(refreshTokenHash);
         } else {
             RefreshToken newRefreshToken = new RefreshToken(accountId, refreshTokenHash);
+            newRefreshToken.setCreatedAt(Instant.now());
             refreshTokenRepository.save(newRefreshToken);
         }
     }
@@ -66,14 +68,14 @@ public class RefreshTokenService {
 
             Optional<RefreshToken> refreshToken = refreshTokenRepository.findByAccountId(userId);
             if (refreshToken.isEmpty()) {
-                log.warn("Not such refresh token by userId: {}",  userId);
+                log.warn("Not such refresh token by accountId: {}",  userId);
                 throw new InvalidRefreshTokenException("Invalid refresh token");
             }
 
             RefreshToken existingRefreshToken = refreshToken.get();
             String existingRefreshTokenHash = existingRefreshToken.getTokenHash();
             if (!tokenService.verifyToken(rawRefreshToken, existingRefreshTokenHash)) {
-                log.warn("Mismatch between the refresh token from the database and the request by userId: {}",  userId);
+                log.warn("Mismatch between the refresh token from the database and the request by accountId: {}",  userId);
                 throw new InvalidRefreshTokenException("Invalid refresh token");
             }
 
