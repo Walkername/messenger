@@ -1,6 +1,5 @@
 package ru.walkername.backend.chat.dto;
 
-import jakarta.persistence.Column;
 import ru.walkername.backend.chat.entity.ChatType;
 
 import java.time.Instant;
