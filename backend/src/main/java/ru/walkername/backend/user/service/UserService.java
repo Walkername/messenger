@@ -31,6 +31,11 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User with such id not found"));
     }
 
+    public User findByAccountId(Long accountId) {
+        return userRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new UserNotFoundException("User with such account id not found"));
+    }
+
     @Transactional
     public User updateFirstName(Long id, String newFirstName) {
         User user = userRepository.findById(id)
