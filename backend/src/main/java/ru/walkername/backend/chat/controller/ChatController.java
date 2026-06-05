@@ -30,7 +30,7 @@ public class ChatController {
             @PathVariable Long chatId,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        Chat chat = chatService.findOne(chatId, userPrincipal.userId());
+        Chat chat = chatService.findOne(chatId, userPrincipal.accountId());
         ChatResponse chatResponse = chatMapper.toChatResponse(chat);
         return new ResponseEntity<>(chatResponse, HttpStatus.OK);
     }
@@ -41,7 +41,7 @@ public class ChatController {
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         Chat chat = chatMapper.toChat(chatRequest);
-        Chat savedChat = chatService.save(chat, userPrincipal.userId());
+        Chat savedChat = chatService.save(chat, userPrincipal.accountId());
         ChatResponse chatResponse = chatMapper.toChatResponse(savedChat);
         return new ResponseEntity<>(chatResponse, HttpStatus.CREATED);
     }

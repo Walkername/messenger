@@ -134,7 +134,7 @@ public class ChatServiceTest {
         UserPrincipal userPrincipal = new UserPrincipal(5L, "walkername", "USER");
 
         when(chatRepository.existsById(chatId)).thenReturn(true);
-        when(chatParticipantRepository.existsByChatIdAndUserId(chatId, userPrincipal.userId()))
+        when(chatParticipantRepository.existsByChatIdAndUserId(chatId, userPrincipal.accountId()))
                 .thenReturn(true);
 
         boolean result = chatService.canAccessChat(chatId, userPrincipal);
@@ -142,7 +142,7 @@ public class ChatServiceTest {
         assertTrue(result);
 
         verify(chatRepository).existsById(chatId);
-        verify(chatParticipantRepository).existsByChatIdAndUserId(chatId, userPrincipal.userId());
+        verify(chatParticipantRepository).existsByChatIdAndUserId(chatId, userPrincipal.accountId());
     }
 
     @Test

@@ -78,7 +78,7 @@ public class ChatControllerTest extends BaseControllerTest {
                 chat.getCreatedAt()
         );
 
-        when(chatService.findOne(chatId, userPrincipal.userId())).thenReturn(chat);
+        when(chatService.findOne(chatId, userPrincipal.accountId())).thenReturn(chat);
         when(chatMapper.toChatResponse(chat)).thenReturn(response);
 
         mockMvc.perform(get("/chats/{chatId}", chatId))
@@ -96,7 +96,7 @@ public class ChatControllerTest extends BaseControllerTest {
     public void shouldReturnErrorResponseForChatNotFoundByGet() throws Exception {
         Long chatId = 1L;
 
-        when(chatService.findOne(chatId, userPrincipal.userId())).thenThrow(
+        when(chatService.findOne(chatId, userPrincipal.accountId())).thenThrow(
                 new ChatNotFoundException("Chat not found")
         );
 
@@ -135,7 +135,7 @@ public class ChatControllerTest extends BaseControllerTest {
         );
 
         when(chatMapper.toChat(request)).thenReturn(newChat);
-        when(chatService.save(newChat, userPrincipal.userId())).thenReturn(savedChat);
+        when(chatService.save(newChat, userPrincipal.accountId())).thenReturn(savedChat);
         when(chatMapper.toChatResponse(savedChat)).thenReturn(response);
 
         mockMvc.perform(post("/chats")
@@ -152,7 +152,7 @@ public class ChatControllerTest extends BaseControllerTest {
                 );
 
         verify(chatMapper).toChat(request);
-        verify(chatService).save(newChat, userPrincipal.userId());
+        verify(chatService).save(newChat, userPrincipal.accountId());
         verify(chatMapper).toChatResponse(savedChat);
     }
 

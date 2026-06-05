@@ -78,7 +78,7 @@ public class MessageControllerTest extends BaseControllerTest {
         Message savedMessage = new Message();
         savedMessage.setId(2L);
         savedMessage.setChat(chat);
-        savedMessage.setUserId(userPrincipal.userId());
+        savedMessage.setUserId(userPrincipal.accountId());
         savedMessage.setContent(message.getContent());
         Instant now = Instant.now();
         savedMessage.setSentAt(now);
@@ -122,7 +122,7 @@ public class MessageControllerTest extends BaseControllerTest {
         Message savedMessage = new Message();
         savedMessage.setId(2L);
         savedMessage.setChat(chat);
-        savedMessage.setUserId(userPrincipal.userId());
+        savedMessage.setUserId(userPrincipal.accountId());
         savedMessage.setContent(message.getContent());
         Instant now = Instant.now();
         savedMessage.setSentAt(now);

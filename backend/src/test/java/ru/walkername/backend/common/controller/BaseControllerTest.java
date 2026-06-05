@@ -11,7 +11,7 @@ import java.util.List;
 public abstract class BaseControllerTest {
 
     protected void setUser(UserPrincipal user) {
-        UserPrincipal principal = new UserPrincipal(user.userId(), user.username(), user.role());
+        UserPrincipal principal = new UserPrincipal(user.accountId(), user.username(), user.role());
 
         var auth = new UsernamePasswordAuthenticationToken(
                 principal,

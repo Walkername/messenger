@@ -67,7 +67,7 @@ public class MessageServiceTest {
         Message savedMessage = new Message();
         savedMessage.setId(1L);
         savedMessage.setChat(existingChat);
-        savedMessage.setUserId(userPrinciple.userId());
+        savedMessage.setUserId(userPrinciple.accountId());
         savedMessage.setContent(message.getContent());
         Instant now = Instant.now();
         savedMessage.setSentAt(now);

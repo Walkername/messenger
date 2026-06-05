@@ -48,11 +48,11 @@ public class MessageService {
 
         // Check If user has access to chat
         if (!chatService.canAccessChat(chatId, userPrincipal)) {
-            log.warn("Access attempt by userId={} to chatId={}", userPrincipal.userId(), chatId);
+            log.warn("Access attempt by accountId={} to chatId={}", userPrincipal.accountId(), chatId);
             throw new ChatNotFoundException("Chat not found");
         }
 
-        message.setUserId(userPrincipal.userId());
+        message.setUserId(userPrincipal.accountId());
         message.setChat(chat);
         message.setSentAt(Instant.now());
         Message savedMessage = messageRepository.save(message);
@@ -64,6 +64,8 @@ public class MessageService {
                 "/topic/chat/" + chatId,
                 messageResponse
         );
+
+        chatRepository.updateLastMessageById(chatId, message.getContent());
 
         return savedMessage;
     }
