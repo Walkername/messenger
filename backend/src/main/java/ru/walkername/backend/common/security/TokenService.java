@@ -34,7 +34,7 @@ public class TokenService {
         Instant expiresAt = Instant.now().plus(15, ChronoUnit.MINUTES);
 
         return JWT.create()
-                .withSubject("Auth details")
+                .withSubject("Auth Details")
                 .withClaim("id", account.getId())
                 .withClaim("username", account.getUsername())
                 .withClaim("role", account.getRole().toString())
@@ -48,7 +48,7 @@ public class TokenService {
         Instant expiresAt = Instant.now().plus(30, ChronoUnit.DAYS);
 
         return JWT.create()
-                .withSubject("Auth details")
+                .withSubject("Auth Details")
                 .withClaim("id", account.getId())
                 .withClaim("username", account.getUsername())
                 .withClaim("role", account.getRole().toString())
