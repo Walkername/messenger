@@ -75,6 +75,8 @@ public class ChatControllerTest extends BaseControllerTest {
                 chat.getId(),
                 chat.getName(),
                 chat.getType(),
+                chat.getCreatedAt(),
+                "",
                 chat.getCreatedAt()
         );
 
@@ -131,6 +133,8 @@ public class ChatControllerTest extends BaseControllerTest {
                 savedChat.getId(),
                 savedChat.getName(),
                 savedChat.getType(),
+                savedChat.getCreatedAt(),
+                "",
                 savedChat.getCreatedAt()
         );
 
