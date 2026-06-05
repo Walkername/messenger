@@ -9,19 +9,19 @@
 
         <createTable tableName="chat">
             <column name="id" type="BIGINT" autoIncrement="true" generationType="BY DEFAULT">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="owner_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="name" type="VARCHAR(50)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
-            <column name="type" type="VARCHAR(50)" >
-                <constraints nullable="false" />
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
             </column>
-            <column name="created_at" type="TIMESTAMPTZ" defaultValueComputed="CURRENT_TIMESTAMP" >
-                <constraints nullable="false" />
+            <column name="created_at" type="TIMESTAMPTZ" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
             </column>
         </createTable>
 
@@ -31,6 +31,29 @@
                 constraintName="uk_chat_owner_type"
         />
 
+    </changeSet>
+
+    <changeSet id="002-add-last-message-at-column" author="walkername">
+        <addColumn tableName="chat">
+            <column name="last_message_at" type="TIMESTAMPTZ" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="003-remove-unique-constraint" author="walkername">
+        <dropUniqueConstraint
+                tableName="chat"
+                constraintName="uk_chat_owner_type"
+        />
+    </changeSet>
+
+    <changeSet id="004-add-last-message-column" author="walername">
+        <addColumn tableName="chat">
+            <column name="last_message" type="varchar(300)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>

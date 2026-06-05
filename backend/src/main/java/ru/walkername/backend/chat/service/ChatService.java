@@ -31,6 +31,7 @@ public class ChatService {
     @Transactional
     public Chat save(Chat chat, Long ownerId) {
         chat.setCreatedAt(Instant.now());
+        chat.setLastMessageAt(Instant.now());
         chat.setOwnerId(ownerId);
         Chat savedChat = chatRepository.save(chat);
 
@@ -56,7 +57,7 @@ public class ChatService {
             return true;
         }
 
-        return chatParticipantRepository.existsByChatIdAndUserId(chatId, userPrincipal.userId());
+        return chatParticipantRepository.existsByChatIdAndUserId(chatId, userPrincipal.accountId());
     }
 
     @Transactional

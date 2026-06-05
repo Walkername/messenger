@@ -38,6 +38,12 @@ public class Chat {
     @Column(name = "type")
     private ChatType type;
 
+    @Column(name = "last_message")
+    private String lastMessage;
+
+    @Column(name = "last_message_at")
+    private Instant lastMessageAt;
+
     @Column(name = "created_at")
     private Instant createdAt;
 
