@@ -2,16 +2,24 @@ package ru.walkername.backend.chat.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.walkername.backend.chat.dto.ChatResponse;
 import ru.walkername.backend.chat.entity.Chat;
 import ru.walkername.backend.chat.entity.ChatParticipant;
 import ru.walkername.backend.chat.exception.ChatNotFoundException;
+import ru.walkername.backend.chat.mapper.ChatMapper;
 import ru.walkername.backend.chat.repository.ChatParticipantRepository;
 import ru.walkername.backend.chat.repository.ChatRepository;
+import ru.walkername.backend.common.dto.PageResponse;
 import ru.walkername.backend.common.security.UserPrincipal;
 
 import java.time.Instant;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,10 +29,28 @@ public class ChatService {
 
     private final ChatRepository chatRepository;
     private final ChatParticipantRepository chatParticipantRepository;
+    private final ChatMapper chatMapper;
 
     public Chat findOne(Long chatId, Long userId) {
         return chatRepository.findOneByChatIdAndUserId(chatId, userId).orElseThrow(
                 () -> new ChatNotFoundException("Chat not found")
+        );
+    }
+
+    public PageResponse<ChatResponse> getChatsByUserId(Long userId, int page, int limit) {
+        Sort sorting = Sort.by(Sort.Direction.DESC, "lastMessageAt");
+        Pageable pageable = PageRequest.of(page, limit, sorting);
+
+        Page<Chat> chats = chatRepository.findByUserId(userId, pageable);
+
+        List<ChatResponse> content = chats.getContent().stream().map(chatMapper::toChatResponse).toList();
+
+        return new PageResponse<>(
+                content,
+                page,
+                limit,
+                chats.getTotalElements(),
+                chats.getTotalPages()
         );
     }
 
