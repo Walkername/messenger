@@ -1,0 +1,25 @@
+.chat-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    flex: 1; /* Добавьте это */
+    min-height: 0; /* Важно для правильной работы overflow */
+}
+
+.chat-sidebar {
+    border-right: 1px solid #e0e0e0;
+    background-color: #f5f5f5;
+    overflow-y: auto;
+}
+
+.chat-main {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}

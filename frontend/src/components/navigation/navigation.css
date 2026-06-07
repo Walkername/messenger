@@ -1,0 +1,46 @@
+.nav-bar {
+    width: 100%;
+    position: sticky;
+    top: 0;
+    background: white;
+    border-bottom: 1px solid #e9ecef;
+    z-index: 1000;
+}
+
+.nav-bar-content {
+    display: flex;
+    max-width: 1126px;
+    margin: 0 auto;
+    list-style-type: none;
+}
+
+.nav-bar-element {
+    padding: 0.6rem 10px;
+    cursor: pointer;
+    height: 100%;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: bold;
+    color: inherit;
+}
+
+.nav-bar-element:hover {
+    cursor: pointer;
+    background: #EAEBF1;
+}
+
+.nav-bar-auth-element {
+    padding: 0.6rem 10px;
+    cursor: pointer;
+    height: 100%;
+    text-decoration: none;
+    font-size: 15px;
+    color: inherit;
+
+    margin-left: auto;
+}
+
+.nav-bar-auth-element:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
