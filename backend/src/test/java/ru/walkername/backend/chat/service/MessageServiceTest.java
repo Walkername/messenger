@@ -140,34 +140,23 @@ public class MessageServiceTest {
         int page = 0;
         int limit = 10;
 
-        Message message1 = new Message();
-        message1.setId(1L);
-        Message message2 = new Message();
-        message2.setId(2L);
-        Message message3 = new Message();
-        message3.setId(3L);
-
         Chat existingChat = new Chat();
         existingChat.setId(chatId);
-        existingChat.setMessages(List.of(message1, message2, message3));
 
-        Page<Message> messages = new PageImpl<>(List.of(message1, message2, message3));
-        MessageResponse response1 = new MessageResponse(1L, chatId, 1L, "", Instant.now());
-        MessageResponse response2 = new MessageResponse(2L, chatId, 1L, "", Instant.now());
-        MessageResponse response3 = new MessageResponse(3L, chatId, 1L, "", Instant.now());
+        MessageResponse message1 = new MessageResponse(1L, chatId, 1L, 1L, "", "", Instant.now());
+        MessageResponse message2 = new MessageResponse(2L, chatId, 1L, 1L, "", "", Instant.now());
+        MessageResponse message3 = new MessageResponse(3L, chatId, 1L, 1L, "", "", Instant.now());
+        Page<MessageResponse> messages = new PageImpl<>(List.of(message1, message2, message3));
 
         when(chatRepository.findById(chatId)).thenReturn(Optional.of(existingChat));
         when(messageRepository.findMessagesByChat(eq(existingChat), any(Pageable.class))).thenReturn(messages);
-        when(messageMapper.toMessageResponse(message1)).thenReturn(response1);
-        when(messageMapper.toMessageResponse(message2)).thenReturn(response2);
-        when(messageMapper.toMessageResponse(message3)).thenReturn(response3);
 
         PageResponse<MessageResponse> result = messageService.findMessagesByChatId(chatId, page, limit);
 
         assertEquals(3, result.content().size());
-        assertEquals(response1.id(), result.content().getFirst().id());
-        assertEquals(response2.id(), result.content().get(1).id());
-        assertEquals(response3.id(), result.content().get(2).id());
+        assertEquals(message1.id(), result.content().getFirst().id());
+        assertEquals(message2.id(), result.content().get(1).id());
+        assertEquals(message3.id(), result.content().get(2).id());
 
         verify(chatRepository).findById(chatId);
     }

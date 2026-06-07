@@ -81,11 +81,10 @@ public class MessageService {
         Sort sorting = Sort.by(Sort.Direction.DESC, "sentAt");
         Pageable pageable = PageRequest.of(page, limit, sorting);
 
-        Page<Message> messages = messageRepository.findMessagesByChat(chat, pageable);
-        List<MessageResponse> content = messages.stream().map(messageMapper::toMessageResponse).toList();
+        Page<MessageResponse> messages = messageRepository.findMessagesByChat(chat, pageable);
 
         return new PageResponse<>(
-                content,
+                messages.getContent(),
                 page,
                 limit,
                 messages.getTotalElements(),

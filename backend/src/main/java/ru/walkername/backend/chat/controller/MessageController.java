@@ -43,7 +43,7 @@ public class MessageController {
     public ResponseEntity<PageResponse<MessageResponse>> getMessagesByChat(
             @PathVariable Long chatId,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "limit", defaultValue = "10") Integer limit
+            @RequestParam(value = "limit", defaultValue = "20") Integer limit
     ) {
         PageResponse<MessageResponse> messages = messageService.findMessagesByChatId(chatId, page, limit);
         return new ResponseEntity<>(messages, HttpStatus.OK);

@@ -3,13 +3,33 @@ package ru.walkername.backend.chat.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import ru.walkername.backend.chat.dto.MessageResponse;
 import ru.walkername.backend.chat.entity.Chat;
 import ru.walkername.backend.chat.entity.Message;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    Page<Message> findMessagesByChat(Chat chat, Pageable pageable);
+    @Query("""
+            SELECT new ru.walkername.backend.chat.dto.MessageResponse(
+                            m.id,
+                            m.chat.id,
+                            a.id,
+                            m.userId,
+                            u.firstName,
+                            m.content,
+                            m.sentAt
+                        ) 
+                        FROM Message m 
+                        JOIN User u
+                        ON m.userId = u.id
+                        JOIN Account a
+                        ON a.id = u.account.id
+                        where m.chat = :chat
+                        
+            """)
+    Page<MessageResponse> findMessagesByChat(Chat chat, Pageable pageable);
 
 }

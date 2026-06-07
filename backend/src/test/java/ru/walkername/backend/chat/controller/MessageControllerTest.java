@@ -86,7 +86,9 @@ public class MessageControllerTest extends BaseControllerTest {
         MessageResponse response = new MessageResponse(
                 savedMessage.getId(),
                 savedMessage.getChat().getId(),
+                userPrincipal.accountId(),
                 savedMessage.getUserId(),
+                "John",
                 savedMessage.getContent(),
                 savedMessage.getSentAt()
         );
@@ -154,7 +156,9 @@ public class MessageControllerTest extends BaseControllerTest {
         MessageResponse response1 = new MessageResponse(
                 1L,
                 chatId,
+                userPrincipal.accountId(),
                 1L,
+                "John",
                 "First message",
                 Instant.parse("2024-01-01T10:00:00Z")
         );
@@ -162,7 +166,9 @@ public class MessageControllerTest extends BaseControllerTest {
         MessageResponse response2 = new MessageResponse(
                 2L,
                 chatId,
+                userPrincipal.accountId(),
                 1L,
+                "John",
                 "Second message",
                 Instant.parse("2024-01-01T10:05:00Z")
         );
