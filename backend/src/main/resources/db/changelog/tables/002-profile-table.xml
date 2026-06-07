@@ -36,4 +36,8 @@
         </sql>
     </changeSet>
 
+    <changeSet id="003-remove-firstname-nullable-constraint" author="walkername">
+        <dropNotNullConstraint tableName="profile" columnName="first_name" />
+    </changeSet>
+
 </databaseChangeLog>

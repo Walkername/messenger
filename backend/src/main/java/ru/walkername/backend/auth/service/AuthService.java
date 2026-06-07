@@ -45,7 +45,6 @@ public class AuthService {
         Account createdAccount = authRepository.save(account);
 
         User user = new User();
-        user.setFirstName("User");
         user.setAccount(createdAccount);
         user.setCreatedAt(Instant.now());
         user.setUpdatedAt(Instant.now());
