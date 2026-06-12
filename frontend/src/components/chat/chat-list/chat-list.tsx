@@ -6,11 +6,11 @@ import './chat-list.css';
 
 interface ChatListProps {
     onSelectChat: (chatId: number) => void;
+    selectedChatId: number | null;
 }
 
-export default function ChatList({ onSelectChat }: ChatListProps) {
+export default function ChatList({ onSelectChat, selectedChatId }: ChatListProps) {
     const [chats, setChats] = useState<PageResponse<ChatResponse> | null>(null);
-    const [selectedId, setSelectedId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -24,7 +24,6 @@ export default function ChatList({ onSelectChat }: ChatListProps) {
     }, []);
 
     const handleSelectChat = (chatId: number) => {
-        setSelectedId(chatId);
         onSelectChat(chatId);
     };
 
@@ -87,7 +86,7 @@ export default function ChatList({ onSelectChat }: ChatListProps) {
                     chats?.content.map((chat) => (
                         <div
                             key={chat.id}
-                            className={`chat-item ${selectedId === chat.id ? 'active' : ''} ${getChatTypeClass(chat.type)}`}
+                            className={`chat-item ${selectedChatId === chat.id ? 'active' : ''} ${getChatTypeClass(chat.type)}`}
                             onClick={() => handleSelectChat(chat.id)}
                         >
                             <div className="chat-info">
