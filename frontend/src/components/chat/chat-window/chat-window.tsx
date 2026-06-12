@@ -11,6 +11,7 @@ import type { MessageRequest } from "../../../types/chat/message-request";
 import getClaimFromToken from "../../../utils/token-validation";
 import "./chat-window.css";
 import type { ChatResponse } from "../../../types/chat/chat-response";
+import { Client } from "@stomp/stompjs";
 
 interface ChatWindowProps {
     chatId: number;
@@ -19,6 +20,8 @@ interface ChatWindowProps {
 export default function ChatWindow({ chatId }: ChatWindowProps) {
     const token = localStorage.getItem("accessToken")!;
     const myUserId = parseInt(getClaimFromToken(token, "id"));
+
+    const stompRef = useRef<Client | null>(null);
 
     const [chat, setChat] = useState<ChatResponse>({
         id: 0,
@@ -112,6 +115,46 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
         textarea.style.height = "auto";
         textarea.style.height = `${textarea.scrollHeight}px`;
     };
+
+    useEffect(() => {
+        const stompClient = new Client({
+            brokerURL: import.meta.env.VITE_BACKEND_WEBSOCKET_URL,
+            connectHeaders: {
+                Authorization: `Bearer ${token}`,
+            },
+            reconnectDelay: 5000,
+            heartbeatIncoming: 10000,
+            heartbeatOutgoing: 10000,
+
+            onConnect: () => {
+                console.log("✅ WebSocket connected");
+
+                stompClient.subscribe(`/topic/chat/${chat.id}`, (msg) => {
+                    try {
+                        const received: MessageResponse = JSON.parse(msg.body);
+                        setMessages((prev) => ({
+                            ...prev,
+                            content: [...prev.content, received],
+                            totalElements: prev.totalElements + 1,
+                        }));
+                    } catch (e) {
+                        console.error("Message parse error:", e);
+                    }
+                });
+            },
+
+            onStompError: (frame) => {
+                console.error("❌ STOMP error:", frame.headers["message"]);
+            },
+        });
+
+        stompClient.activate();
+        stompRef.current = stompClient;
+
+        return () => {
+            stompClient.deactivate();
+        };
+    }, [chat?.id, token]);
 
     return (
         <div className="chat-window">
