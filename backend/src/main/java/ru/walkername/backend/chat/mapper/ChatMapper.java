@@ -12,4 +12,6 @@ public interface ChatMapper {
 
     ChatResponse toChatResponse(Chat chat);
 
+    ChatResponse toChatResponse(Chat chat, long participantsNumber);
+
 }

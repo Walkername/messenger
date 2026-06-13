@@ -8,7 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.walkername.backend.auth.entity.Account;
+import ru.walkername.backend.auth.exception.AccountNotFoundException;
+import ru.walkername.backend.auth.repository.AuthRepository;
 import ru.walkername.backend.chat.dto.ChatResponse;
+import ru.walkername.backend.chat.dto.ParticipantResponse;
 import ru.walkername.backend.chat.entity.Chat;
 import ru.walkername.backend.chat.entity.ChatParticipant;
 import ru.walkername.backend.chat.exception.ChatNotFoundException;
@@ -30,11 +34,18 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final ChatParticipantRepository chatParticipantRepository;
     private final ChatMapper chatMapper;
+    private final AuthRepository authRepository;
 
-    public Chat findOne(Long chatId, Long userId) {
-        return chatRepository.findOneByChatIdAndUserId(chatId, userId).orElseThrow(
+    public ChatResponse findOne(Long chatId, Long userId) {
+        Chat chat = chatRepository.findOneByChatIdAndUserId(chatId, userId).orElseThrow(
                 () -> new ChatNotFoundException("Chat not found")
         );
+
+        long participantsNumber = chatParticipantRepository.countByChatId(chatId);
+
+        ChatResponse response = chatMapper.toChatResponse(chat, participantsNumber);
+        System.out.println(response);
+        return response;
     }
 
     public PageResponse<ChatResponse> getChatsByUserId(Long userId, int page, int limit) {
@@ -54,6 +65,29 @@ public class ChatService {
         );
     }
 
+    public PageResponse<ParticipantResponse> getChatParticipants(Long chatId, UserPrincipal userPrincipal, int page, int limit) {
+        if (!canAccessChat(chatId, userPrincipal)) {
+            log.warn(
+                    "Getting chat participants attempt when user (accountID: {}) does not have access to chat with id {}",
+                    userPrincipal.accountId(), chatId
+            );
+            throw new ChatNotFoundException("Chat not found");
+        }
+
+        Sort sorting = Sort.by(Sort.Direction.DESC, "joinedAt");
+        Pageable pageable = PageRequest.of(page, limit, sorting);
+
+        Page<ParticipantResponse> participants = chatParticipantRepository.findByChatId(chatId, pageable);
+
+        return new PageResponse<>(
+                participants.getContent(),
+                page,
+                limit,
+                participants.getTotalElements(),
+                participants.getTotalPages()
+        );
+    }
+
     @Transactional
     public Chat save(Chat chat, Long ownerId) {
         chat.setCreatedAt(Instant.now());
@@ -66,9 +100,9 @@ public class ChatService {
         return savedChat;
     }
 
-    private void createChatParticipant(Long chatId, Long userId) {
+    private void createChatParticipant(Long chatId, Long accountId) {
         ChatParticipant chatParticipant = new ChatParticipant();
-        chatParticipant.setUserId(userId);
+        chatParticipant.setAccountId(accountId);
         chatParticipant.setChatId(chatId);
         chatParticipant.setJoinedAt(Instant.now());
         chatParticipantRepository.save(chatParticipant);
@@ -83,7 +117,7 @@ public class ChatService {
             return true;
         }
 
-        return chatParticipantRepository.existsByChatIdAndUserId(chatId, userPrincipal.accountId());
+        return chatParticipantRepository.existsByChatIdAndAccountId(chatId, userPrincipal.accountId());
     }
 
     @Transactional
@@ -110,6 +144,28 @@ public class ChatService {
         );
 
         chatRepository.delete(chat);
+    }
+
+    @Transactional
+    public void inviteByUsername(Long chatId, UserPrincipal inviterPrincipal, String invitedUsername) {
+        if (!chatRepository.existsById(chatId)) {
+            log.warn("Invite user attempt for non-existent chat with id {}", chatId);
+            throw new ChatNotFoundException("Chat not found");
+        }
+
+        if (!canAccessChat(chatId, inviterPrincipal)) {
+            log.warn("Invite user attempt when user (accountID: {}) does not have access to chat with id {}", inviterPrincipal.accountId(), chatId);
+            throw new ChatNotFoundException("Chat not found");
+        }
+
+        Account invitedAccount = authRepository.findByUsername(invitedUsername).orElseThrow(
+                () -> {
+                    log.warn("Invite user attempt for non-existent invited user with name {}", invitedUsername);
+                    throw new AccountNotFoundException("Invited user not found");
+                }
+        );
+
+        createChatParticipant(chatId, invitedAccount.getId());
     }
 
 }

@@ -17,8 +17,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
                             m.id,
                             m.chat.id,
                             a.id,
-                            m.userId,
-                            u.firstName,
+                            a.username,
                             m.content,
                             m.sentAt
                         ) 

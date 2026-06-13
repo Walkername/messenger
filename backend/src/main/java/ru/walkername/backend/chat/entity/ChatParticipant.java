@@ -26,7 +26,7 @@ public class ChatParticipant {
 
     private Long chatId;
 
-    private Long userId;
+    private Long accountId;
 
     private Instant joinedAt;
 

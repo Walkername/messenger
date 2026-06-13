@@ -7,7 +7,9 @@ import java.time.Instant;
 public record ChatResponse(
         Long id,
         String name,
+        Long ownerId,
         ChatType type,
+        Long participantsNumber,
         Instant createdAt,
         String lastMessage,
         Instant lastMessageAt

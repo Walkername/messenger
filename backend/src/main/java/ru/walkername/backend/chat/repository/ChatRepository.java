@@ -13,10 +13,10 @@ import java.util.Optional;
 @Repository
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 
-    @Query(value = "SELECT c FROM Chat c JOIN ChatParticipant cp ON c.id = cp.chatId WHERE c.id = :chatId AND cp.userId = :userId")
+    @Query(value = "SELECT c FROM Chat c JOIN ChatParticipant cp ON c.id = cp.chatId WHERE c.id = :chatId AND cp.accountId = :userId")
     Optional<Chat> findOneByChatIdAndUserId(Long chatId, Long userId);
 
-    @Query(value = "SELECT c FROM Chat c JOIN ChatParticipant cp ON c.id = cp.chatId WHERE cp.userId = :userId")
+    @Query(value = "SELECT c FROM Chat c JOIN ChatParticipant cp ON c.id = cp.chatId WHERE cp.accountId = :userId")
     Page<Chat> findByUserId(Long userId, Pageable pageable);
 
     @Query("update Chat c set c.lastMessage = :lastMessage where c.id = :id")

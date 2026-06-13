@@ -74,14 +74,16 @@ public class ChatControllerTest extends BaseControllerTest {
         ChatResponse response = new ChatResponse(
                 chat.getId(),
                 chat.getName(),
+                userPrincipal.accountId(),
                 chat.getType(),
+                0L,
                 chat.getCreatedAt(),
                 "",
                 chat.getCreatedAt()
         );
 
-        when(chatService.findOne(chatId, userPrincipal.accountId())).thenReturn(chat);
-        when(chatMapper.toChatResponse(chat)).thenReturn(response);
+        when(chatService.findOne(chatId, userPrincipal.accountId())).thenReturn(response);
+//        when(chatMapper.toChatResponse(chat, 0L)).thenReturn(response);
 
         mockMvc.perform(get("/chats/{chatId}", chatId))
                 .andExpect(status().isOk())
@@ -132,7 +134,9 @@ public class ChatControllerTest extends BaseControllerTest {
         ChatResponse response = new ChatResponse(
                 savedChat.getId(),
                 savedChat.getName(),
+                userPrincipal.accountId(),
                 savedChat.getType(),
+                0L,
                 savedChat.getCreatedAt(),
                 "",
                 savedChat.getCreatedAt()

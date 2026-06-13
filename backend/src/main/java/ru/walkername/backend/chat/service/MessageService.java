@@ -35,7 +35,6 @@ public class MessageService {
     private final SimpMessagingTemplate messagingTemplate;
 
     private final ChatService chatService;
-    private final MessageMapper messageMapper;
 
     @Transactional
     public Message send(Message message, Long chatId, UserPrincipal userPrincipal) {
@@ -57,7 +56,14 @@ public class MessageService {
         message.setSentAt(Instant.now());
         Message savedMessage = messageRepository.save(message);
 
-        MessageResponse messageResponse = messageMapper.toMessageResponse(savedMessage);
+        MessageResponse messageResponse = new MessageResponse(
+                savedMessage.getId(),
+                chat.getId(),
+                userPrincipal.accountId(),
+                userPrincipal.username(),
+                message.getContent(),
+                message.getSentAt()
+        );
 
         // Send to WebSocket
         messagingTemplate.convertAndSend(

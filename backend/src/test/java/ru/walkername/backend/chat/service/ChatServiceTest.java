@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.walkername.backend.chat.dto.ChatResponse;
 import ru.walkername.backend.chat.entity.Chat;
 import ru.walkername.backend.chat.entity.ChatType;
 import ru.walkername.backend.chat.exception.ChatNotFoundException;
@@ -56,13 +57,13 @@ public class ChatServiceTest {
         when(chatRepository.findOneByChatIdAndUserId(chatId, userId))
                 .thenReturn(Optional.of(chat));
 
-        Chat result = chatService.findOne(chatId, userId);
+        ChatResponse result = chatService.findOne(chatId, userId);
 
-        assertEquals(chatId, result.getId());
-        assertEquals(ownerId, result.getOwnerId());
-        assertEquals("Chat123", result.getName());
-        assertEquals(ChatType.PRIVATE, result.getType());
-        assertEquals(now.toString(), result.getCreatedAt().toString());
+        assertEquals(chatId, result.id());
+        assertEquals(ownerId, result.ownerId());
+        assertEquals("Chat123", result.name());
+        assertEquals(ChatType.PRIVATE, result.type());
+        assertEquals(now.toString(), result.createdAt().toString());
 
         verify(chatRepository).findOneByChatIdAndUserId(chatId, userId);
     }
@@ -134,7 +135,7 @@ public class ChatServiceTest {
         UserPrincipal userPrincipal = new UserPrincipal(5L, "walkername", "USER");
 
         when(chatRepository.existsById(chatId)).thenReturn(true);
-        when(chatParticipantRepository.existsByChatIdAndUserId(chatId, userPrincipal.accountId()))
+        when(chatParticipantRepository.existsByChatIdAndAccountId(chatId, userPrincipal.accountId()))
                 .thenReturn(true);
 
         boolean result = chatService.canAccessChat(chatId, userPrincipal);
@@ -142,7 +143,7 @@ public class ChatServiceTest {
         assertTrue(result);
 
         verify(chatRepository).existsById(chatId);
-        verify(chatParticipantRepository).existsByChatIdAndUserId(chatId, userPrincipal.accountId());
+        verify(chatParticipantRepository).existsByChatIdAndAccountId(chatId, userPrincipal.accountId());
     }
 
     @Test

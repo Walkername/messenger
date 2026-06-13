@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.walkername.backend.chat.dto.ChatRequest;
 import ru.walkername.backend.chat.dto.ChatResponse;
+import ru.walkername.backend.chat.dto.ParticipantResponse;
 import ru.walkername.backend.chat.entity.Chat;
 import ru.walkername.backend.chat.mapper.ChatMapper;
 import ru.walkername.backend.chat.service.ChatService;
@@ -42,9 +43,19 @@ public class ChatController {
             @PathVariable Long chatId,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        Chat chat = chatService.findOne(chatId, userPrincipal.accountId());
-        ChatResponse chatResponse = chatMapper.toChatResponse(chat);
-        return new ResponseEntity<>(chatResponse, HttpStatus.OK);
+        ChatResponse response = chatService.findOne(chatId, userPrincipal.accountId());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/{chatId}/participants")
+    public ResponseEntity<PageResponse<ParticipantResponse>> getParticipants(
+            @PathVariable Long chatId,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        PageResponse<ParticipantResponse> response = chatService.getChatParticipants(chatId, userPrincipal, page, limit);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping()
@@ -56,6 +67,16 @@ public class ChatController {
         Chat savedChat = chatService.save(chat, userPrincipal.accountId());
         ChatResponse chatResponse = chatMapper.toChatResponse(savedChat);
         return new ResponseEntity<>(chatResponse, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{id}/invite")
+    public ResponseEntity<HttpStatus> invite(
+            @PathVariable Long id,
+            @RequestParam String username,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        chatService.inviteByUsername(id, userPrincipal, username);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
 }

@@ -2,12 +2,12 @@ package ru.walkername.backend.chat.dto;
 
 import java.time.Instant;
 
-public record MessageResponse(
-        Long id,
+public record ParticipantResponse(
         Long chatId,
         Long accountId,
+        Long userId,
         String username,
-        String content,
-        Instant sentAt
+        String firstName,
+        Instant joinedAt
 ) {
 }
