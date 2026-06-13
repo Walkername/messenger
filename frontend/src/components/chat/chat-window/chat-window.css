@@ -8,15 +8,133 @@
 .chat-window-header {
     border-bottom: 1px solid #e9ecef;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    justify-content: space-between;
     padding: 0px 20px;
     background: white;
     flex-shrink: 0;
 }
+
+.chat-window-header-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
 .chat-window-header-name {
     font-size: 15px;
-    margin-bottom: 3px;
+    margin-bottom: 0px;
+}
+
+.chat-window-participants-number {
+    color: #adb5bd;
+    font-size: 13px;
+    margin: 0px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.chat-window-participants-number:hover {
+    text-decoration: underline;
+}
+
+.chat-window-participants-list-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: rgba(0, 0, 0, 0.3);
+
+    z-index: 1000;
+}
+
+.chat-window-participants-list {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    min-width: 400px;
+    max-width: 500px;
+    max-height: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: slideIn 0.3s ease-in-out;
+    text-align: start;
+    position: relative;
+    gap: 10px;
+}
+
+.chat-participant-card {
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.chat-participant-card-admin {
+    font-size: 11px;
+    font-weight: 600;
+    align-content: center;
+    color: #adb5bd;
+    text-decoration: underline;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    align-self: center;
+    padding: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chat-participant-card:hover {
+    background-color: #f8f9fa;
+}
+
+.chat-participant-card-personal {
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-participant-card-firstname {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.chat-participant-card-username {
+    font-size: 15px;
+    color: #adb5bd;
+}
+
+.chat-participant-card-joined-at {
+    align-content: center;
+    font-style: italic;
+    color: #adb5bd;
+    font-size: 11px;
+    position: relative;
+    cursor: help;
+}
+
+.chat-participant-card-joined-at:hover::after {
+    content: attr(data-full-date);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-30%) translateY(100%);
+    margin-bottom: 8px;
+    background-color: #333;
+    color: white;
+    font-size: 12px;
+    font-style: normal;
+    padding: 0px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
 }
 
 .chat-window-header-created-at {
@@ -46,6 +164,164 @@
     pointer-events: none;
 }
 
+.chat-window-header-functions {
+    display: flex;
+    align-items: center;
+}
+
+.chat-invite-button {
+    background-color: #f8f9fa;
+    border: none;
+    color: black;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.chat-invite-button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.chat-invite-modal-window-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: rgba(0, 0, 0, 0.3);
+
+    z-index: 1000;
+}
+
+.chat-invite-modal-window {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    min-width: 400px;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: slideIn 0.3s ease-in-out;
+    text-align: start;
+    position: relative;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    text-align: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.chat-invite-window-description {
+    font-size: 15px;
+}
+
+.chat-invite-username-label {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.chat-invite-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 10px;
+
+    gap: 10px;
+}
+
+.chat-invite-input {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    background: white;
+
+    flex-shrink: 0;
+
+    padding: 10px 20px;
+
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+
+    align-items: end;
+
+    font-size: 15px;
+
+    outline: none;
+}
+
+.chat-invite-submit-button {
+    border: none;
+    width: auto;
+    min-width: 100px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    font-size: 14px;
+    align-self: center;
+    transition: all 0.2s;
+}
+
+.chat-invite-submit-button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.invite-status {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.invite-status.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.invite-status.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
 .messages-container {
     flex: 1;
     overflow-y: auto;
@@ -72,6 +348,10 @@
 .message.own {
     margin-left: auto;
     background: #cce4ff;
+}
+
+.message.other {
+    background: #e3e3e3;
 }
 
 .message-owner {
@@ -115,7 +395,7 @@
 }
 
 .message.other .message-time:hover::after {
-    transform: translateX(80%) translateY(150%);
+    transform: translateX(-20%) translateY(150%);
 }
 
 .message.own .message-time:hover::after {

@@ -3,8 +3,7 @@ export type MessageResponse = {
     id: number;
     chatId: number;
     accountId: number;
-    userId: number;
-    firstName: string;
+    username: string;
     content: string;
     sentAt: string;
 };

@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import {
     getChat,
     getMessagesFromChat,
+    getParticipantsFromChat,
+    inviteUserToChat,
     sendMessageToChat,
 } from "../../../api/chat-api";
 import type { PageResponse } from "../../../types/common/page-response";
@@ -12,6 +14,7 @@ import getClaimFromToken from "../../../utils/token-validation";
 import "./chat-window.css";
 import type { ChatResponse } from "../../../types/chat/chat-response";
 import { Client } from "@stomp/stompjs";
+import type { ParticipantResponse } from "../../../types/chat/participant-response";
 
 interface ChatWindowProps {
     chatId: number;
@@ -19,14 +22,17 @@ interface ChatWindowProps {
 
 export default function ChatWindow({ chatId }: ChatWindowProps) {
     const token = localStorage.getItem("accessToken")!;
-    const myUserId = parseInt(getClaimFromToken(token, "id"));
+    const myAccountId = parseInt(getClaimFromToken(token, "id"));
+    console.log(myAccountId);
 
     const stompRef = useRef<Client | null>(null);
 
     const [chat, setChat] = useState<ChatResponse>({
         id: 0,
         name: "",
+        ownerId: 0,
         type: "",
+        participantsNumber: 0,
         lastMessage: "",
         lastMessageAt: "",
         createdAt: "",
@@ -90,11 +96,11 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
             content: newMessage,
         };
 
-        sendMessageToChat(chatId, message);
-
-        setNewMessage("");
-        getMessagesFromChat(chatId).then((data) => {
-            setMessages(data);
+        sendMessageToChat(chatId, message).then(() => {
+            setNewMessage("");
+            getMessagesFromChat(chatId).then((data) => {
+                setMessages(data);
+            });
         });
     };
 
@@ -134,7 +140,7 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
                         const received: MessageResponse = JSON.parse(msg.body);
                         setMessages((prev) => ({
                             ...prev,
-                            content: [...prev.content, received],
+                            content: [received, ...prev.content],
                             totalElements: prev.totalElements + 1,
                         }));
                     } catch (e) {
@@ -156,28 +162,221 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
         };
     }, [chat?.id, token]);
 
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages.content]);
+
+    const [inviteModalWindowVisibility, setInviteModalWindowVisibility] =
+        useState<boolean>(false);
+
+    const handleClickChatInviteButton = () => {
+        setInviteModalWindowVisibility(true);
+    };
+
+    const closeInviteModalWindow = () => {
+        setInviteModalWindowVisibility(false);
+        setInviteStatus("");
+    };
+
+    const [usernameToInvite, setUsernameToInvite] = useState("");
+    const [inviteStatus, setInviteStatus] = useState("");
+
+    const handleUsernameInviteChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+        const value = e.target.value;
+        setUsernameToInvite(value);
+    };
+
+    const handleChatInvite = (e: React.SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        inviteUserToChat(chatId, usernameToInvite)
+            .then((data) => {
+                if (data.ok) {
+                    setInviteStatus("User has been invited");
+                } else {
+                    setInviteStatus("Failed to invite user");
+                }
+
+                setUsernameToInvite("");
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    const [
+        participantsModalWindowVisibility,
+        setParticipantsModalWindowVisibility,
+    ] = useState<boolean>(false);
+
+    const [participants, setParticipants] =
+        useState<PageResponse<ParticipantResponse>>();
+
+    const handleClickParticipantsButton = () => {
+        getParticipantsFromChat(chatId).then((data) => {
+            setParticipants(data);
+        });
+
+        setParticipantsModalWindowVisibility(true);
+    };
+
+    const closeParticipantsModalWindow = () => {
+        setParticipantsModalWindowVisibility(false);
+    };
+
     return (
         <div className="chat-window">
             <div className="chat-window-header">
-                <h3 className="chat-window-header-name">{chat?.name}</h3>
-                <span
-                    className="chat-window-header-created-at"
-                    data-full-date={formatTimeLong(chat.createdAt)}
-                >
-                    Created: {formatTimeShort(chat?.createdAt)}
-                </span>
+                <div className="chat-window-header-info">
+                    <h3 className="chat-window-header-name">{chat.name}</h3>
+                    <span
+                        className="chat-window-participants-number"
+                        onClick={handleClickParticipantsButton}
+                    >
+                        {chat.participantsNumber} members
+                    </span>
+                    {participantsModalWindowVisibility && (
+                        <div
+                            className="chat-window-participants-list-container"
+                            onClick={closeParticipantsModalWindow}
+                        >
+                            <div
+                                className="chat-window-participants-list"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <button
+                                    type="button"
+                                    className="modal-close-btn"
+                                    onClick={closeParticipantsModalWindow}
+                                >
+                                    ×
+                                </button>
+                                {participants?.content.map(
+                                    (participant, index) => (
+                                        <div
+                                            className={`chat-participant-card`}
+                                            key={index}
+                                        >
+                                            <div className="chat-participant-card-personal">
+                                                <span className="chat-participant-card-firstname">
+                                                    {participant.firstName}
+                                                </span>
+                                                <span className="chat-participant-card-username">
+                                                    @{participant.username}
+                                                </span>
+                                            </div>
+                                            {participant.accountId ===
+                                                chat.ownerId && (
+                                                <span className="chat-participant-card-admin">Administrator</span>
+                                            )}
+                                            <span
+                                                className="chat-participant-card-joined-at"
+                                                data-full-date={formatTimeLong(
+                                                    participant.joinedAt,
+                                                )}
+                                            >
+                                                Joined at:{" "}
+                                                {formatTimeShort(
+                                                    participant.joinedAt,
+                                                )}
+                                            </span>
+                                        </div>
+                                    ),
+                                )}
+                            </div>
+                        </div>
+                    )}
+                    <span
+                        className="chat-window-header-created-at"
+                        data-full-date={formatTimeLong(chat.createdAt)}
+                    >
+                        Created: {formatTimeShort(chat.createdAt)}
+                    </span>
+                </div>
+                <div className="chat-window-header-functions">
+                    <button
+                        className="chat-invite-button"
+                        onClick={handleClickChatInviteButton}
+                    >
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M12 5v14M5 12h14"></path>
+                        </svg>
+                        Invite
+                    </button>
+                    {inviteModalWindowVisibility && (
+                        <div
+                            className="chat-invite-modal-window-container"
+                            onClick={closeInviteModalWindow}
+                        >
+                            <div
+                                className="chat-invite-modal-window"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <form
+                                    className="chat-invite-form"
+                                    onSubmit={handleChatInvite}
+                                >
+                                    <button
+                                        type="button"
+                                        className="modal-close-btn"
+                                        onClick={closeInviteModalWindow}
+                                    >
+                                        ×
+                                    </button>
+                                    <span className="chat-invite-window-description">
+                                        You can invite someone to the chat:
+                                    </span>
+                                    <label className="chat-invite-username-label">
+                                        Username:
+                                    </label>
+                                    <input
+                                        className="chat-invite-input"
+                                        value={usernameToInvite}
+                                        onChange={handleUsernameInviteChange}
+                                        type="text"
+                                        required
+                                        placeholder="Username"
+                                    />
+                                    <input
+                                        className="chat-invite-submit-button"
+                                        type="submit"
+                                        value="Invite"
+                                    />
+                                    {inviteStatus && (
+                                        <div
+                                            className={`invite-status ${inviteStatus.includes("Failed") ? "error" : "success"}`}
+                                        >
+                                            {inviteStatus}
+                                        </div>
+                                    )}
+                                </form>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
             <div className="messages-container">
+                <div ref={messagesEndRef} />
                 {messages.content.map((msg) => (
                     <div
                         key={msg.id}
-                        className={`message ${msg.accountId === myUserId ? "own" : "other"}`}
+                        className={`message ${msg.accountId === myAccountId ? "own" : "other"}`}
                     >
                         <div
                             className="message-owner"
-                            hidden={msg.accountId === myUserId ? true : false}
+                            hidden={
+                                msg.accountId === myAccountId ? true : false
+                            }
                         >
-                            {msg.firstName}
+                            {msg.username}
                         </div>
                         <div className="message-content">{msg.content}</div>
                         <div
@@ -188,7 +387,6 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
                         </div>
                     </div>
                 ))}
-                <div ref={messagesEndRef} />
             </div>
             <form className="message-input-section" onSubmit={sendMessage}>
                 <div className="message-input-container">

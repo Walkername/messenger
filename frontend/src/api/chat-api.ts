@@ -2,6 +2,7 @@ import type { ChatResponse } from "../types/chat/chat-response";
 import type { CreateChatRequest } from "../types/chat/create-chat-request";
 import type { MessageRequest } from "../types/chat/message-request";
 import type { MessageResponse } from "../types/chat/message-response";
+import type { ParticipantResponse } from "../types/chat/participant-response";
 import type { PageResponse } from "../types/common/page-response";
 import customRequest from "./custom-request";
 
@@ -70,4 +71,27 @@ export const sendMessageToChat = async (chatId: number, request: MessageRequest)
         },
     );
     return await response.json() as MessageResponse;
+};
+
+export const inviteUserToChat = async (chatId: number, username: string) => {
+    const response = await customRequest(
+        `${import.meta.env.VITE_BACKEND_URL}/chats/${chatId}/invite?username=${username}`,
+        {
+            method: "POST",
+        },
+    );
+    return response;
+};
+
+export const getParticipantsFromChat = async (chatId: number): Promise<PageResponse<ParticipantResponse>> => {
+    const response = await customRequest(
+        `${import.meta.env.VITE_BACKEND_URL}/chats/${chatId}/participants`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        },
+    );
+    return await response.json() as PageResponse<ParticipantResponse>;
 };
