@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.walkername.backend.chat.entity.Chat;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Repository
@@ -19,8 +20,8 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     @Query(value = "SELECT c FROM Chat c JOIN ChatParticipant cp ON c.id = cp.chatId WHERE cp.accountId = :userId")
     Page<Chat> findByUserId(Long userId, Pageable pageable);
 
-    @Query("update Chat c set c.lastMessage = :lastMessage where c.id = :id")
+    @Query("update Chat c set c.lastMessage = :lastMessage, c.lastMessageAt = :lastMessageAt where c.id = :id")
     @Modifying
-    void updateLastMessageById(Long id, String lastMessage);
+    void updateLastMessageById(Long id, String lastMessage, Instant lastMessageAt);
 
 }

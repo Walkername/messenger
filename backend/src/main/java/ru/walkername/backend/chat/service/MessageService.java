@@ -13,14 +13,12 @@ import ru.walkername.backend.chat.dto.MessageResponse;
 import ru.walkername.backend.chat.entity.Chat;
 import ru.walkername.backend.chat.entity.Message;
 import ru.walkername.backend.chat.exception.ChatNotFoundException;
-import ru.walkername.backend.chat.mapper.MessageMapper;
 import ru.walkername.backend.chat.repository.ChatRepository;
 import ru.walkername.backend.chat.repository.MessageRepository;
 import ru.walkername.backend.common.dto.PageResponse;
 import ru.walkername.backend.common.security.UserPrincipal;
 
 import java.time.Instant;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -53,7 +51,8 @@ public class MessageService {
 
         message.setUserId(userPrincipal.accountId());
         message.setChat(chat);
-        message.setSentAt(Instant.now());
+        Instant now = Instant.now();
+        message.setSentAt(now);
         Message savedMessage = messageRepository.save(message);
 
         MessageResponse messageResponse = new MessageResponse(
@@ -71,7 +70,7 @@ public class MessageService {
                 messageResponse
         );
 
-        chatRepository.updateLastMessageById(chatId, message.getContent());
+        chatRepository.updateLastMessageById(chatId, message.getContent(), now);
 
         return savedMessage;
     }
