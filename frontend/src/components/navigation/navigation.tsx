@@ -10,7 +10,7 @@ export default function Navigation() {
         <nav className="nav-bar">
             <ul className="nav-bar-content">
                 <Link className="nav-bar-element" to="/">
-                    Home
+                    Messenger
                 </Link>
                 <Link className="nav-bar-element" to="/profile">
                     Profile

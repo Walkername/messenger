@@ -35,12 +35,12 @@ export default function ChatList({ onSelectChat, selectedChatId }: ChatListProps
         const diffHours = Math.floor(diffMs / 3600000);
         const diffDays = Math.floor(diffMs / 86400000);
 
-        if (diffMins < 1) return 'Только что';
-        if (diffMins < 60) return `${diffMins} мин`;
-        if (diffHours < 24) return `${diffHours} ч`;
-        if (diffDays === 1) return 'Вчера';
-        if (diffDays < 7) return `${diffDays} дн`;
-        return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+        if (diffMins < 1) return 'Now';
+        if (diffMins < 60) return `${diffMins} min`;
+        if (diffHours < 24) return `${diffHours} h`;
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} d`;
+        return date.toLocaleDateString('en-EN', { day: 'numeric', month: 'short' });
     };
 
     const getChatTypeClass = (type: string) => {
@@ -72,15 +72,14 @@ export default function ChatList({ onSelectChat, selectedChatId }: ChatListProps
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M12 5v14M5 12h14" />
                     </svg>
-                    Новый чат
+                    Create new chat
                 </button>
             </div>
             <div className="chat-items">
                 {chats?.content.length === 0 ? (
                     <div className="no-chats">
                         <div className="no-chats-icon">💬</div>
-                        <p>У вас пока нет чатов</p>
-                        <button className="start-chat-btn">Начать чат</button>
+                        <p>You don't have any chats yet</p>
                     </div>
                 ) : (
                     chats?.content.map((chat) => (
@@ -93,8 +92,8 @@ export default function ChatList({ onSelectChat, selectedChatId }: ChatListProps
                                 <div className="chat-info-header">
                                     <div className="chat-name">
                                         {chat.name}
-                                        {chat.type === 'group' && <span className="group-badge">Группа</span>}
-                                        {chat.type === 'channel' && <span className="channel-badge">Канал</span>}
+                                        {chat.type === 'PRIVATE' && <span className="group-badge">PRIVATE</span>}
+                                        {chat.type === 'GROUP' && <span className="channel-badge">GROUP</span>}
                                     </div>
                                     <div className="chat-time">
                                         {formatTime(chat.lastMessageAt || chat.createdAt)}
@@ -104,7 +103,7 @@ export default function ChatList({ onSelectChat, selectedChatId }: ChatListProps
                                     {chat.lastMessage ? (
                                         <>
                                             <span className="message-preview">{chat.lastMessage}</span>
-                                            {!chat.lastMessage && <span className="no-messages">Нет сообщений</span>}
+                                            {!chat.lastMessage && <span className="no-messages">No messages</span>}
                                         </>
                                     ) : (
                                         <span className="no-messages">Создан {new Date(chat.createdAt).toLocaleDateString('ru-RU')}</span>

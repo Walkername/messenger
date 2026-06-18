@@ -1,0 +1,81 @@
+.chat-window-participants-list {
+    background: white;
+    border-radius: 12px;
+    min-width: 400px;
+    max-width: 500px;
+    max-height: 500px;
+    animation: slideIn 0.3s ease-in-out;
+    text-align: start;
+    position: relative;
+    gap: 10px;
+}
+
+.chat-participant-card {
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.chat-participant-card-admin {
+    font-size: 11px;
+    font-weight: 600;
+    align-content: center;
+    color: #adb5bd;
+    text-decoration: underline;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    align-self: center;
+    padding: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chat-participant-card:hover {
+    background-color: #f8f9fa;
+}
+
+.chat-participant-card-personal {
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-participant-card-firstname {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.chat-participant-card-username {
+    font-size: 15px;
+    color: #adb5bd;
+}
+
+.chat-participant-card-joined-at {
+    align-content: center;
+    font-style: italic;
+    color: #adb5bd;
+    font-size: 11px;
+    position: relative;
+    cursor: help;
+}
+
+.chat-participant-card-joined-at:hover::after {
+    content: attr(data-full-date);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-45%) translateY(100%);
+    margin-bottom: 8px;
+    background-color: #333;
+    color: white;
+    font-size: 12px;
+    font-style: normal;
+    padding: 0px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+}

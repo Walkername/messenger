@@ -1,9 +1,9 @@
-import "./chat-layout.css";
-import ChatList from "../chat-list/chat-list";
-import ChatWindow from "../chat-window/chat-window";
+import ChatList from "../../components/chat/chat-list/chat-list";
+import ChatWindow from "../../components/chat/chat-window/chat-window";
+import "./messenger-page.css";
 import { useNavigate, useParams } from "react-router-dom";
 
-export default function ChatLayout() {
+export default function MessengerPage() {
     const { id } = useParams();
 
     const navigate = useNavigate();

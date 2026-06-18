@@ -1,0 +1,84 @@
+.chat-window-header {
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 20px;
+    background: white;
+    flex-shrink: 0;
+}
+
+.chat-window-header-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.chat-window-header-name {
+    font-size: 15px;
+    margin-bottom: 0px;
+}
+
+.chat-window-participants-number {
+    color: #adb5bd;
+    font-size: 13px;
+    margin: 0px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.chat-window-participants-number:hover {
+    text-decoration: underline;
+}
+
+.chat-window-header-created-at {
+    font-style: italic;
+    color: #adb5bd;
+    font-size: 11px;
+    position: relative;
+    cursor: help;
+}
+
+.chat-window-header-created-at:hover::after {
+    content: attr(data-full-date);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateY(100%);
+    margin-bottom: 8px;
+    background-color: #333;
+    color: white;
+    font-size: 12px;
+    font-style: normal;
+    padding: 0px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+}
+
+.chat-window-header-functions {
+    display: flex;
+    align-items: center;
+}
+
+.chat-invite-button {
+    background-color: #f8f9fa;
+    border: none;
+    color: black;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.chat-invite-button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
