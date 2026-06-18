@@ -16,6 +16,7 @@ import ru.walkername.backend.chat.dto.ParticipantResponse;
 import ru.walkername.backend.chat.entity.Chat;
 import ru.walkername.backend.chat.entity.ChatParticipant;
 import ru.walkername.backend.chat.exception.ChatNotFoundException;
+import ru.walkername.backend.chat.exception.ChatParticipantAlreadyExistsException;
 import ru.walkername.backend.chat.mapper.ChatMapper;
 import ru.walkername.backend.chat.repository.ChatParticipantRepository;
 import ru.walkername.backend.chat.repository.ChatRepository;
@@ -101,6 +102,10 @@ public class ChatService {
     }
 
     private void createChatParticipant(Long chatId, Long accountId) {
+        if (chatParticipantRepository.existsByChatIdAndAccountId(chatId, accountId)) {
+            throw new ChatParticipantAlreadyExistsException("This user is already a member of the chat");
+        }
+
         ChatParticipant chatParticipant = new ChatParticipant();
         chatParticipant.setAccountId(accountId);
         chatParticipant.setChatId(chatId);
@@ -161,7 +166,7 @@ public class ChatService {
         Account invitedAccount = authRepository.findByUsername(invitedUsername).orElseThrow(
                 () -> {
                     log.warn("Invite user attempt for non-existent invited user with name {}", invitedUsername);
-                    throw new AccountNotFoundException("Invited user not found");
+                    return new AccountNotFoundException("Invited user not found");
                 }
         );
 
