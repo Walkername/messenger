@@ -1,8 +1,14 @@
-import { useEffect, useRef, type Dispatch, type SetStateAction } from "react";
+import {
+    useEffect,
+    useRef,
+    type Dispatch,
+    type SetStateAction,
+} from "react";
 import getClaimFromToken from "../../../utils/token-validation";
 import {
     formatMessageTimeShort,
     formatTimeLong,
+    formatTimeMonthDay,
 } from "../../../utils/validation-time";
 import { getMessagesFromChat } from "../../../api/chat-api";
 import type { PageResponse } from "../../../types/common/page-response";
@@ -35,27 +41,60 @@ export default function MessagesList({
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages.content]);
 
+    const groupMessagesByDay = () => {
+        const groups: {
+            date: string;
+            messages: MessageResponse[];
+        }[] = [];
+
+        messages.content.forEach((msg) => {
+            const msgDate = new Date(msg.sentAt);
+            const dateKey = msgDate.toDateString();
+
+            const lastGroup = groups[groups.length - 1];
+            if (lastGroup && lastGroup.date === dateKey) {
+                lastGroup.messages.push(msg);
+            } else {
+                groups.push({ date: dateKey, messages: [msg] });
+            }
+        });
+
+        return groups;
+    };
+
+    const groupedMessages = groupMessagesByDay();
+    
     return (
         <div className="messages-container">
             <div ref={messagesEndRef} />
-            {messages.content.map((msg) => (
-                <div
-                    key={msg.id}
-                    className={`message ${msg.accountId === myAccountId ? "own" : "other"}`}
-                >
-                    <div
-                        className="message-owner"
-                        hidden={msg.accountId === myAccountId ? true : false}
-                    >
-                        {msg.username}
+            {groupedMessages.map((group, groupIndex) => (
+                <div key={groupIndex}>
+                    <div className="date-divider">
+                        <span className="date-divider-text">
+                            {formatTimeMonthDay(group.date)}
+                        </span>
                     </div>
-                    <div className="message-content">{msg.content}</div>
-                    <div
-                        className="message-time"
-                        data-full-date={formatTimeLong(msg.sentAt)}
-                    >
-                        {formatMessageTimeShort(msg.sentAt)}
-                    </div>
+
+                    {group.messages.toReversed().map((msg) => (
+                        <div
+                            key={msg.id}
+                            className={`message ${msg.accountId === myAccountId ? "own" : "other"}`}
+                        >
+                            <div
+                                className="message-owner"
+                                hidden={msg.accountId === myAccountId}
+                            >
+                                {msg.username}
+                            </div>
+                            <div className="message-content">{msg.content}</div>
+                            <div
+                                className="message-time"
+                                data-full-date={formatTimeLong(msg.sentAt)}
+                            >
+                                {formatMessageTimeShort(msg.sentAt)}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             ))}
         </div>

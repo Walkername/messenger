@@ -77,3 +77,12 @@
 .message.own .message-time:hover::after {
     transform: translateX(-80%) translateY(150%);
 }
+
+.date-divider-text {
+    font-size: 15px;
+    color: #9da4ab;
+
+    padding: 5px 14px;
+    border-radius: 12px;
+    background-color: white;
+}

@@ -8,6 +8,14 @@ export const formatTimeShort = (dateString: string) => {
     });
 };
 
+export const formatTimeMonthDay = (dateString: string) => {
+    const dateObj: Date = new Date(dateString);
+    return dateObj.toLocaleString("en-US", {
+        month: "long",
+        day: "numeric",
+    });
+};
+
 export const formatMessageTimeShort = (dateString: string) => {
     const dateObj: Date = new Date(dateString);
     return dateObj.toLocaleString("en-US", {
