@@ -34,7 +34,7 @@ public class ChatController {
             @RequestParam(value = "limit", defaultValue = "10") Integer limit,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        PageResponse<ChatResponse> response = chatService.getChatsByUserId(userPrincipal.accountId(), page, limit);
+        PageResponse<ChatResponse> response = chatService.getChatsByAccountId(userPrincipal.accountId(), page, limit);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

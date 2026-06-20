@@ -11,47 +11,47 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.walkername.backend.common.security.UserPrincipal;
+import ru.walkername.backend.user.dto.ProfileResponse;
 import ru.walkername.backend.user.dto.UpdateFirstNameRequest;
-import ru.walkername.backend.user.dto.UserResponse;
-import ru.walkername.backend.user.entity.User;
-import ru.walkername.backend.user.mapper.UserMapper;
-import ru.walkername.backend.user.service.UserService;
+import ru.walkername.backend.user.entity.Profile;
+import ru.walkername.backend.user.mapper.ProfileMapper;
+import ru.walkername.backend.user.service.ProfileService;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
-public class UserController {
+public class ProfileController {
 
-    private final UserService userService;
-    private final UserMapper userMapper;
+    private final ProfileService profileService;
+    private final ProfileMapper profileMapper;
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> get(
+    public ResponseEntity<ProfileResponse> get(
             @PathVariable Long id
     ) {
-        User user = userService.findOne(id);
-        UserResponse userResponse = userMapper.toUserResponse(user);
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        Profile profile = profileService.findOne(id);
+        ProfileResponse profileResponse = profileMapper.toProfileResponse(profile);
+        return new ResponseEntity<>(profileResponse, HttpStatus.OK);
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getMe(
+    public ResponseEntity<ProfileResponse> getMe(
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        User user = userService.findByAccountId(userPrincipal.accountId());
-        UserResponse userResponse = userMapper.toUserResponse(user);
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        Profile profile = profileService.findByAccountId(userPrincipal.accountId());
+        ProfileResponse profileResponse = profileMapper.toProfileResponse(profile);
+        return new ResponseEntity<>(profileResponse, HttpStatus.OK);
     }
 
     @PatchMapping("/me/firstname")
-    public ResponseEntity<UserResponse> updateMyFirstName(
+    public ResponseEntity<ProfileResponse> updateMyFirstName(
             @RequestBody UpdateFirstNameRequest request,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         String newFirstName = request.firstName();
-        User user = userService.updateFirstName(userPrincipal.accountId(), newFirstName);
-        UserResponse userResponse = userMapper.toUserResponse(user);
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        Profile profile = profileService.updateFirstName(userPrincipal.accountId(), newFirstName);
+        ProfileResponse profileResponse = profileMapper.toProfileResponse(profile);
+        return new ResponseEntity<>(profileResponse, HttpStatus.OK);
     }
 
 }

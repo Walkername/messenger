@@ -27,4 +27,8 @@
 
     </changeSet>
 
+    <changeSet id="002-change-user_id-on-account_id" author="walkername">
+        <renameColumn tableName="message" oldColumnName="user_id" newColumnName="account_id" />
+    </changeSet>
+
 </databaseChangeLog>

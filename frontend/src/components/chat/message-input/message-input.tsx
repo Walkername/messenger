@@ -1,16 +1,13 @@
-import { useRef, useState, type Dispatch, type SetStateAction } from "react";
+import { useRef, useState } from "react";
 import type { MessageRequest } from "../../../types/chat/message-request";
-import { getMessagesFromChat, sendMessageToChat } from "../../../api/chat-api";
-import type { MessageResponse } from "../../../types/chat/message-response";
-import type { PageResponse } from "../../../types/common/page-response";
+import { sendMessageToChat } from "../../../api/chat-api";
 import "./message-input.css";
 
 interface MessageInputProps {
     chatId: number;
-    setMessages: Dispatch<SetStateAction<PageResponse<MessageResponse>>>;
 }
 
-export default function MessageInput({ chatId, setMessages }: MessageInputProps) {
+export default function MessageInput({ chatId }: MessageInputProps) {
     const [newMessage, setNewMessage] = useState("");
 
     const sendMessage = async (e: React.FormEvent) => {
@@ -23,9 +20,6 @@ export default function MessageInput({ chatId, setMessages }: MessageInputProps)
 
         sendMessageToChat(chatId, message).then(() => {
             setNewMessage("");
-            getMessagesFromChat(chatId).then((data) => {
-                setMessages(data);
-            });
         });
     };
 
@@ -49,7 +43,7 @@ export default function MessageInput({ chatId, setMessages }: MessageInputProps)
 
     const handleEnterSubmit = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault(); // Предотвращает перенос строки
+            e.preventDefault();
             sendMessage(e as unknown as React.FormEvent);
         }
     };

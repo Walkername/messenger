@@ -4,6 +4,7 @@ import MessagesList from "../messages-list/messages-list";
 import type { PageResponse } from "../../../types/common/page-response";
 import type { MessageResponse } from "../../../types/chat/message-response";
 import { Client } from "@stomp/stompjs";
+import { getMessagesFromChat } from "../../../api/chat-api";
 
 interface MessagesSectionProps {
     chatId: number;
@@ -19,6 +20,12 @@ export default function MessagesSection({ chatId }: MessagesSectionProps) {
         totalElements: 0,
         totalPages: 0,
     });
+
+    useEffect(() => {
+        getMessagesFromChat(chatId).then((data) => {
+            setMessages(data);
+        });
+    }, [chatId]);
 
     const stompRef = useRef<Client | null>(null);
 
@@ -65,11 +72,9 @@ export default function MessagesSection({ chatId }: MessagesSectionProps) {
     return (
         <>
             <MessagesList
-                chatId={chatId}
                 messages={messages}
-                setMessages={setMessages}
             />
-            <MessageInput chatId={chatId} setMessages={setMessages} />
+            <MessageInput chatId={chatId} />
         </>
     );
 }

@@ -34,9 +34,8 @@ public class MessageController {
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         Message message = messageMapper.toMessage(messageRequest);
-        Message savedMessage = messageService.send(message, chatId, userPrincipal);
-        MessageResponse messageResponse = messageMapper.toMessageResponse(savedMessage);
-        return new ResponseEntity<>(messageResponse, HttpStatus.CREATED);
+        MessageResponse response = messageService.send(message, chatId, userPrincipal);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping()

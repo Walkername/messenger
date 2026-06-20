@@ -14,12 +14,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.walkername.backend.common.controller.BaseControllerTest;
 import ru.walkername.backend.common.security.JWTFilter;
 import ru.walkername.backend.common.security.UserPrincipal;
+import ru.walkername.backend.user.dto.ProfileResponse;
 import ru.walkername.backend.user.dto.UpdateFirstNameRequest;
-import ru.walkername.backend.user.dto.UserResponse;
-import ru.walkername.backend.user.entity.User;
-import ru.walkername.backend.user.exception.UserNotFoundException;
-import ru.walkername.backend.user.mapper.UserMapper;
-import ru.walkername.backend.user.service.UserService;
+import ru.walkername.backend.user.entity.Profile;
+import ru.walkername.backend.user.exception.ProfileNotFoundException;
+import ru.walkername.backend.user.mapper.ProfileMapper;
+import ru.walkername.backend.user.service.ProfileService;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(
-        controllers = UserController.class,
+        controllers = ProfileController.class,
         excludeFilters = {
                 @ComponentScan.Filter(
                         type = FilterType.ASSIGNABLE_TYPE,
@@ -39,16 +39,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 )
         })
 @AutoConfigureMockMvc(addFilters = false)
-public class UserControllerTest extends BaseControllerTest {
+public class ProfileControllerTest extends BaseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
-    private UserService userService;
+    private ProfileService profileService;
 
     @MockitoBean
-    private UserMapper userMapper;
+    private ProfileMapper profileMapper;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -65,21 +65,21 @@ public class UserControllerTest extends BaseControllerTest {
     public void shouldReturnUserResponseByGet() throws Exception {
         Long id = 1L;
 
-        User user = new User();
-        user.setId(id);
-        user.setFirstName("Michael");
-        user.setCreatedAt(Instant.now());
-        user.setUpdatedAt(Instant.now());
+        Profile profile = new Profile();
+        profile.setId(id);
+        profile.setFirstName("Michael");
+        profile.setCreatedAt(Instant.now());
+        profile.setUpdatedAt(Instant.now());
 
-        UserResponse response = new UserResponse(
-                user.getId(),
-                user.getFirstName(),
-                user.getCreatedAt(),
-                user.getUpdatedAt()
+        ProfileResponse response = new ProfileResponse(
+                profile.getId(),
+                profile.getFirstName(),
+                profile.getCreatedAt(),
+                profile.getUpdatedAt()
         );
 
-        when(userService.findOne(id)).thenReturn(user);
-        when(userMapper.toUserResponse(user)).thenReturn(response);
+        when(profileService.findOne(id)).thenReturn(profile);
+        when(profileMapper.toProfileResponse(profile)).thenReturn(response);
 
         mockMvc.perform(get("/users/{id}", id))
                 .andExpect(status().isOk())
@@ -96,10 +96,10 @@ public class UserControllerTest extends BaseControllerTest {
     public void shouldReturnErrorResponseForUserNotFoundByGet() throws Exception {
         Long id = 1L;
 
-        User user = new User();
-        user.setId(id);
+        Profile profile = new Profile();
+        profile.setId(id);
 
-        when(userService.findOne(id)).thenThrow(new UserNotFoundException("User with such id not found"));
+        when(profileService.findOne(id)).thenThrow(new ProfileNotFoundException("User with such id not found"));
 
         mockMvc.perform(get("/users/{id}", 1))
                 .andExpect(status().isNotFound())
@@ -117,21 +117,21 @@ public class UserControllerTest extends BaseControllerTest {
         String newFirstName = "Johny";
         UpdateFirstNameRequest request = new UpdateFirstNameRequest(newFirstName);
 
-        User user = new User();
-        user.setId(id);
-        user.setFirstName(newFirstName);
-        user.setCreatedAt(Instant.now());
-        user.setUpdatedAt(Instant.now());
+        Profile profile = new Profile();
+        profile.setId(id);
+        profile.setFirstName(newFirstName);
+        profile.setCreatedAt(Instant.now());
+        profile.setUpdatedAt(Instant.now());
 
-        UserResponse response = new UserResponse(
-                user.getId(),
-                user.getFirstName(),
-                user.getCreatedAt(),
-                user.getUpdatedAt()
+        ProfileResponse response = new ProfileResponse(
+                profile.getId(),
+                profile.getFirstName(),
+                profile.getCreatedAt(),
+                profile.getUpdatedAt()
         );
 
-        when(userService.updateFirstName(userPrincipal.accountId(), newFirstName)).thenReturn(user);
-        when(userMapper.toUserResponse(user)).thenReturn(response);
+        when(profileService.updateFirstName(userPrincipal.accountId(), newFirstName)).thenReturn(profile);
+        when(profileMapper.toProfileResponse(profile)).thenReturn(response);
 
         mockMvc.perform(
                         patch("/users/me/firstname")
@@ -154,12 +154,12 @@ public class UserControllerTest extends BaseControllerTest {
         String newFirstName = "Johny";
         UpdateFirstNameRequest request = new UpdateFirstNameRequest(newFirstName);
 
-        User user = new User();
-        user.setId(id);
-        user.setFirstName(newFirstName);
+        Profile profile = new Profile();
+        profile.setId(id);
+        profile.setFirstName(newFirstName);
 
-        when(userService.updateFirstName(userPrincipal.accountId(), newFirstName)).thenThrow(
-                new UserNotFoundException("User with such id not found")
+        when(profileService.updateFirstName(userPrincipal.accountId(), newFirstName)).thenThrow(
+                new ProfileNotFoundException("User with such id not found")
         );
 
         mockMvc.perform(

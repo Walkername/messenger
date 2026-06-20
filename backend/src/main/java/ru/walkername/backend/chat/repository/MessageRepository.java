@@ -20,14 +20,11 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
                             a.username,
                             m.content,
                             m.sentAt
-                        ) 
-                        FROM Message m 
-                        JOIN User u
-                        ON m.userId = u.id
+                        )
+                        FROM Message m
                         JOIN Account a
-                        ON a.id = u.account.id
+                        ON a.id = m.accountId
                         where m.chat = :chat
-                        
             """)
     Page<MessageResponse> findMessagesByChat(Chat chat, Pageable pageable);
 
