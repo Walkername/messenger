@@ -94,9 +94,9 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             DecodedJWT jwt = tokenService.validateAccessToken(token);
             String role = jwt.getClaim("role").asString();
             String username = jwt.getClaim("username").asString();
-            Long userId = jwt.getClaim("id").asLong();
+            Long accountId = jwt.getClaim("id").asLong();
 
-            UserPrincipal userPrincipal = new UserPrincipal(userId, username, role);
+            UserPrincipal userPrincipal = new UserPrincipal(accountId, username, role);
 
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                     userPrincipal,

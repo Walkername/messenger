@@ -14,8 +14,8 @@ import ru.walkername.backend.chat.exception.ChatNotFoundException;
 import ru.walkername.backend.chat.exception.ChatParticipantAlreadyExistsException;
 import ru.walkername.backend.common.dto.ErrorResponse;
 import ru.walkername.backend.common.dto.ValidationErrorResponse;
-import ru.walkername.backend.user.exception.UserExistsException;
-import ru.walkername.backend.user.exception.UserNotFoundException;
+import ru.walkername.backend.user.exception.ProfileExistsException;
+import ru.walkername.backend.user.exception.ProfileNotFoundException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleException(UserExistsException ex) {
+    public ResponseEntity<ErrorResponse> handleException(ProfileExistsException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 System.currentTimeMillis()
@@ -106,7 +106,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleException(UserNotFoundException ex) {
+    public ResponseEntity<ErrorResponse> handleException(ProfileNotFoundException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 System.currentTimeMillis()

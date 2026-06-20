@@ -56,4 +56,8 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="005-rename-owner_id-column" author="walkername">
+        <renameColumn tableName="chat" oldColumnName="owner_id" newColumnName="owner_account_id" />
+    </changeSet>
+
 </databaseChangeLog>

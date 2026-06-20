@@ -5,7 +5,7 @@ import java.time.Instant;
 public record ParticipantResponse(
         Long chatId,
         Long accountId,
-        Long userId,
+        Long profileId,
         String username,
         String firstName,
         Instant joinedAt

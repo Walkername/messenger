@@ -32,8 +32,8 @@ public class Message {
     @JsonBackReference
     private Chat chat;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "account_id")
+    private Long accountId;
 
     @Column(name = "content")
     private String content;

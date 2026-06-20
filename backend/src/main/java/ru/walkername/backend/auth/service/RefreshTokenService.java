@@ -64,22 +64,22 @@ public class RefreshTokenService {
     private Long validateRefreshToken(String rawRefreshToken) {
         try {
             DecodedJWT jwt = tokenService.validateRefreshToken(rawRefreshToken);
-            Long userId = jwt.getClaim("id").asLong();
+            Long accountId = jwt.getClaim("id").asLong();
 
-            Optional<RefreshToken> refreshToken = refreshTokenRepository.findByAccountId(userId);
+            Optional<RefreshToken> refreshToken = refreshTokenRepository.findByAccountId(accountId);
             if (refreshToken.isEmpty()) {
-                log.warn("Not such refresh token by accountId: {}",  userId);
+                log.warn("Not such refresh token by accountId: {}",  accountId);
                 throw new InvalidRefreshTokenException("Invalid refresh token");
             }
 
             RefreshToken existingRefreshToken = refreshToken.get();
             String existingRefreshTokenHash = existingRefreshToken.getTokenHash();
             if (!tokenService.verifyToken(rawRefreshToken, existingRefreshTokenHash)) {
-                log.warn("Mismatch between the refresh token from the database and the request by accountId: {}",  userId);
+                log.warn("Mismatch between the refresh token from the database and the request by accountId: {}",  accountId);
                 throw new InvalidRefreshTokenException("Invalid refresh token");
             }
 
-            return userId;
+            return accountId;
         } catch (JWTVerificationException e) {
             throw new InvalidRefreshTokenException("Invalid refresh token");
         }

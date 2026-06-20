@@ -78,7 +78,7 @@ public class MessageControllerTest extends BaseControllerTest {
         Message savedMessage = new Message();
         savedMessage.setId(2L);
         savedMessage.setChat(chat);
-        savedMessage.setUserId(userPrincipal.accountId());
+        savedMessage.setAccountId(userPrincipal.accountId());
         savedMessage.setContent(message.getContent());
         Instant now = Instant.now();
         savedMessage.setSentAt(now);
@@ -87,15 +87,13 @@ public class MessageControllerTest extends BaseControllerTest {
                 savedMessage.getId(),
                 savedMessage.getChat().getId(),
                 userPrincipal.accountId(),
-                savedMessage.getUserId(),
                 "John",
                 savedMessage.getContent(),
                 savedMessage.getSentAt()
         );
 
         when(messageMapper.toMessage(request)).thenReturn(message);
-        when(messageService.send(message, chatId, userPrincipal)).thenReturn(savedMessage);
-        when(messageMapper.toMessageResponse(savedMessage)).thenReturn(response);
+        when(messageService.send(message, chatId, userPrincipal)).thenReturn(response);
 
         mockMvc.perform(
                         post("/chats/{chatId}/messages", chatId)
@@ -124,7 +122,7 @@ public class MessageControllerTest extends BaseControllerTest {
         Message savedMessage = new Message();
         savedMessage.setId(2L);
         savedMessage.setChat(chat);
-        savedMessage.setUserId(userPrincipal.accountId());
+        savedMessage.setAccountId(userPrincipal.accountId());
         savedMessage.setContent(message.getContent());
         Instant now = Instant.now();
         savedMessage.setSentAt(now);
@@ -157,7 +155,6 @@ public class MessageControllerTest extends BaseControllerTest {
                 1L,
                 chatId,
                 userPrincipal.accountId(),
-                1L,
                 "John",
                 "First message",
                 Instant.parse("2024-01-01T10:00:00Z")
@@ -167,7 +164,6 @@ public class MessageControllerTest extends BaseControllerTest {
                 2L,
                 chatId,
                 userPrincipal.accountId(),
-                1L,
                 "John",
                 "Second message",
                 Instant.parse("2024-01-01T10:05:00Z")

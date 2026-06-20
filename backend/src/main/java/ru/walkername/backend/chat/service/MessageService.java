@@ -35,7 +35,7 @@ public class MessageService {
     private final ChatService chatService;
 
     @Transactional
-    public Message send(Message message, Long chatId, UserPrincipal userPrincipal) {
+    public MessageResponse send(Message message, Long chatId, UserPrincipal userPrincipal) {
         Chat chat = chatRepository.findById(chatId).orElseThrow(
                 () -> {
                     log.warn("Send message attempt for non-existent chat with id {}", chatId);
@@ -49,7 +49,7 @@ public class MessageService {
             throw new ChatNotFoundException("Chat not found");
         }
 
-        message.setUserId(userPrincipal.accountId());
+        message.setAccountId(userPrincipal.accountId());
         message.setChat(chat);
         Instant now = Instant.now();
         message.setSentAt(now);
@@ -72,7 +72,7 @@ public class MessageService {
 
         chatRepository.updateLastMessageById(chatId, message.getContent(), now);
 
-        return savedMessage;
+        return messageResponse;
     }
 
     public PageResponse<MessageResponse> findMessagesByChatId(Long chatId, int page, int limit) {

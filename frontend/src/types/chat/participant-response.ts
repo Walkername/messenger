@@ -2,7 +2,7 @@
 export type ParticipantResponse = {
     chatId: number;
     accountId: number;
-    userId: number;
+    profileId: number;
     username: string;
     firstName: string;
     joinedAt: string;

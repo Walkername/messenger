@@ -10,6 +10,7 @@ import ru.walkername.backend.chat.dto.ChatResponse;
 import ru.walkername.backend.chat.entity.Chat;
 import ru.walkername.backend.chat.entity.ChatType;
 import ru.walkername.backend.chat.exception.ChatNotFoundException;
+import ru.walkername.backend.chat.mapper.ChatMapper;
 import ru.walkername.backend.chat.repository.ChatParticipantRepository;
 import ru.walkername.backend.chat.repository.ChatRepository;
 import ru.walkername.backend.common.security.UserPrincipal;
@@ -34,6 +35,9 @@ public class ChatServiceTest {
     private ChatRepository chatRepository;
 
     @Mock
+    private ChatMapper chatMapper;
+
+    @Mock
     private ChatParticipantRepository chatParticipantRepository;
 
     @InjectMocks
@@ -43,49 +47,66 @@ public class ChatServiceTest {
     @DisplayName("findOne: should return chat entity")
     public void shouldReturnChatByFindOne() {
         Long chatId = 1L;
-        Long userId = 5L;
+        Long accountId = 5L;
         Long ownerId = 10L;
+        long participantsNumber = 3;
 
         Chat chat = new Chat();
         chat.setId(chatId);
-        chat.setOwnerId(ownerId);
+        chat.setOwnerAccountId(ownerId);
         chat.setName("Chat123");
         chat.setType(ChatType.PRIVATE);
         Instant now = Instant.now();
         chat.setCreatedAt(now);
+        chat.setLastMessage("Hello");
+        chat.setLastMessageAt(now);
 
-        when(chatRepository.findOneByChatIdAndUserId(chatId, userId))
+        ChatResponse response = new ChatResponse(
+                chatId,
+                chat.getName(),
+                ownerId,
+                chat.getType(),
+                participantsNumber,
+                chat.getCreatedAt(),
+                chat.getLastMessage(),
+                chat.getLastMessageAt()
+        );
+
+        when(chatRepository.findOneByChatIdAndAccountId(chatId, accountId))
                 .thenReturn(Optional.of(chat));
+        when(chatParticipantRepository.countByChatId(chatId)).thenReturn(participantsNumber);
+        when(chatMapper.toChatResponse(chat, participantsNumber)).thenReturn(response);
 
-        ChatResponse result = chatService.findOne(chatId, userId);
+        ChatResponse result = chatService.findOne(chatId, accountId);
 
         assertEquals(chatId, result.id());
-        assertEquals(ownerId, result.ownerId());
+        assertEquals(ownerId, result.ownerAccountId());
         assertEquals("Chat123", result.name());
         assertEquals(ChatType.PRIVATE, result.type());
         assertEquals(now.toString(), result.createdAt().toString());
 
-        verify(chatRepository).findOneByChatIdAndUserId(chatId, userId);
+        verify(chatRepository).findOneByChatIdAndAccountId(chatId, accountId);
+        verify(chatMapper).toChatResponse(chat, participantsNumber);
     }
 
     @Test
     @DisplayName("findOne: should throw exception for chat not found")
     public void shouldThrowExceptionForChatNotFoundByFindOne() {
         Long chatId = 1L;
-        Long userId = 5L;
+        Long accountId = 5L;
 
         Chat chat = new Chat();
         chat.setId(chatId);
 
-        when(chatRepository.findOneByChatIdAndUserId(chatId, userId))
+        when(chatRepository.findOneByChatIdAndAccountId(chatId, accountId))
                 .thenReturn(Optional.empty());
 
         assertThrows(
                 ChatNotFoundException.class,
-                () -> chatService.findOne(chatId, userId)
+                () -> chatService.findOne(chatId, accountId)
         );
 
-        verify(chatRepository).findOneByChatIdAndUserId(chatId, userId);
+        verify(chatRepository).findOneByChatIdAndAccountId(chatId, accountId);
     }
 
     @Test
@@ -106,7 +127,7 @@ public class ChatServiceTest {
         chat.setId(chatId);
 
         assertEquals(chatId, result.getId());
-        assertEquals(ownerId, result.getOwnerId());
+        assertEquals(ownerId, result.getOwnerAccountId());
         assertEquals(name, result.getName());
         assertEquals(type, result.getType());
 

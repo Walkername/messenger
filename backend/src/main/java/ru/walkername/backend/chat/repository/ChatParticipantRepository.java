@@ -19,16 +19,16 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             SELECT new ru.walkername.backend.chat.dto.ParticipantResponse(
                 cp.id,
                 a.id,
-                u.id,
+                p.id,
                 a.username,
-                u.firstName,
+                p.firstName,
                 cp.joinedAt
             )
             FROM ChatParticipant cp
             JOIN Account a
             ON cp.accountId = a.id
-            JOIN User u
-            ON a.id = u.account.id
+            JOIN Profile p
+            ON a.id = p.account.id
             WHERE cp.chatId = :chatId
             """)
     Page<ParticipantResponse> findByChatId(Long chatId, Pageable pageable);

@@ -13,8 +13,8 @@ import ru.walkername.backend.auth.exception.AccountExistsException;
 import ru.walkername.backend.auth.exception.InvalidCredentialsException;
 import ru.walkername.backend.auth.repository.AuthRepository;
 import ru.walkername.backend.common.security.TokenService;
-import ru.walkername.backend.user.entity.User;
-import ru.walkername.backend.user.service.UserService;
+import ru.walkername.backend.user.entity.Profile;
+import ru.walkername.backend.user.service.ProfileService;
 
 import java.time.Instant;
 
@@ -24,7 +24,7 @@ import java.time.Instant;
 public class AuthService {
 
     private final AuthRepository authRepository;
-    private final UserService userService;
+    private final ProfileService profileService;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
     private final RefreshTokenService refreshTokenService;
@@ -44,11 +44,11 @@ public class AuthService {
         );
         Account createdAccount = authRepository.save(account);
 
-        User user = new User();
-        user.setAccount(createdAccount);
-        user.setCreatedAt(Instant.now());
-        user.setUpdatedAt(Instant.now());
-        userService.save(user);
+        Profile profile = new Profile();
+        profile.setAccount(createdAccount);
+        profile.setCreatedAt(Instant.now());
+        profile.setUpdatedAt(Instant.now());
+        profileService.save(profile);
 
         log.debug("Account registered successfully: {}", account.getUsername());
 

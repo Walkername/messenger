@@ -13,7 +13,7 @@ import ru.walkername.backend.auth.exception.AccountExistsException;
 import ru.walkername.backend.auth.exception.InvalidCredentialsException;
 import ru.walkername.backend.auth.repository.AuthRepository;
 import ru.walkername.backend.common.security.TokenService;
-import ru.walkername.backend.user.service.UserService;
+import ru.walkername.backend.user.service.ProfileService;
 
 import java.security.SecureRandom;
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class AuthServiceTest {
     private RefreshTokenService refreshTokenService;
 
     @Mock
-    private UserService userService;
+    private ProfileService profileService;
 
     @Mock
     private PasswordEncoder passwordEncoder;

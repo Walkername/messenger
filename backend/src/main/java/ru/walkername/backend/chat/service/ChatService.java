@@ -37,23 +37,21 @@ public class ChatService {
     private final ChatMapper chatMapper;
     private final AuthRepository authRepository;
 
-    public ChatResponse findOne(Long chatId, Long userId) {
-        Chat chat = chatRepository.findOneByChatIdAndUserId(chatId, userId).orElseThrow(
+    public ChatResponse findOne(Long chatId, Long accountId) {
+        Chat chat = chatRepository.findOneByChatIdAndAccountId(chatId, accountId).orElseThrow(
                 () -> new ChatNotFoundException("Chat not found")
         );
 
         long participantsNumber = chatParticipantRepository.countByChatId(chatId);
 
-        ChatResponse response = chatMapper.toChatResponse(chat, participantsNumber);
-        System.out.println(response);
-        return response;
+        return chatMapper.toChatResponse(chat, participantsNumber);
     }
 
-    public PageResponse<ChatResponse> getChatsByUserId(Long userId, int page, int limit) {
+    public PageResponse<ChatResponse> getChatsByAccountId(Long accountId, int page, int limit) {
         Sort sorting = Sort.by(Sort.Direction.DESC, "lastMessageAt");
         Pageable pageable = PageRequest.of(page, limit, sorting);
 
-        Page<Chat> chats = chatRepository.findByUserId(userId, pageable);
+        Page<Chat> chats = chatRepository.findByAccountId(accountId, pageable);
 
         List<ChatResponse> content = chats.getContent().stream().map(chatMapper::toChatResponse).toList();
 
@@ -93,7 +91,7 @@ public class ChatService {
     public Chat save(Chat chat, Long ownerId) {
         chat.setCreatedAt(Instant.now());
         chat.setLastMessageAt(Instant.now());
-        chat.setOwnerId(ownerId);
+        chat.setOwnerAccountId(ownerId);
         Chat savedChat = chatRepository.save(chat);
 
         createChatParticipant(savedChat.getId(), ownerId);

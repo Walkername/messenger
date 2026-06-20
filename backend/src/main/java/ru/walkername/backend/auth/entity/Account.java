@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.walkername.backend.user.entity.User;
+import ru.walkername.backend.user.entity.Profile;
 
 import java.time.Instant;
 
@@ -39,7 +39,7 @@ public class Account {
     private AccountRole role;
 
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
-    private User user;
+    private Profile profile;
 
     private Instant createdAt;
 

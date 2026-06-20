@@ -28,8 +28,8 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "owner_id")
-    private Long ownerId;
+    @Column(name = "owner_account_id")
+    private Long ownerAccountId;
 
     @Column(name = "name")
     private String name;
