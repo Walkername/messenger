@@ -5,21 +5,21 @@ import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    
+
     const [request, setRequest] = useState<AuthRequest>({
         username: "",
         password: "",
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = e.target;
+        const { name, value } = e.target;
         setRequest((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleLoginFormSubmit = (e) => {
+    const handleLoginFormSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log(request);
-        login(request).then((data) => {
+        login(request).then(() => {
             navigate("/");
         });
     };

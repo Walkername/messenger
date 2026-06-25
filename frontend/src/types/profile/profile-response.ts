@@ -1,6 +1,8 @@
 
 export type ProfileResponse = {
-    id: number;
+    accountId: number;
+    profileId: number;
+    username: string;
     firstName: string;
     createdAt: string;
     updatedAt: string;

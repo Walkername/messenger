@@ -9,19 +9,18 @@ export default function RegisterPage() {
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = e.target;
+        const { name, value } = e.target;
         setRequest((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleRegisterFormSubmit = (e) => {
+    const handleRegisterFormSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        register(request)
-            .then((data) => {
-                console.log(data);
-            })
+        register(request).then((data) => {
+            console.log(data);
+        });
     };
-    
+
     return (
         <>
             <h1>Register</h1>
@@ -46,7 +45,9 @@ export default function RegisterPage() {
                 />
                 <br></br>
 
-                <label htmlFor="password-confirmation">Password confirmation:</label>
+                <label htmlFor="password-confirmation">
+                    Password confirmation:
+                </label>
                 <br></br>
                 <input
                     id="password-confirmation"
