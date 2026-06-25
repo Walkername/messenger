@@ -1,9 +1,11 @@
-package ru.walkername.backend.user.dto;
+package ru.walkername.backend.profile.dto;
 
 import java.time.Instant;
 
 public record ProfileResponse(
-        Long id,
+        Long accountId,
+        Long profileId,
+        String username,
         String firstName,
         Instant createdAt,
         Instant updatedAt

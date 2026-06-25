@@ -12,12 +12,13 @@ import ru.walkername.backend.auth.entity.Account;
 import ru.walkername.backend.auth.exception.AccountNotFoundException;
 import ru.walkername.backend.auth.repository.AuthRepository;
 import ru.walkername.backend.chat.dto.ChatResponse;
-import ru.walkername.backend.chat.dto.ParticipantResponse;
+import ru.walkername.backend.chat.dto.ChatParticipantResponse;
 import ru.walkername.backend.chat.entity.Chat;
 import ru.walkername.backend.chat.entity.ChatParticipant;
 import ru.walkername.backend.chat.exception.ChatNotFoundException;
 import ru.walkername.backend.chat.exception.ChatParticipantAlreadyExistsException;
 import ru.walkername.backend.chat.mapper.ChatMapper;
+import ru.walkername.backend.chat.mapper.ChatParticipantMapper;
 import ru.walkername.backend.chat.repository.ChatParticipantRepository;
 import ru.walkername.backend.chat.repository.ChatRepository;
 import ru.walkername.backend.common.dto.PageResponse;
@@ -36,6 +37,7 @@ public class ChatService {
     private final ChatParticipantRepository chatParticipantRepository;
     private final ChatMapper chatMapper;
     private final AuthRepository authRepository;
+    private final ChatParticipantMapper chatParticipantMapper;
 
     public ChatResponse findOne(Long chatId, Long accountId) {
         Chat chat = chatRepository.findOneByChatIdAndAccountId(chatId, accountId).orElseThrow(
@@ -64,7 +66,7 @@ public class ChatService {
         );
     }
 
-    public PageResponse<ParticipantResponse> getChatParticipants(Long chatId, UserPrincipal userPrincipal, int page, int limit) {
+    public PageResponse<ChatParticipantResponse> getChatParticipants(Long chatId, UserPrincipal userPrincipal, int page, int limit) {
         if (!canAccessChat(chatId, userPrincipal)) {
             log.warn(
                     "Getting chat participants attempt when user (accountID: {}) does not have access to chat with id {}",
@@ -76,7 +78,8 @@ public class ChatService {
         Sort sorting = Sort.by(Sort.Direction.DESC, "joinedAt");
         Pageable pageable = PageRequest.of(page, limit, sorting);
 
-        Page<ParticipantResponse> participants = chatParticipantRepository.findByChatId(chatId, pageable);
+        Page<ChatParticipantResponse> participants = chatParticipantRepository.findByChatId(chatId, pageable)
+                .map(chatParticipantMapper::toChatParticipantResponse);
 
         return new PageResponse<>(
                 participants.getContent(),

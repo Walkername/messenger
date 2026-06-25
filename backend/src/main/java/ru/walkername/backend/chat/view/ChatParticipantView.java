@@ -1,8 +1,8 @@
-package ru.walkername.backend.chat.dto;
+package ru.walkername.backend.chat.view;
 
 import java.time.Instant;
 
-public record ParticipantResponse(
+public record ChatParticipantView(
         Long chatId,
         Long accountId,
         Long profileId,

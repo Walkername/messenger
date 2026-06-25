@@ -13,6 +13,7 @@ import ru.walkername.backend.chat.dto.MessageResponse;
 import ru.walkername.backend.chat.entity.Chat;
 import ru.walkername.backend.chat.entity.Message;
 import ru.walkername.backend.chat.exception.ChatNotFoundException;
+import ru.walkername.backend.chat.mapper.MessageMapper;
 import ru.walkername.backend.chat.repository.ChatRepository;
 import ru.walkername.backend.chat.repository.MessageRepository;
 import ru.walkername.backend.common.dto.PageResponse;
@@ -33,6 +34,7 @@ public class MessageService {
     private final SimpMessagingTemplate messagingTemplate;
 
     private final ChatService chatService;
+    private final MessageMapper messageMapper;
 
     @Transactional
     public MessageResponse send(Message message, Long chatId, UserPrincipal userPrincipal) {
@@ -86,7 +88,7 @@ public class MessageService {
         Sort sorting = Sort.by(Sort.Direction.DESC, "sentAt");
         Pageable pageable = PageRequest.of(page, limit, sorting);
 
-        Page<MessageResponse> messages = messageRepository.findMessagesByChat(chat, pageable);
+        Page<MessageResponse> messages = messageRepository.findMessagesByChat(chat, pageable).map(messageMapper::toMessageResponse);
 
         return new PageResponse<>(
                 messages.getContent(),

@@ -1,4 +1,4 @@
-package ru.walkername.backend.user.entity;
+package ru.walkername.backend.profile.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

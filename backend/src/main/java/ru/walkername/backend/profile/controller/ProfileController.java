@@ -1,4 +1,4 @@
-package ru.walkername.backend.user.controller;
+package ru.walkername.backend.profile.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,20 +10,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.walkername.backend.auth.service.AuthService;
 import ru.walkername.backend.common.security.UserPrincipal;
-import ru.walkername.backend.user.dto.ProfileResponse;
-import ru.walkername.backend.user.dto.UpdateFirstNameRequest;
-import ru.walkername.backend.user.entity.Profile;
-import ru.walkername.backend.user.mapper.ProfileMapper;
-import ru.walkername.backend.user.service.ProfileService;
+import ru.walkername.backend.profile.dto.ProfileResponse;
+import ru.walkername.backend.profile.dto.UpdateFirstNameRequest;
+import ru.walkername.backend.profile.dto.UpdateUsernameRequest;
+import ru.walkername.backend.profile.entity.Profile;
+import ru.walkername.backend.profile.mapper.ProfileMapper;
+import ru.walkername.backend.profile.view.ProfileView;
+import ru.walkername.backend.profile.service.ProfileService;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/profiles")
 public class ProfileController {
 
     private final ProfileService profileService;
     private final ProfileMapper profileMapper;
+    private final AuthService authService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ProfileResponse> get(
@@ -38,9 +42,9 @@ public class ProfileController {
     public ResponseEntity<ProfileResponse> getMe(
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        Profile profile = profileService.findByAccountId(userPrincipal.accountId());
-        ProfileResponse profileResponse = profileMapper.toProfileResponse(profile);
-        return new ResponseEntity<>(profileResponse, HttpStatus.OK);
+        ProfileView view = profileService.getFullInfoByAccountId(userPrincipal.accountId());
+        ProfileResponse response = profileMapper.toProfileResponse(view);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PatchMapping("/me/firstname")
@@ -49,9 +53,20 @@ public class ProfileController {
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         String newFirstName = request.firstName();
-        Profile profile = profileService.updateFirstName(userPrincipal.accountId(), newFirstName);
-        ProfileResponse profileResponse = profileMapper.toProfileResponse(profile);
-        return new ResponseEntity<>(profileResponse, HttpStatus.OK);
+        ProfileView view = profileService.updateFirstName(userPrincipal.accountId(), newFirstName);
+        ProfileResponse response = profileMapper.toProfileResponse(view);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PatchMapping("/me/username")
+    public ResponseEntity<ProfileResponse> updateMyUsername(
+            @RequestBody UpdateUsernameRequest request,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        String newUsername = request.username();
+        ProfileView view = authService.updateUsername(userPrincipal.accountId(), newUsername);
+        ProfileResponse response = profileMapper.toProfileResponse(view);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

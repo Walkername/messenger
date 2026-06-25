@@ -1,4 +1,4 @@
-package ru.walkername.backend.user.exception;
+package ru.walkername.backend.profile.exception;
 
 public class ProfileNotFoundException extends RuntimeException {
     public ProfileNotFoundException(String message) {

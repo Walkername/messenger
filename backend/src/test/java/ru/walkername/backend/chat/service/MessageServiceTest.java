@@ -17,6 +17,7 @@ import ru.walkername.backend.chat.exception.ChatNotFoundException;
 import ru.walkername.backend.chat.mapper.MessageMapper;
 import ru.walkername.backend.chat.repository.ChatRepository;
 import ru.walkername.backend.chat.repository.MessageRepository;
+import ru.walkername.backend.chat.view.MessageView;
 import ru.walkername.backend.common.dto.PageResponse;
 import ru.walkername.backend.common.security.UserPrincipal;
 
@@ -143,13 +144,20 @@ public class MessageServiceTest {
         Chat existingChat = new Chat();
         existingChat.setId(chatId);
 
-        MessageResponse message1 = new MessageResponse(1L, chatId, 1L, "", "", Instant.now());
-        MessageResponse message2 = new MessageResponse(2L, chatId, 1L, "", "", Instant.now());
-        MessageResponse message3 = new MessageResponse(3L, chatId, 1L, "", "", Instant.now());
-        Page<MessageResponse> messages = new PageImpl<>(List.of(message1, message2, message3));
+        MessageView message1 = new MessageView(1L, chatId, 1L, "", "", Instant.now());
+        MessageView message2 = new MessageView(2L, chatId, 1L, "", "", Instant.now());
+        MessageView message3 = new MessageView(3L, chatId, 1L, "", "", Instant.now());
+        Page<MessageView> messages = new PageImpl<>(List.of(message1, message2, message3));
+
+        MessageResponse response1 = new MessageResponse(1L, chatId, 1L, "", "", Instant.now());
+        MessageResponse response2 = new MessageResponse(2L, chatId, 1L, "", "", Instant.now());
+        MessageResponse response3 = new MessageResponse(3L, chatId, 1L, "", "", Instant.now());
 
         when(chatRepository.findById(chatId)).thenReturn(Optional.of(existingChat));
         when(messageRepository.findMessagesByChat(eq(existingChat), any(Pageable.class))).thenReturn(messages);
+        when(messageMapper.toMessageResponse(message1)).thenReturn(response1);
+        when(messageMapper.toMessageResponse(message2)).thenReturn(response2);
+        when(messageMapper.toMessageResponse(message3)).thenReturn(response3);
 
         PageResponse<MessageResponse> result = messageService.findMessagesByChatId(chatId, page, limit);
 

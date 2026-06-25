@@ -1,4 +1,4 @@
-package ru.walkername.backend.user.controller;
+package ru.walkername.backend.profile.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,15 +11,17 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.walkername.backend.auth.service.AuthService;
 import ru.walkername.backend.common.controller.BaseControllerTest;
 import ru.walkername.backend.common.security.JWTFilter;
 import ru.walkername.backend.common.security.UserPrincipal;
-import ru.walkername.backend.user.dto.ProfileResponse;
-import ru.walkername.backend.user.dto.UpdateFirstNameRequest;
-import ru.walkername.backend.user.entity.Profile;
-import ru.walkername.backend.user.exception.ProfileNotFoundException;
-import ru.walkername.backend.user.mapper.ProfileMapper;
-import ru.walkername.backend.user.service.ProfileService;
+import ru.walkername.backend.profile.dto.ProfileResponse;
+import ru.walkername.backend.profile.dto.UpdateFirstNameRequest;
+import ru.walkername.backend.profile.entity.Profile;
+import ru.walkername.backend.profile.exception.ProfileNotFoundException;
+import ru.walkername.backend.profile.mapper.ProfileMapper;
+import ru.walkername.backend.profile.service.ProfileService;
+import ru.walkername.backend.profile.view.ProfileView;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
@@ -50,6 +52,9 @@ public class ProfileControllerTest extends BaseControllerTest {
     @MockitoBean
     private ProfileMapper profileMapper;
 
+    @MockitoBean
+    private AuthService authService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -72,7 +77,9 @@ public class ProfileControllerTest extends BaseControllerTest {
         profile.setUpdatedAt(Instant.now());
 
         ProfileResponse response = new ProfileResponse(
+                userPrincipal.accountId(),
                 profile.getId(),
+                "",
                 profile.getFirstName(),
                 profile.getCreatedAt(),
                 profile.getUpdatedAt()
@@ -81,10 +88,10 @@ public class ProfileControllerTest extends BaseControllerTest {
         when(profileService.findOne(id)).thenReturn(profile);
         when(profileMapper.toProfileResponse(profile)).thenReturn(response);
 
-        mockMvc.perform(get("/users/{id}", id))
+        mockMvc.perform(get("/profiles/{id}", id))
                 .andExpect(status().isOk())
                 .andExpectAll(
-                        jsonPath("$.id").value(id),
+                        jsonPath("$.accountId").value(response.accountId()),
                         jsonPath("$.firstName").value(response.firstName()),
                         jsonPath("$.createdAt").value(response.createdAt().toString()),
                         jsonPath("$.updatedAt").value(response.updatedAt().toString())
@@ -101,7 +108,7 @@ public class ProfileControllerTest extends BaseControllerTest {
 
         when(profileService.findOne(id)).thenThrow(new ProfileNotFoundException("User with such id not found"));
 
-        mockMvc.perform(get("/users/{id}", 1))
+        mockMvc.perform(get("/profiles/{id}", 1))
                 .andExpect(status().isNotFound())
                 .andExpectAll(
                         jsonPath("$.message")
@@ -117,30 +124,35 @@ public class ProfileControllerTest extends BaseControllerTest {
         String newFirstName = "Johny";
         UpdateFirstNameRequest request = new UpdateFirstNameRequest(newFirstName);
 
-        Profile profile = new Profile();
-        profile.setId(id);
-        profile.setFirstName(newFirstName);
-        profile.setCreatedAt(Instant.now());
-        profile.setUpdatedAt(Instant.now());
+        ProfileView profile = new ProfileView(
+                userPrincipal.accountId(),
+                id,
+                userPrincipal.username(),
+                newFirstName,
+                Instant.now(),
+                Instant.now()
+        );
 
         ProfileResponse response = new ProfileResponse(
-                profile.getId(),
-                profile.getFirstName(),
-                profile.getCreatedAt(),
-                profile.getUpdatedAt()
+                profile.accountId(),
+                profile.profileId(),
+                "",
+                profile.firstName(),
+                profile.createdAt(),
+                profile.updatedAt()
         );
 
         when(profileService.updateFirstName(userPrincipal.accountId(), newFirstName)).thenReturn(profile);
         when(profileMapper.toProfileResponse(profile)).thenReturn(response);
 
         mockMvc.perform(
-                        patch("/users/me/firstname")
+                        patch("/profiles/me/firstname")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isOk())
                 .andExpectAll(
-                        jsonPath("$.id").value(id),
+                        jsonPath("$.accountId").value(response.accountId()),
                         jsonPath("$.firstName").value(response.firstName()),
                         jsonPath("$.createdAt").value(response.createdAt().toString()),
                         jsonPath("$.updatedAt").value(response.updatedAt().toString())
@@ -163,7 +175,7 @@ public class ProfileControllerTest extends BaseControllerTest {
         );
 
         mockMvc.perform(
-                        patch("/users/me/firstname")
+                        patch("/profiles/me/firstname")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
                 )

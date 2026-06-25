@@ -5,8 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import ru.walkername.backend.chat.dto.ParticipantResponse;
 import ru.walkername.backend.chat.entity.ChatParticipant;
+import ru.walkername.backend.chat.view.ChatParticipantView;
 
 @Repository
 public interface ChatParticipantRepository extends JpaRepository<ChatParticipant, Long> {
@@ -16,7 +16,7 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
     long countByChatId(Long chatId);
 
     @Query("""
-            SELECT new ru.walkername.backend.chat.dto.ParticipantResponse(
+            SELECT new ru.walkername.backend.chat.view.ChatParticipantView(
                 cp.id,
                 a.id,
                 p.id,
@@ -31,6 +31,6 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             ON a.id = p.account.id
             WHERE cp.chatId = :chatId
             """)
-    Page<ParticipantResponse> findByChatId(Long chatId, Pageable pageable);
+    Page<ChatParticipantView> findByChatId(Long chatId, Pageable pageable);
 
 }

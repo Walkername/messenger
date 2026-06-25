@@ -1,4 +1,4 @@
-package ru.walkername.backend.user.dto;
+package ru.walkername.backend.profile.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

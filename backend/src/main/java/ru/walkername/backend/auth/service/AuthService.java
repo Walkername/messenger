@@ -10,11 +10,14 @@ import ru.walkername.backend.auth.dto.JWTResponse;
 import ru.walkername.backend.auth.entity.Account;
 import ru.walkername.backend.auth.entity.AccountRole;
 import ru.walkername.backend.auth.exception.AccountExistsException;
+import ru.walkername.backend.auth.exception.AccountNotFoundException;
 import ru.walkername.backend.auth.exception.InvalidCredentialsException;
 import ru.walkername.backend.auth.repository.AuthRepository;
 import ru.walkername.backend.common.security.TokenService;
-import ru.walkername.backend.user.entity.Profile;
-import ru.walkername.backend.user.service.ProfileService;
+import ru.walkername.backend.profile.entity.Profile;
+import ru.walkername.backend.profile.mapper.ProfileMapper;
+import ru.walkername.backend.profile.service.ProfileService;
+import ru.walkername.backend.profile.view.ProfileView;
 
 import java.time.Instant;
 
@@ -28,6 +31,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
     private final RefreshTokenService refreshTokenService;
+    private final ProfileMapper profileMapper;
 
     @Transactional
     public Account register(AuthRequest request) {
@@ -81,6 +85,26 @@ public class AuthService {
         }
 
         return dbAccount;
+    }
+
+    @Transactional
+    public ProfileView updateUsername(Long accountId, String newUsername) {
+        Account account = authRepository.findById(accountId).orElseThrow(
+                () -> {
+                    log.warn("Update username attempt for non-existing account: {}", accountId);
+                    return new AccountNotFoundException("Account with such username does not exist");
+                }
+        );
+
+        if (authRepository.existsByUsername(newUsername)) {
+            log.warn("Update username attempt for existing username: {}", newUsername);
+            throw new AccountExistsException("Account with such username already exists");
+        }
+
+        account.setUsername(newUsername);
+        log.debug("Account updated successfully: {}", account.getUsername());
+
+        return profileService.getFullInfoByAccountId(accountId);
     }
 
 }

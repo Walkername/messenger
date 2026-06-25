@@ -14,8 +14,8 @@ import ru.walkername.backend.chat.exception.ChatNotFoundException;
 import ru.walkername.backend.chat.exception.ChatParticipantAlreadyExistsException;
 import ru.walkername.backend.common.dto.ErrorResponse;
 import ru.walkername.backend.common.dto.ValidationErrorResponse;
-import ru.walkername.backend.user.exception.ProfileExistsException;
-import ru.walkername.backend.user.exception.ProfileNotFoundException;
+import ru.walkername.backend.profile.exception.ProfileExistsException;
+import ru.walkername.backend.profile.exception.ProfileNotFoundException;
 
 import java.util.Map;
 import java.util.stream.Collectors;

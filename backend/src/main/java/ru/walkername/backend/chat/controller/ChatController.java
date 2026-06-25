@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.walkername.backend.chat.dto.ChatRequest;
 import ru.walkername.backend.chat.dto.ChatResponse;
-import ru.walkername.backend.chat.dto.ParticipantResponse;
+import ru.walkername.backend.chat.dto.ChatParticipantResponse;
 import ru.walkername.backend.chat.entity.Chat;
 import ru.walkername.backend.chat.mapper.ChatMapper;
 import ru.walkername.backend.chat.service.ChatService;
@@ -48,13 +48,13 @@ public class ChatController {
     }
 
     @GetMapping("/{chatId}/participants")
-    public ResponseEntity<PageResponse<ParticipantResponse>> getParticipants(
+    public ResponseEntity<PageResponse<ChatParticipantResponse>> getParticipants(
             @PathVariable Long chatId,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "limit", defaultValue = "10") Integer limit,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        PageResponse<ParticipantResponse> response = chatService.getChatParticipants(chatId, userPrincipal, page, limit);
+        PageResponse<ChatParticipantResponse> response = chatService.getChatParticipants(chatId, userPrincipal, page, limit);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

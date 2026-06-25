@@ -1,4 +1,4 @@
-package ru.walkername.backend.user.service;
+package ru.walkername.backend.profile.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -6,10 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.walkername.backend.auth.entity.Account;
-import ru.walkername.backend.user.entity.Profile;
-import ru.walkername.backend.user.exception.ProfileExistsException;
-import ru.walkername.backend.user.exception.ProfileNotFoundException;
-import ru.walkername.backend.user.repository.ProfileRepository;
+import ru.walkername.backend.profile.entity.Profile;
+import ru.walkername.backend.profile.exception.ProfileExistsException;
+import ru.walkername.backend.profile.exception.ProfileNotFoundException;
+import ru.walkername.backend.profile.repository.ProfileRepository;
+import ru.walkername.backend.profile.view.ProfileView;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -84,26 +85,36 @@ public class ProfileServiceTest {
 
     @Test
     public void shouldReturnUserByUpdateFirstName() {
-        Long id = 1L;
+        Long profileId = 1L;
+        Long accountId = 2L;
         String newFirstName = "Michael";
 
         Profile profile = new Profile();
-        profile.setId(id);
+        profile.setId(profileId);
         profile.setFirstName(newFirstName);
         Instant now = Instant.now();
         profile.setCreatedAt(now);
         profile.setUpdatedAt(now);
 
-        when(profileRepository.findById(id)).thenReturn(Optional.of(profile));
+        ProfileView view = new ProfileView(
+                accountId,
+                profileId,
+                "username123",
+                newFirstName,
+                profile.getCreatedAt(),
+                profile.getUpdatedAt()
+        );
 
-        Profile result = profileService.updateFirstName(id, newFirstName);
+        when(profileRepository.findByAccountId(accountId)).thenReturn(Optional.of(profile));
+        when(profileRepository.findFullInfoByAccountId(accountId)).thenReturn(Optional.of(view));
 
-        assertEquals(profile.getId(), result.getId());
-        assertEquals(profile.getFirstName(), result.getFirstName());
-        assertEquals(profile.getCreatedAt().toString(), result.getCreatedAt().toString());
-        assertEquals(profile.getUpdatedAt().toString(), result.getUpdatedAt().toString());
+        ProfileView result = profileService.updateFirstName(accountId, newFirstName);
 
-        verify(profileRepository).findById(id);
+        assertEquals(profile.getId(), result.profileId());
+        assertEquals(profile.getFirstName(), result.firstName());
+
+        verify(profileRepository).findByAccountId(accountId);
+        verify(profileRepository).findByAccountId(accountId);
     }
 
     @Test
@@ -111,14 +122,14 @@ public class ProfileServiceTest {
         Long id = 1L;
         String newFirstName = "Michael";
 
-        when(profileRepository.findById(id)).thenReturn(Optional.empty());
+        when(profileRepository.findByAccountId(id)).thenReturn(Optional.empty());
 
         assertThrows(
                 ProfileNotFoundException.class,
                 () -> profileService.updateFirstName(id, newFirstName)
         );
 
-        verify(profileRepository).findById(id);
+        verify(profileRepository).findByAccountId(id);
     }
 
 }

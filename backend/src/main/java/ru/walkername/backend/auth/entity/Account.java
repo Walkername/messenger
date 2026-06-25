@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.walkername.backend.user.entity.Profile;
+import ru.walkername.backend.profile.entity.Profile;
 
 import java.time.Instant;
 
