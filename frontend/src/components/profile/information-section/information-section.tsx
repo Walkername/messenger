@@ -16,7 +16,7 @@ export default function InformationSection() {
         getMyProfile().then((data) => {
             setProfile(data);
             setUsernameInput(data.username);
-            setFirstNameInput(data.firstName);
+            setFirstNameInput(data.firstName || "");
         });
     }, []);
 
@@ -29,7 +29,7 @@ export default function InformationSection() {
             .then((data) => {
                 setProfile(data);
                 setUsernameInput(data.username);
-                setFirstNameInput(data.firstName);
+                setFirstNameInput(data.firstName || "");
             })
     };
 

@@ -15,6 +15,9 @@ export default function Navigation() {
                 <Link className="nav-bar-element" to="/profile">
                     Profile
                 </Link>
+                <Link className="nav-bar-element" to="/call">
+                    Call
+                </Link>
                 <Link
                     className="nav-bar-auth-element"
                     to="/login"

@@ -31,11 +31,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http
+//                .addFilterBefore((request, response, chain) -> {
+//                    jakarta.servlet.http.HttpServletRequest req = (jakarta.servlet.http.HttpServletRequest) request;
+//                    System.out.println("=== INCOMING REQUEST ===");
+//                    System.out.println("Method: " + req.getMethod());
+//                    System.out.println("Header Origin: " + req.getHeader("Origin"));
+//                    System.out.println("Remote IP: " + req.getRemoteAddr());
+//                    chain.doFilter(request, response);
+//                }, org.springframework.security.web.context.SecurityContextHolderFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers(
-                                "/auth/login", "/auth/register", "/auth/refresh",
+                                "/auth/login", "/auth/register", "/auth/refresh", "/profiles/{id}",
                                 "/swagger-ui/**", "/v3/api-docs/**"
                         ).permitAll()
                         .anyRequest().hasAnyAuthority("USER", "ADMIN")
@@ -53,7 +61,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(corsAllowedOrigins);
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
 

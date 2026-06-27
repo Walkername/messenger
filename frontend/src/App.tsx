@@ -9,6 +9,7 @@ import PageContent from "./components/page-content/page-content";
 import MessengerPage from "./pages/messenger/messenger-page";
 import SecuritySection from "./components/profile/security-section/security-section";
 import InformationSection from "./components/profile/information-section/information-section";
+import CallPage from "./pages/call/call-page";
 
 function App() {
     return (
@@ -30,6 +31,7 @@ function App() {
                             <Route path="*" element={<Navigate to="/profile/information" replace />} />
                         </Route>
                         <Route path="/chats/:id" element={<MessengerPage />} />
+                        <Route path="/call" element={<CallPage />} />
                     </Route>
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
