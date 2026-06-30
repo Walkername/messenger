@@ -2,6 +2,7 @@ import { useState } from "react";
 import { login } from "../../api/auth-api";
 import type { AuthRequest } from "../../types/auth/auth-request";
 import { useNavigate } from "react-router-dom";
+import "./login-page.css";
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -25,35 +26,33 @@ export default function LoginPage() {
     };
 
     return (
-        <>
-            <h1>Login</h1>
+        <div className="login-layout">
+            <h1 className="login-layout-header">Login</h1>
             <form className="login-form" onSubmit={handleLoginFormSubmit}>
-                <label htmlFor="username">Username:</label>
-                <br></br>
+                <label htmlFor="username">Username</label>
                 <input
+                    className="login-form-username-input"
                     id="username"
                     name="username"
                     type="text"
                     onChange={handleChange}
                 />
-                <br></br>
 
-                <label htmlFor="password">Password:</label>
-                <br></br>
+                <label htmlFor="password">Password</label>
                 <input
+                    className="login-form-password-input"
                     id="password"
                     name="password"
                     type="password"
                     onChange={handleChange}
                 />
-                <br></br>
 
-                <input type="submit" />
+                <input className="login-form-submit-input" type="submit" />
             </form>
 
-            <div>
-                <a href="/register">Sign Up</a>
-            </div>
-        </>
+            <a className="sign-up-ref" href="/register">
+                Sign Up
+            </a>
+        </div>
     );
 }

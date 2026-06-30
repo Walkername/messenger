@@ -1,0 +1,114 @@
+.register-layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    max-width: 460px;
+    max-height: 500px;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    background-color: white;
+}
+
+.register-layout-header {
+    font-size: 45px;
+}
+
+.register-form {
+    font-size: 15px;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+.register-form-username-input {
+    font-size: 15px;
+    
+    border: 1px solid #e9ecef;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+
+    padding: 10px 20px;
+}
+
+.register-form-username-input:focus {
+    outline: none;
+}
+
+.register-form-password-input {
+    font-size: 15px;
+    
+    border: 1px solid #e9ecef;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+
+    padding: 10px 20px;
+}
+
+.register-form-password-input:focus {
+    outline: none;
+}
+
+.register-form-password-confirmation-input {
+    font-size: 15px;
+    
+    border: 1px solid #e9ecef;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+
+    padding: 10px 20px;
+}
+
+.register-form-password-confirmation-input:focus {
+    outline: none;
+}
+
+.register-form-submit-input {
+    border: none;
+    width: auto;
+    min-width: 100px;
+    margin-top: 10px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    font-size: 14px;
+    align-self: center;
+    transition: all 0.2s;
+}
+
+.register-form-submit-input:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.sign-in-ref {
+    font-size: 15px;
+}
+
+.register-request-status {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.register-request-status.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.register-request-status.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
