@@ -27,7 +27,7 @@ export default function LoginPage() {
 
     return (
         <div className="login-layout">
-            <h1 className="login-layout-header">Login</h1>
+            <h1 className="login-layout-header">Sign In</h1>
             <form className="login-form" onSubmit={handleLoginFormSubmit}>
                 <label htmlFor="username">Username</label>
                 <input
@@ -47,7 +47,7 @@ export default function LoginPage() {
                     onChange={handleChange}
                 />
 
-                <input className="login-form-submit-input" type="submit" />
+                <input className="login-form-submit-input" type="submit" value="Sign In" />
             </form>
 
             <a className="sign-up-ref" href="/register">

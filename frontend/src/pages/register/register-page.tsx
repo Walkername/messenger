@@ -46,7 +46,7 @@ export default function RegisterPage() {
 
     return (
         <div className="register-layout">
-            <h1 className="register-layout-header">Register</h1>
+            <h1 className="register-layout-header">Sign Up</h1>
             <form className="register-form" onSubmit={handleRegisterFormSubmit}>
                 <label htmlFor="username">Username</label>
                 <input
@@ -77,7 +77,7 @@ export default function RegisterPage() {
                     onChange={handleChange}
                 />
 
-                <input className="register-form-submit-input" type="submit" />
+                <input className="register-form-submit-input" type="submit" value="Sign Up" />
             </form>
 
             <a className="sign-in-ref" href="/login">
