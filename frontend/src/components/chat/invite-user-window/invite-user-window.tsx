@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ModalWindow from "../../modal-window/modal-window";
-import { inviteUserToChat } from "../../../api/chat-api";
 import "./invite-user-window.css";
+import { chatService } from "../../../services/chat-service";
 
 interface InviteUserWindowProps {
     isOpen: boolean;
@@ -31,7 +31,8 @@ export default function InviteUserWindow({
 
     const handleChatInvite = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
-        inviteUserToChat(chatId, usernameToInvite)
+        chatService
+            .inviteUserToChat(chatId, usernameToInvite)
             .then(() => {
                 setStatus({
                     message: "User has been invited successfully!",

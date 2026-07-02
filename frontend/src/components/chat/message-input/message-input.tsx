@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import type { MessageRequest } from "../../../types/chat/message-request";
-import { sendMessageToChat } from "../../../api/chat-api";
 import "./message-input.css";
+import { chatService } from "../../../services/chat-service";
 
 interface MessageInputProps {
     chatId: number;
@@ -18,7 +18,7 @@ export default function MessageInput({ chatId }: MessageInputProps) {
             content: newMessage,
         };
 
-        sendMessageToChat(chatId, message).then(() => {
+        chatService.sendMessageToChat(chatId, message).then(() => {
             setNewMessage("");
         });
     };

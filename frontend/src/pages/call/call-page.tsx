@@ -2,9 +2,10 @@
 import { useCallback, useState } from "react";
 import VideoCall from "../../components/call/video-call/video-call";
 import getClaimFromToken from "../../utils/token-validation";
+import { authService } from "../../services/auth-service";
 
 export default function CallPage() {
-    const token = localStorage.getItem("accessToken");
+    const token = authService.getToken()!;
     const accountId: string = String(getClaimFromToken(token, "id"));
     const [idToCall, setIdToCall] = useState<string>("");
     const [callWith, setCallWith] = useState<string | undefined>(undefined);

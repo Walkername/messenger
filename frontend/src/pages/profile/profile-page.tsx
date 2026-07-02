@@ -1,8 +1,4 @@
-// ProfilePage.tsx
-import { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import type { ProfileResponse } from "../../types/profile/profile-response";
-import { getMyProfile } from "../../api/profile-api";
 import "./profile-page.css";
 
 type TabOption = 'information' | 'security';
@@ -19,29 +15,6 @@ const TAB_CONFIG: Record<TabOption, { label: string; path: string }> = {
 };
 
 export default function ProfilePage() {
-    const [profile, setProfile] = useState<ProfileResponse>();
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        getMyProfile()
-            .then((data) => {
-                setProfile(data);
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error('Failed to load profile:', error);
-                setLoading(false);
-            });
-    }, []);
-
-    if (loading) {
-        return <div className="loading-state">Loading profile...</div>;
-    }
-
-    if (!profile) {
-        return <div className="error-state">Failed to load profile</div>;
-    }
-
     return (
         <div className="profile-layout">
             <aside className="profile-sidebar">
@@ -60,7 +33,7 @@ export default function ProfilePage() {
                 </nav>
             </aside>
             <main className="current-profile-option">
-                <Outlet context={{ profile }} />
+                <Outlet />
             </main>
         </div>
     );

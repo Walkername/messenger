@@ -11,6 +11,7 @@ import {
 import type { PageResponse } from "../../../types/common/page-response";
 import type { MessageResponse } from "../../../types/chat/message-response";
 import "./messages-list.css";
+import { useAuthStore } from "../../../auth/store";
 
 interface MessagesListProps {
     messages: PageResponse<MessageResponse>;
@@ -19,7 +20,7 @@ interface MessagesListProps {
 export default function MessagesList({
     messages,
 }: MessagesListProps) {
-    const token = localStorage.getItem("accessToken")!;
+    const token = useAuthStore.getState().accessToken!;
     const myAccountId = parseInt(getClaimFromToken(token, "id"));
 
     const messagesEndRef = useRef<HTMLDivElement>(null);

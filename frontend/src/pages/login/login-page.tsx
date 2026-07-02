@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { login } from "../../api/auth-api";
 import type { AuthRequest } from "../../types/auth/auth-request";
 import { useNavigate } from "react-router-dom";
 import "./login-page.css";
+import { authService } from "../../services/auth-service";
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -20,9 +20,12 @@ export default function LoginPage() {
     const handleLoginFormSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log(request);
-        login(request).then(() => {
+        authService.login(request).then(() => {
             navigate("/");
         });
+        // login(request).then(() => {
+        //     navigate("/");
+        // });
     };
 
     return (

@@ -5,9 +5,9 @@ import {
     formatTimeLong,
     formatTimeShort,
 } from "../../../utils/validation-time";
-import { getParticipantsFromChat } from "../../../api/chat-api";
 import ModalWindow from "../../modal-window/modal-window";
 import "./participants-list.css";
+import { chatService } from "../../../services/chat-service";
 
 interface ParticipantsListProps {
     isOpen: boolean;
@@ -27,7 +27,7 @@ export default function ParticipantsList({
 
     useEffect(() => {
         if (isOpen) {
-            getParticipantsFromChat(chatId).then((data) => {
+            chatService.getParticipantsFromChat(chatId).then((data) => {
                 setParticipants(data);
             });
         }

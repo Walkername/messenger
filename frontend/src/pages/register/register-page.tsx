@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { register } from "../../api/auth-api";
 import type { AuthRequest } from "../../types/auth/auth-request";
 import "./register-page.css";
+import { authService } from "../../services/auth-service";
 
 export default function RegisterPage() {
     const [request, setRequest] = useState<AuthRequest>({
@@ -27,7 +27,8 @@ export default function RegisterPage() {
     ) => {
         e.preventDefault();
 
-        register(request)
+        authService
+            .register(request)
             .then((data) => {
                 console.log(data);
                 setRequestStatus({
@@ -77,7 +78,11 @@ export default function RegisterPage() {
                     onChange={handleChange}
                 />
 
-                <input className="register-form-submit-input" type="submit" value="Sign Up" />
+                <input
+                    className="register-form-submit-input"
+                    type="submit"
+                    value="Sign Up"
+                />
             </form>
 
             <a className="sign-in-ref" href="/login">

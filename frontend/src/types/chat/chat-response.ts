@@ -2,7 +2,7 @@
 export type ChatResponse = {
     id: number;
     name: string;
-    ownerId: number;
+    ownerAccountId: number;
     type: string;
     participantsNumber: number;
     lastMessage: string;

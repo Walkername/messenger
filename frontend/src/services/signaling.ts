@@ -1,10 +1,9 @@
 // services/signaling.ts
 import { Client, type Message } from "@stomp/stompjs";
 import type { SignalingMessage } from "../types/call/webrtc";
+import { authService } from "./auth-service";
 
 class SignalingService {
-    private token = localStorage.getItem("accessToken")!;
-
     private stompClient: Client | null = null;
     private onMessageCallback: ((message: SignalingMessage) => void) | null =
         null;
@@ -15,11 +14,12 @@ class SignalingService {
     ): Promise<void> {
         return new Promise((resolve, reject) => {
             this.onMessageCallback = onMessage;
+            const token = authService.getToken();
 
             this.stompClient = new Client({
                 brokerURL: import.meta.env.VITE_BACKEND_WEBSOCKET_URL,
                 connectHeaders: {
-                    Authorization: `Bearer ${this.token}`,
+                    Authorization: `Bearer ${token}`,
                 },
                 reconnectDelay: 5000,
                 heartbeatIncoming: 10000,
@@ -59,7 +59,6 @@ class SignalingService {
             const data: SignalingMessage = JSON.parse(message.body);
             console.log(data);
             if (this.onMessageCallback) {
-                console.log("432");
                 this.onMessageCallback(data);
             }
         } catch (error) {
@@ -69,7 +68,6 @@ class SignalingService {
 
     private handleActiveUsers(message: Message) {
         console.log("Active users:", message.body);
-        // Здесь можно обновлять список онлайн-пользователей
     }
 
     sendMessage(destination: string, body: any) {

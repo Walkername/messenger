@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import type { CallState, SignalingMessage } from "../types/call/webrtc";
 
 interface UseWebRTCProps {
@@ -6,7 +6,7 @@ interface UseWebRTCProps {
     onCallEnded?: () => void;
 }
 
-export const useWebRTC = ({ accountId, onCallEnded }: UseWebRTCProps) => {
+export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
     const [callState, setCallState] = useState<CallState>({
         isInCall: false,
         isMuted: false,
@@ -21,15 +21,19 @@ export const useWebRTC = ({ accountId, onCallEnded }: UseWebRTCProps) => {
     const pendingIceRef = useRef<RTCIceCandidateInit[]>([]);
 
     const [remoteStream, setRemoteStream] = useState<MediaStream>();
+    const [localStream, setLocalStream] = useState<MediaStream>();
 
-    const rtcConfig: RTCConfiguration = {
-        iceServers: [
-            { urls: "stun:stun.l.google.com:19302" },
-            { urls: "stun:stun1.l.google.com:19302" },
-            { urls: "stun:stun.ekiga.net" },
-        ],
-        iceCandidatePoolSize: 10,
-    };
+    const rtcConfig = useMemo<RTCConfiguration>(
+        () => ({
+            iceServers: [
+                { urls: "stun:stun.l.google.com:19302" },
+                { urls: "stun:stun1.l.google.com:19302" },
+                { urls: "stun:stun.ekiga.net" },
+            ],
+            iceCandidatePoolSize: 10,
+        }),
+        [],
+    );
 
     // ---------------------------
     // MEDIA
@@ -37,19 +41,70 @@ export const useWebRTC = ({ accountId, onCallEnded }: UseWebRTCProps) => {
     const initLocalStream = useCallback(async () => {
         if (localStreamRef.current) return localStreamRef.current;
 
-        console.log("📷 Getting user media...");
+        // console.log("📷 Getting user media...");
         const stream = await navigator.mediaDevices.getUserMedia({
             video: true,
             audio: true,
         });
 
-        console.log("✅ Local stream acquired:", {
-            videoTracks: stream.getVideoTracks().length,
-            audioTracks: stream.getAudioTracks().length,
-        });
+        // console.log("✅ Local stream acquired:", {
+        //     videoTracks: stream.getVideoTracks().length,
+        //     audioTracks: stream.getAudioTracks().length,
+        // });
 
         localStreamRef.current = stream;
+        setLocalStream(stream);
         return stream;
+    }, []);
+
+    // ---------------------------
+    // CLEANUP
+    // ---------------------------
+    const cleanupCall = useCallback(() => {
+        // console.log("🧹 Cleaning up call");
+
+        if (pcRef.current) {
+            pcRef.current.close();
+            pcRef.current = null;
+        }
+
+        if (remoteStreamRef.current) {
+            remoteStreamRef.current
+                .getTracks()
+                .forEach((track) => track.stop());
+            remoteStreamRef.current = null;
+        }
+
+        currentPeerRef.current = null;
+        pendingIceRef.current = [];
+
+        setCallState({
+            isInCall: false,
+            isMuted: false,
+            isVideoOn: true,
+            callStatus: "ended",
+            localStream: localStreamRef.current || undefined,
+            remoteStream: undefined,
+        });
+
+        onCallEnded?.();
+    }, [onCallEnded]);
+
+    // ---------------------------
+    // SIGNALING SEND
+    // ---------------------------
+    const sendMessage = useCallback((msg: SignalingMessage) => {
+        // console.log(`📤 Sending message: ${msg.type}`, {
+        //     from: msg.from,
+        //     to: msg.to,
+        //     hasPayload: !!msg.payload,
+        // });
+
+        if (window.__signalingService) {
+            window.__signalingService.sendSignalingMessage(msg);
+        } else {
+            console.warn("⚠️ Signaling service not available");
+        }
     }, []);
 
     // ---------------------------
@@ -169,12 +224,11 @@ export const useWebRTC = ({ accountId, onCallEnded }: UseWebRTCProps) => {
 
             // STATE
             pc.onconnectionstatechange = () => {
-                console.log("connection:", pc.connectionState);
                 const state = pc.connectionState;
-                console.log(`🔗 Connection state: ${state}`);
+                // console.log(`🔗 Connection state: ${state}`);
 
                 if (state === "connected") {
-                    console.log("🎉 PeerConnection connected!");
+                    // console.log("🎉 PeerConnection connected!");
                     setCallState((p) => ({
                         ...p,
                         isInCall: true,
@@ -182,54 +236,37 @@ export const useWebRTC = ({ accountId, onCallEnded }: UseWebRTCProps) => {
                     }));
                 }
 
-                if (state === "checking") {
-                    console.log("🔄 Checking connection...");
-                }
+                // if (state === "checking") {
+                //     console.log("🔄 Checking connection...");
+                // }
 
-                if (state === "new") {
-                    console.log("🆕 Connection state: new");
-                }
+                // if (state === "new") {
+                //     console.log("🆕 Connection state: new");
+                // }
 
-                if (state === "connecting") {
-                    console.log("🔄 Connecting...");
-                }
+                // if (state === "connecting") {
+                //     console.log("🔄 Connecting...");
+                // }
 
-                if (state === "disconnected") {
-                    console.warn("⚠️ Connection disconnected");
-                    cleanupCall();
-                }
+                // if (state === "disconnected") {
+                //     console.warn("⚠️ Connection disconnected");
+                //     cleanupCall();
+                // }
 
-                if (state === "failed") {
-                    console.error("❌ Connection failed");
-                    cleanupCall();
-                }
+                // if (state === "failed") {
+                //     console.error("❌ Connection failed");
+                //     cleanupCall();
+                // }
 
-                if (state === "closed") {
-                    console.log("🔒 Connection closed");
-                }
+                // if (state === "closed") {
+                //     console.log("🔒 Connection closed");
+                // }
             };
 
             return pc;
         },
-        [accountId],
+        [accountId, cleanupCall, rtcConfig, sendMessage],
     );
-
-    // ---------------------------
-    // SIGNALING SEND
-    // ---------------------------
-    const sendMessage = useCallback((msg: SignalingMessage) => {
-        console.log(`📤 Sending message: ${msg.type}`, {
-            from: msg.from,
-            to: msg.to,
-            hasPayload: !!msg.payload,
-        });
-
-        if ((window as any).__signalingService) {
-            (window as any).__signalingService.sendSignalingMessage(msg);
-        } else {
-            console.warn("⚠️ Signaling service not available");
-        }
-    }, []);
 
     // ---------------------------
     // CALL START
@@ -273,7 +310,13 @@ export const useWebRTC = ({ accountId, onCallEnded }: UseWebRTCProps) => {
                 cleanupCall();
             }
         },
-        [accountId, initLocalStream, createPeerConnection],
+        [
+            accountId,
+            initLocalStream,
+            createPeerConnection,
+            cleanupCall,
+            sendMessage,
+        ],
     );
 
     // ---------------------------
@@ -344,7 +387,13 @@ export const useWebRTC = ({ accountId, onCallEnded }: UseWebRTCProps) => {
                 cleanupCall();
             }
         },
-        [accountId, initLocalStream, createPeerConnection],
+        [
+            accountId,
+            initLocalStream,
+            createPeerConnection,
+            cleanupCall,
+            sendMessage,
+        ],
     );
 
     // ---------------------------
@@ -427,39 +476,6 @@ export const useWebRTC = ({ accountId, onCallEnded }: UseWebRTCProps) => {
     }, []);
 
     // ---------------------------
-    // CLEANUP
-    // ---------------------------
-    const cleanupCall = useCallback(() => {
-        console.log("🧹 Cleaning up call");
-
-        if (pcRef.current) {
-            pcRef.current.close();
-            pcRef.current = null;
-        }
-
-        if (remoteStreamRef.current) {
-            remoteStreamRef.current
-                .getTracks()
-                .forEach((track) => track.stop());
-            remoteStreamRef.current = null;
-        }
-
-        currentPeerRef.current = null;
-        pendingIceRef.current = [];
-
-        setCallState({
-            isInCall: false,
-            isMuted: false,
-            isVideoOn: true,
-            callStatus: "ended",
-            localStream: localStreamRef.current || undefined,
-            remoteStream: undefined,
-        });
-
-        onCallEnded?.();
-    }, [onCallEnded]);
-
-    // ---------------------------
     // END CALL
     // ---------------------------
     const endCall = useCallback(() => {
@@ -475,7 +491,7 @@ export const useWebRTC = ({ accountId, onCallEnded }: UseWebRTCProps) => {
         }
 
         cleanupCall();
-    }, [accountId, cleanupCall]);
+    }, [accountId, cleanupCall, sendMessage]);
 
     // ---------------------------
     // SIGNALLING ROUTER
@@ -559,8 +575,7 @@ export const useWebRTC = ({ accountId, onCallEnded }: UseWebRTCProps) => {
         toggleMute,
         toggleVideo,
         handleSignalingMessage,
-        localStreamRef,
-        remoteStreamRef,
-        remoteStream
+        localStream,
+        remoteStream,
     };
-};
+}

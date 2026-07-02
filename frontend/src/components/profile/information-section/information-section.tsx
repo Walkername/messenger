@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import "./information-section.css";
 import type { ProfileResponse } from "../../../types/profile/profile-response";
-import { getMyProfile, updateProfileFirstName, updateProfileUsername } from "../../../api/profile-api";
 import { formatTimeLong } from "../../../utils/validation-time";
 import type { UpdateFirstNameRequest } from "../../../types/profile/update-firstname-request";
 import type { UpdateUsernameRequest } from "../../../types/profile/update-username-request";
+import { profileService } from "../../../services/profile-service";
 
 export default function InformationSection() {
     const [profile, setProfile] = useState<ProfileResponse>();
@@ -13,7 +13,7 @@ export default function InformationSection() {
     const [firstNameInput, setFirstNameInput] = useState<string>("");
 
     useEffect(() => {
-        getMyProfile().then((data) => {
+        profileService.getMyProfile().then((data) => {
             setProfile(data);
             setUsernameInput(data.username);
             setFirstNameInput(data.firstName || "");
@@ -25,12 +25,11 @@ export default function InformationSection() {
         const request: UpdateUsernameRequest = {
             username: usernameInput,
         };
-        updateProfileUsername(request)
-            .then((data) => {
-                setProfile(data);
-                setUsernameInput(data.username);
-                setFirstNameInput(data.firstName || "");
-            })
+        profileService.updateMyProfileUsername(request).then((data) => {
+            setProfile(data);
+            setUsernameInput(data.username);
+            setFirstNameInput(data.firstName || "");
+        });
     };
 
     const updateFirstName = (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -38,19 +37,20 @@ export default function InformationSection() {
         const request: UpdateFirstNameRequest = {
             firstName: firstNameInput,
         };
-        updateProfileFirstName(request)
-            .then((data) => {
-                setProfile(data);
-                setUsernameInput(data.username);
-                setFirstNameInput(data.firstName);
-            });
+        profileService.updateMyProfileFirstName(request).then((data) => {
+            setProfile(data);
+            setUsernameInput(data.username);
+            setFirstNameInput(data.firstName);
+        });
     };
 
     return (
         profile && (
             <div className="profile-info-section">
                 <div className="profile-info-header">
-                    <span className="profile-info-firstname">{profile.firstName}</span>
+                    <span className="profile-info-firstname">
+                        {profile.firstName}
+                    </span>
                     <div className="profile-info-ids">
                         <span className="profile-info-username">
                             @{profile.username}
@@ -70,7 +70,10 @@ export default function InformationSection() {
                 </div>
 
                 <div className="profile-info-edit">
-                    <form className="profile-info-username-form" onSubmit={updateUsername}>
+                    <form
+                        className="profile-info-username-form"
+                        onSubmit={updateUsername}
+                    >
                         <label className="profile-info-username-label">
                             Username
                         </label>
@@ -89,7 +92,10 @@ export default function InformationSection() {
                         />
                     </form>
 
-                    <form className="profile-info-firstname-form" onSubmit={updateFirstName}>
+                    <form
+                        className="profile-info-firstname-form"
+                        onSubmit={updateFirstName}
+                    >
                         <label className="profile-info-firstname-label">
                             First Name
                         </label>

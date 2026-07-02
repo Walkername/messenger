@@ -59,7 +59,7 @@ export default function ChatHeader({ chat }: ChatHeaderProps) {
                 isOpen={isParticipantsModalOpen}
                 onClose={() => setIsParticipantsModalOpen(false)}
                 chatId={chat.id}
-                ownerId={chat.ownerId}
+                ownerId={chat.ownerAccountId}
             />
             <InviteUserWindow
                 isOpen={isInviteModalOpen}

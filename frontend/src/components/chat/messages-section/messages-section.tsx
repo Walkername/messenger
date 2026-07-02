@@ -4,15 +4,16 @@ import MessagesList from "../messages-list/messages-list";
 import type { PageResponse } from "../../../types/common/page-response";
 import type { MessageResponse } from "../../../types/chat/message-response";
 import { Client } from "@stomp/stompjs";
-import { getMessagesFromChat } from "../../../api/chat-api";
+import { chatService } from "../../../services/chat-service";
+import { useAuthStore } from "../../../auth/store";
 
 interface MessagesSectionProps {
     chatId: number;
 }
 
 export default function MessagesSection({ chatId }: MessagesSectionProps) {
-    const token = localStorage.getItem("accessToken")!;
-    
+    const token = useAuthStore.getState().accessToken;
+
     const [messages, setMessages] = useState<PageResponse<MessageResponse>>({
         content: [],
         page: 0,
@@ -22,7 +23,7 @@ export default function MessagesSection({ chatId }: MessagesSectionProps) {
     });
 
     useEffect(() => {
-        getMessagesFromChat(chatId).then((data) => {
+        chatService.getMessagesFromChat(chatId).then((data) => {
             setMessages(data);
         });
     }, [chatId]);
@@ -71,9 +72,7 @@ export default function MessagesSection({ chatId }: MessagesSectionProps) {
 
     return (
         <>
-            <MessagesList
-                messages={messages}
-            />
+            <MessagesList messages={messages} />
             <MessageInput chatId={chatId} />
         </>
     );

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { getMyChats } from '../../../api/chat-api';
 import type { PageResponse } from '../../../types/common/page-response';
 import type { ChatResponse } from '../../../types/chat/chat-response';
 import './chat-list.css';
+import { chatService } from '../../../services/chat-service';
 
 interface ChatListProps {
     onSelectChat: (chatId: number) => void;
@@ -14,7 +14,7 @@ export default function ChatList({ onSelectChat, selectedChatId }: ChatListProps
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        getMyChats()
+        chatService.getMyChats()
             .then((data) => {
                 setChats(data);
             })
@@ -78,7 +78,6 @@ export default function ChatList({ onSelectChat, selectedChatId }: ChatListProps
             <div className="chat-items">
                 {chats?.content.length === 0 ? (
                     <div className="no-chats">
-                        <div className="no-chats-icon">💬</div>
                         <p>You don't have any chats yet</p>
                     </div>
                 ) : (

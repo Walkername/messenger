@@ -14,7 +14,7 @@ interface VideoCallProps {
 
 declare global {
     interface Window {
-        __signalingService: typeof signalingService;
+        __signalingService?: typeof signalingService;
     }
 }
 
@@ -35,8 +35,7 @@ const VideoCall: React.FC<VideoCallProps> = ({
         toggleMute,
         toggleVideo,
         handleSignalingMessage,
-        localStreamRef,
-        remoteStreamRef,
+        localStream,
         remoteStream,
     } = useWebRTC({
         accountId,
@@ -79,12 +78,12 @@ const VideoCall: React.FC<VideoCallProps> = ({
     }, [isConnected, remoteUserId, startCall, callState.isInCall]);
 
     // Обработка звонка от другого пользователя
-    const handleIncomingCall = (fromUserId: string) => {
-        setCallTarget(fromUserId);
-        // Здесь можно показать модальное окно с подтверждением звонка
-        // Для автоматического принятия раскомментируйте следующую строку:
-        // startCall(fromUserId);
-    };
+    // const handleIncomingCall = (fromUserId: string) => {
+    //     setCallTarget(fromUserId);
+    //     // Здесь можно показать модальное окно с подтверждением звонка
+    //     // Для автоматического принятия раскомментируйте следующую строку:
+    //     // startCall(fromUserId);
+    // };
 
     return (
         <div className="video-call-container">
@@ -92,7 +91,7 @@ const VideoCall: React.FC<VideoCallProps> = ({
             <div className="video-grid">
                 <div className="video-wrapper local">
                     <VideoPlayer
-                        stream={localStreamRef.current || undefined}
+                        stream={localStream || undefined}
                         muted={true}
                         label="Вы"
                         className={!callState.isInCall ? "inactive" : ""}
