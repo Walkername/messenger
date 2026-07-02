@@ -7,7 +7,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.walkername.backend.auth.dto.JWTResponse;
+import ru.walkername.backend.auth.dto.AuthTokens;
 import ru.walkername.backend.auth.entity.Account;
 
 import java.security.MessageDigest;
@@ -58,10 +58,10 @@ public class TokenService {
                 .sign(Algorithm.HMAC256(refreshTokenSecret));
     }
 
-    public JWTResponse generateTokensPair(Account account) {
+    public AuthTokens generateTokensPair(Account account) {
         String accessToken = generateAccessToken(account);
         String refreshToken = generateRefreshToken(account);
-        return new JWTResponse(accessToken, refreshToken);
+        return new AuthTokens(accessToken, refreshToken);
     }
 
     public DecodedJWT validateAccessToken(String token) {

@@ -10,6 +10,7 @@ import ru.walkername.backend.auth.exception.AccountExistsException;
 import ru.walkername.backend.auth.exception.AccountNotFoundException;
 import ru.walkername.backend.auth.exception.InvalidCredentialsException;
 import ru.walkername.backend.auth.exception.InvalidRefreshTokenException;
+import ru.walkername.backend.auth.exception.RefreshTokenCookieNotFoundException;
 import ru.walkername.backend.chat.exception.ChatNotFoundException;
 import ru.walkername.backend.chat.exception.ChatParticipantAlreadyExistsException;
 import ru.walkername.backend.common.dto.ErrorResponse;
@@ -44,6 +45,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleException(InvalidJWTException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException(RefreshTokenCookieNotFoundException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 System.currentTimeMillis()

@@ -6,7 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.walkername.backend.auth.dto.AuthRequest;
-import ru.walkername.backend.auth.dto.JWTResponse;
+import ru.walkername.backend.auth.dto.AuthTokens;
 import ru.walkername.backend.auth.entity.Account;
 import ru.walkername.backend.auth.entity.AccountRole;
 import ru.walkername.backend.auth.exception.AccountExistsException;
@@ -15,7 +15,6 @@ import ru.walkername.backend.auth.exception.InvalidCredentialsException;
 import ru.walkername.backend.auth.repository.AuthRepository;
 import ru.walkername.backend.common.security.TokenService;
 import ru.walkername.backend.profile.entity.Profile;
-import ru.walkername.backend.profile.mapper.ProfileMapper;
 import ru.walkername.backend.profile.service.ProfileService;
 import ru.walkername.backend.profile.view.ProfileView;
 
@@ -31,7 +30,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
     private final RefreshTokenService refreshTokenService;
-    private final ProfileMapper profileMapper;
 
     @Transactional
     public Account register(AuthRequest request) {
@@ -60,16 +58,16 @@ public class AuthService {
     }
 
     @Transactional
-    public JWTResponse login(AuthRequest request) {
+    public AuthTokens login(AuthRequest request) {
         Account dbAccount = checkAndGet(request);
 
-        JWTResponse jwtResponse = tokenService.generateTokensPair(dbAccount);
+        AuthTokens authTokens = tokenService.generateTokensPair(dbAccount);
 
-        refreshTokenService.update(dbAccount.getId(), jwtResponse.refreshToken());
+        refreshTokenService.update(dbAccount.getId(), authTokens.refreshToken());
 
         log.debug("Account successfully authenticated: {}", dbAccount.getUsername());
 
-        return jwtResponse;
+        return authTokens;
     }
 
     private Account checkAndGet(AuthRequest request) {

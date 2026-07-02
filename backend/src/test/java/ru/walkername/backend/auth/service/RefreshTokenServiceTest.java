@@ -9,7 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.walkername.backend.auth.dto.JWTResponse;
+import ru.walkername.backend.auth.dto.AuthTokens;
 import ru.walkername.backend.auth.dto.RefreshTokenRequest;
 import ru.walkername.backend.auth.entity.Account;
 import ru.walkername.backend.auth.entity.RefreshToken;
@@ -94,7 +94,7 @@ public class RefreshTokenServiceTest {
         Account existingAccount = new Account();
         existingAccount.setId(1L);
 
-        JWTResponse jwtResponse = new JWTResponse("newAccessToken", "newRefreshToken");
+        AuthTokens authTokens = new AuthTokens("newAccessToken", "newRefreshToken");
 
         DecodedJWT mockDecodedJWT = mock(DecodedJWT.class);
         Claim mockClaim = mock(Claim.class);
@@ -104,9 +104,9 @@ public class RefreshTokenServiceTest {
         when(refreshTokenRepository.findByAccountId(1L)).thenReturn(Optional.of(existingRefreshToken));
         when(tokenService.verifyToken(request.token(), correctRefreshTokenHash)).thenReturn(true);
         when(authRepository.findById(1L)).thenReturn(Optional.of(existingAccount));
-        when(tokenService.generateTokensPair(existingAccount)).thenReturn(jwtResponse);
+        when(tokenService.generateTokensPair(existingAccount)).thenReturn(authTokens);
 
-        JWTResponse result = refreshTokenService.refreshTokens(request.token());
+        AuthTokens result = refreshTokenService.refreshTokens(request.token());
 
         verify(tokenService).validateRefreshToken(request.token());
         verify(refreshTokenRepository, times(2)).findByAccountId(1L);
@@ -114,8 +114,8 @@ public class RefreshTokenServiceTest {
         verify(authRepository).findById(1L);
         verify(tokenService).generateTokensPair(existingAccount);
 
-        assertEquals(jwtResponse.accessToken(), result.accessToken());
-        assertEquals(jwtResponse.refreshToken(), result.refreshToken());
+        assertEquals(authTokens.accessToken(), result.accessToken());
+        assertEquals(authTokens.refreshToken(), result.refreshToken());
     }
 
     @Test

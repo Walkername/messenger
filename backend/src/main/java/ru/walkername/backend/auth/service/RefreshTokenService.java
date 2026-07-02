@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.walkername.backend.auth.dto.JWTResponse;
+import ru.walkername.backend.auth.dto.AuthTokens;
 import ru.walkername.backend.auth.entity.Account;
 import ru.walkername.backend.auth.entity.RefreshToken;
 import ru.walkername.backend.auth.exception.AccountNotFoundException;
@@ -43,16 +43,16 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public JWTResponse refreshTokens(String refreshToken) {
+    public AuthTokens refreshTokens(String refreshToken) {
         Long accountId = validateRefreshToken(refreshToken);
 
         Account account = getAccountById(accountId);
 
-        JWTResponse jwtResponse = tokenService.generateTokensPair(account);
+        AuthTokens authTokens = tokenService.generateTokensPair(account);
 
-        update(accountId, jwtResponse.refreshToken());
+        update(accountId, authTokens.refreshToken());
 
-        return jwtResponse;
+        return authTokens;
     }
 
     private Account getAccountById(Long accountId) {

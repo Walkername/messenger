@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.walkername.backend.auth.dto.AuthRequest;
-import ru.walkername.backend.auth.dto.JWTResponse;
+import ru.walkername.backend.auth.dto.AuthTokens;
 import ru.walkername.backend.auth.entity.Account;
 import ru.walkername.backend.auth.exception.AccountExistsException;
 import ru.walkername.backend.auth.exception.InvalidCredentialsException;
@@ -96,10 +96,10 @@ public class AuthServiceTest {
         when(authRepository.findByUsername(authRequest.username())).thenReturn(Optional.of(account));
         when(passwordEncoder.matches(authRequest.password(), account.getPasswordHash())).thenReturn(true);
 
-        JWTResponse jwtResponse = new JWTResponse("accessToken", "refreshToken");
-        when(tokenService.generateTokensPair(account)).thenReturn(jwtResponse);
+        AuthTokens authTokens = new AuthTokens("accessToken", "refreshToken");
+        when(tokenService.generateTokensPair(account)).thenReturn(authTokens);
 
-        JWTResponse result = authService.login(authRequest);
+        AuthTokens result = authService.login(authRequest);
 
         assertNotNull(result);
         assertNotEquals(null, result.accessToken());

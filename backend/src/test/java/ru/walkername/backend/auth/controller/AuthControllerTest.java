@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import ru.walkername.backend.auth.dto.AccountResponse;
 import ru.walkername.backend.auth.dto.AuthRequest;
-import ru.walkername.backend.auth.dto.JWTResponse;
+import ru.walkername.backend.auth.dto.AuthTokens;
 import ru.walkername.backend.auth.dto.RefreshTokenRequest;
 import ru.walkername.backend.auth.entity.Account;
 import ru.walkername.backend.auth.entity.AccountRole;
@@ -225,9 +225,9 @@ public class AuthControllerTest {
     public void shouldReturnJwtResponseByLogin() throws Exception {
         AuthRequest request = new AuthRequest("user123", "password123");
 
-        JWTResponse jwtResponse = new JWTResponse("accessToken", "refreshTken");
+        AuthTokens authTokens = new AuthTokens("accessToken", "refreshTken");
 
-        when(authService.login(request)).thenReturn(jwtResponse);
+        when(authService.login(request)).thenReturn(authTokens);
 
         mockMvc.perform(
                         post("/auth/login")
@@ -235,8 +235,8 @@ public class AuthControllerTest {
                                 .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").value(jwtResponse.accessToken()))
-                .andExpect(jsonPath("$.refreshToken").value(jwtResponse.refreshToken()));
+                .andExpect(jsonPath("$.accessToken").value(authTokens.accessToken()))
+                .andExpect(jsonPath("$.refreshToken").value(authTokens.refreshToken()));
     }
 
     @Test
@@ -285,9 +285,9 @@ public class AuthControllerTest {
     public void shouldReturnJwtResponseByRefresh() throws Exception {
         RefreshTokenRequest request = new RefreshTokenRequest("rawRefreshToken");
 
-        JWTResponse jwtResponse = new JWTResponse("accessToken", "refreshTken");
+        AuthTokens authTokens = new AuthTokens("accessToken", "refreshTken");
 
-        when(refreshTokenService.refreshTokens(request.token())).thenReturn(jwtResponse);
+        when(refreshTokenService.refreshTokens(request.token())).thenReturn(authTokens);
 
         mockMvc.perform(
                         post("/auth/refresh")
@@ -295,8 +295,8 @@ public class AuthControllerTest {
                                 .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").value(jwtResponse.accessToken()))
-                .andExpect(jsonPath("$.refreshToken").value(jwtResponse.refreshToken()));
+                .andExpect(jsonPath("$.accessToken").value(authTokens.accessToken()))
+                .andExpect(jsonPath("$.refreshToken").value(authTokens.refreshToken()));
     }
 
     @Test
