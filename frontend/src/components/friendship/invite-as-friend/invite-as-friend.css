@@ -1,0 +1,46 @@
+.invite-as-friend-container {
+    border-bottom: 1px solid #e9ecef;
+    padding: 10px;
+}
+
+.invite-as-friend-form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.invite-as-friend-input {
+    font-size: 15px;
+
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+
+    padding: 10px 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.invite-as-friend-input:focus {
+    outline: none;
+}
+
+.invite-as-friend-submit {
+    background-color: #f8f9fa;
+    border: none;
+    color: black;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.invite-as-friend-submit:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}

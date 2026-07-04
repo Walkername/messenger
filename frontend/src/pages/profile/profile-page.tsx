@@ -1,16 +1,16 @@
 import { NavLink, Outlet } from "react-router-dom";
 import "./profile-page.css";
 
-type TabOption = 'information' | 'security';
+type TabOption = "information" | "security";
 
 const TAB_CONFIG: Record<TabOption, { label: string; path: string }> = {
     information: {
-        label: 'Information',
-        path: 'information',
+        label: "Information",
+        path: "information",
     },
     security: {
-        label: 'Security',
-        path: 'security',
+        label: "Security",
+        path: "security",
     },
 };
 
@@ -23,8 +23,8 @@ export default function ProfilePage() {
                         <NavLink
                             key={tab}
                             to={`/profile/${TAB_CONFIG[tab].path}`}
-                            className={({ isActive }) => 
-                                `profile-sidebar-btn ${isActive ? 'active' : ''}`
+                            className={({ isActive }) =>
+                                `profile-sidebar-btn ${isActive ? "active" : ""}`
                             }
                         >
                             {TAB_CONFIG[tab].label}

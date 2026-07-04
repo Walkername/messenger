@@ -3,6 +3,7 @@ import type { JWTResponse } from "../types/auth/jwt-response";
 import { apiClient } from "../api/client";
 import { useAuthStore } from "../auth/store";
 import type { AuthResponse } from "../types/auth/auth-response";
+import getClaimFromToken from "../utils/token-validation";
 
 export const authService = {
     login: async (request: AuthRequest): Promise<JWTResponse> => {
@@ -55,5 +56,10 @@ export const authService = {
 
     getToken: (): string | null => {
         return useAuthStore.getState().accessToken;
+    },
+
+    getAccountId: (): number | null => {
+        const token = useAuthStore.getState().accessToken!;
+        return getClaimFromToken(token, "id");
     },
 };

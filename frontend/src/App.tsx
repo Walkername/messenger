@@ -18,6 +18,10 @@ import CallPage from "./pages/call/call-page";
 import { useEffect } from "react";
 import { useAuthStore } from "./auth/store";
 import { apiClient } from "./api/client";
+import FriendsPage from "./pages/friendship/friendship-page";
+import FriendsSection from "./components/friendship/friends-section/friends-section";
+import IncomingSection from "./components/friendship/incoming-section/incoming-section";
+import OutgoingSection from "./components/friendship/outgoing-section/outgoing-section";
 
 function App() {
     const setAccessToken = useAuthStore((state) => state.setAccessToken);
@@ -76,6 +80,32 @@ function App() {
                         </Route>
                         <Route path="/chats/:id" element={<MessengerPage />} />
                         <Route path="/call" element={<CallPage />} />
+                        <Route path="/friends" element={<FriendsPage />}>
+                            <Route
+                                index
+                                element={<Navigate to="/friends/all" replace />}
+                            />
+
+                            <Route
+                                path="all"
+                                element={<FriendsSection />}
+                            />
+
+                            <Route
+                                path="invitations/incoming"
+                                element={<IncomingSection />}
+                            />
+
+                            <Route
+                                path="invitations/outgoing"
+                                element={<OutgoingSection />}
+                            />
+
+                            <Route
+                                path="*"
+                                element={<Navigate to="/friends/all" replace />}
+                            />
+                        </Route>
                     </Route>
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
