@@ -26,11 +26,17 @@ public class RefreshToken {
     @Column(name = "account_id")
     private Long accountId;
 
+    @Column(name = "previous_token_hash")
+    private String previousTokenHash;
+
     @Column(name = "token_hash")
     private String tokenHash;
 
     @Column(name = "created_at")
     private Instant createdAt;
+
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
     public RefreshToken(Long accountId, String tokenHash) {
         this.accountId = accountId;

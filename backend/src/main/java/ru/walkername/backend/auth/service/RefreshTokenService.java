@@ -10,11 +10,13 @@ import ru.walkername.backend.auth.dto.AuthTokens;
 import ru.walkername.backend.auth.entity.Account;
 import ru.walkername.backend.auth.entity.RefreshToken;
 import ru.walkername.backend.auth.exception.AccountNotFoundException;
+import ru.walkername.backend.auth.exception.DuplicateRefreshTokenUpdateException;
 import ru.walkername.backend.auth.exception.InvalidRefreshTokenException;
 import ru.walkername.backend.auth.repository.AuthRepository;
 import ru.walkername.backend.auth.repository.RefreshTokenRepository;
 import ru.walkername.backend.common.security.TokenService;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -27,16 +29,20 @@ public class RefreshTokenService {
     private final TokenService tokenService;
     private final AuthRepository authRepository;
 
+    private static final Duration GRACE_PERIOD = Duration.ofSeconds(5);
+
     @Transactional
     public void update(Long accountId, String rawRefreshToken) {
         Optional<RefreshToken> dbRefreshToken = refreshTokenRepository.findByAccountId(accountId);
-        String refreshTokenHash = tokenService.hashToken(rawRefreshToken);
+        String newRefreshTokenHash = tokenService.hashToken(rawRefreshToken);
 
         if (dbRefreshToken.isPresent()) {
             RefreshToken existingRefreshToken = dbRefreshToken.get();
-            existingRefreshToken.setTokenHash(refreshTokenHash);
+            String currentTokenHash = existingRefreshToken.getTokenHash();
+            existingRefreshToken.setPreviousTokenHash(currentTokenHash);
+            existingRefreshToken.setTokenHash(newRefreshTokenHash);
         } else {
-            RefreshToken newRefreshToken = new RefreshToken(accountId, refreshTokenHash);
+            RefreshToken newRefreshToken = new RefreshToken(accountId, newRefreshTokenHash);
             newRefreshToken.setCreatedAt(Instant.now());
             refreshTokenRepository.save(newRefreshToken);
         }
@@ -66,7 +72,7 @@ public class RefreshTokenService {
             DecodedJWT jwt = tokenService.validateRefreshToken(rawRefreshToken);
             Long accountId = jwt.getClaim("id").asLong();
 
-            Optional<RefreshToken> refreshToken = refreshTokenRepository.findByAccountId(accountId);
+            Optional<RefreshToken> refreshToken = refreshTokenRepository.findByAccountIdWithLock(accountId);
             if (refreshToken.isEmpty()) {
                 log.warn("Not such refresh token by accountId: {}",  accountId);
                 throw new InvalidRefreshTokenException("Invalid refresh token");
@@ -74,6 +80,24 @@ public class RefreshTokenService {
 
             RefreshToken existingRefreshToken = refreshToken.get();
             String existingRefreshTokenHash = existingRefreshToken.getTokenHash();
+
+            String previousTokenHash = existingRefreshToken.getPreviousTokenHash();
+            if (previousTokenHash != null && tokenService.verifyToken(rawRefreshToken, previousTokenHash)) {
+                if (existingRefreshToken.getUpdatedAt() != null) {
+                    long secondsSinceUpdate = Duration.between(
+                            existingRefreshToken.getUpdatedAt(),
+                            Instant.now()
+                    ).toSeconds();
+
+                    if (secondsSinceUpdate > GRACE_PERIOD.getSeconds()) {
+                        log.warn("Duplicate refresh request detected within grace period for accountId: {}", accountId);
+                        Account account = getAccountById(accountId);
+                        String accessToken = tokenService.generateAccessToken(account);
+                        throw new DuplicateRefreshTokenUpdateException(accessToken);
+                    }
+                }
+            }
+
             if (!tokenService.verifyToken(rawRefreshToken, existingRefreshTokenHash)) {
                 log.warn("Mismatch between the refresh token from the database and the request by accountId: {}",  accountId);
                 throw new InvalidRefreshTokenException("Invalid refresh token");

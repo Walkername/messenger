@@ -45,4 +45,18 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="002-add-previous-token-hash-column" author="walkername">
+        <addColumn tableName="refresh_token">
+            <column name="previous_token_hash" type="VARCHAR">
+                <constraints unique="true"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="refresh_token">
+            <column name="updated_at" type="TIMESTAMPTZ" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

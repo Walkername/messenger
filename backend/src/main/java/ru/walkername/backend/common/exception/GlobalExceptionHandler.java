@@ -6,8 +6,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.walkername.backend.auth.dto.JWTResponse;
 import ru.walkername.backend.auth.exception.AccountExistsException;
 import ru.walkername.backend.auth.exception.AccountNotFoundException;
+import ru.walkername.backend.auth.exception.DuplicateRefreshTokenUpdateException;
 import ru.walkername.backend.auth.exception.InvalidCredentialsException;
 import ru.walkername.backend.auth.exception.InvalidRefreshTokenException;
 import ru.walkername.backend.auth.exception.RefreshTokenCookieNotFoundException;
@@ -59,6 +61,12 @@ public class GlobalExceptionHandler {
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<JWTResponse> handleException(DuplicateRefreshTokenUpdateException ex) {
+        JWTResponse response = new JWTResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @ExceptionHandler
