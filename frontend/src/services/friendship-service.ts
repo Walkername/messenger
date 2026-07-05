@@ -57,5 +57,27 @@ export const friendshipService = {
             console.error("Inviting as friend error:", error);
             throw error;
         }
-    }
+    },
+
+    inviteAsFriend: async (accountId: number): Promise<FriendshipResponse> => {
+        try {
+            return apiClient.post<FriendshipResponse>(
+                `/friendship/me/invite?id=${accountId}`
+            );
+        } catch (error) {
+            console.error("Inviting as friend error:", error);
+            throw error;
+        }
+    },
+
+    removeFromFriend: async (accountId: number) => {
+        try {
+            return apiClient.delete(
+                `/friendship/me/remove/${accountId}`
+            );
+        } catch (error) {
+            console.error("Inviting as friend error:", error);
+            throw error;
+        }
+    },
 };

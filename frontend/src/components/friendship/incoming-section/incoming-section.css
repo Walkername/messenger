@@ -1,0 +1,69 @@
+
+.incoming-invitations-container {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.incoming-invitation-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+
+    padding: 12px;
+
+    font-size: 15px;
+}
+
+.incoming-invitation-card-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+}
+
+.incoming-invitation-card-username {
+    color: #adb5bd;
+    font-style: italic;
+}
+
+.incoming-invitation-card-firstname {
+    font-weight: 600;
+}
+
+.incoming-invitation-card-sent-at {
+    color: #adb5bd;
+    font-size: 11px;
+}
+
+.incoming-invitation-card-functions {
+    display: flex;
+    align-self: center;
+    gap: 10px;
+}
+
+.incoming-invitation-card-accept {
+    background-color: #f8f9fa;
+    border: none;
+    color: black;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.incoming-invitation-card-accept:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}

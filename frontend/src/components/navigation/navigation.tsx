@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
 import "./navigation.css";
-import { authService } from "../../services/auth-service";
-// import { useAuthStore } from "../../auth/store";
+import { useAuthStore } from "../../auth/store";
 
 export default function Navigation() {
-    const accessToken = authService.getToken();
+    const { accessToken } = useAuthStore();
     
     const handleLogout = () => {
         localStorage.clear();

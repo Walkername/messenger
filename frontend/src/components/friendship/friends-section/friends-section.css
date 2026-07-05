@@ -1,0 +1,38 @@
+
+.friends-container {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+}
+
+.friends-switches-sidebar {
+    min-width: 100px;
+    border-left: 1px solid #e9ecef;
+    flex-shrink: 0;
+}
+
+.friends-switches-sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    padding-top: 4px;
+}
+
+.friends-switches-sidebar-btn {
+    text-decoration: none;
+    color: black;
+    font-size: 15px;
+    padding: 6px;
+    margin: 2px 6px;
+    text-align: left;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+.friends-switches-sidebar-btn:hover {
+    background-color: #f8f9fa;
+}
+
+.friends-switches-sidebar-btn.active {
+    background-color: #e3e3e3;
+}

@@ -4,7 +4,8 @@ import "./invite-as-friend.css";
 
 export default function InviteAsFriend() {
     const [usernameToInvite, setUsernameToInvite] = useState<string>("");
-    const handleInviteAsFriend = () => {
+    const handleInviteAsFriend = (e: React.SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
         friendshipService.inviteAsFriendByUsername(usernameToInvite);
     };
 

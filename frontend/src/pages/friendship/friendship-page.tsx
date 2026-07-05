@@ -1,51 +1,55 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { Navigate, NavLink, useSearchParams } from "react-router-dom";
 import "./friendship-page.css";
 import InviteAsFriend from "../../components/friendship/invite-as-friend/invite-as-friend";
+import FriendsSection from "../../components/friendship/friends-section/friends-section";
+import IncomingSection from "../../components/friendship/incoming-section/incoming-section";
+import OutgoingSection from "../../components/friendship/outgoing-section/outgoing-section";
 
-type TabOption = "friends" | "incoming" | "outgoing";
+type Section = "all" | "incoming" | "outgoing";
 
-const TAB_CONFIG: Record<TabOption, { label: string; path: string }> = {
-    friends: {
+const TAB_CONFIG: Record<Section, { label: string }> = {
+    all: {
         label: "Friends",
-        path: "all",
     },
     incoming: {
         label: "Incoming invitations",
-        path: "invitations/incoming",
     },
     outgoing: {
         label: "Outgoing invitations",
-        path: "invitations/outgoing"
     },
 };
 
 export default function FriendsPage() {
-    
+    const [searchParams] = useSearchParams();
+    const section = searchParams.get("section");
 
-    
-
-    
+    if (!section) {
+        return <Navigate to="/friends?section=all" replace />;
+    }
 
     return (
         <div className="friendship-page-layout">
             <aside className="friendship-page-sidebar">
                 <nav className="friendship-page-sidebar-nav">
-                    {(Object.keys(TAB_CONFIG) as TabOption[]).map((tab) => (
+                    {Object.entries(TAB_CONFIG).map(([key, value]) => (
                         <NavLink
-                            key={tab}
-                            to={`/friends/${TAB_CONFIG[tab].path}`}
-                            className={({ isActive }) =>
-                                `friendship-sidebar-btn ${isActive ? "active" : ""}`
+                            key={key}
+                            to={`/friends?section=${key}`}
+                            className={() =>
+                                `friendship-sidebar-btn ${section === key ? "active" : ""}`
                             }
                         >
-                            {TAB_CONFIG[tab].label}
+                            {value.label}
                         </NavLink>
                     ))}
                 </nav>
             </aside>
             <main className="current-friendship-option">
                 <InviteAsFriend />
-                <Outlet />
+                {section === "all" && <FriendsSection />}
+                {section === "online" && <FriendsSection />}
+                {section === "incoming" && <IncomingSection />}
+                {section === "outgoing" && <OutgoingSection />}
             </main>
         </div>
     );

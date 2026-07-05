@@ -1,21 +1,42 @@
-import { useEffect, useState } from "react";
-import { friendshipService } from "../../../services/friendship-service";
-import type { PageResponse } from "../../../types/common/page-response";
-import type { FriendshipResponse } from "../../../types/friendship/friendship-response";
+import "./friends-section.css";
+import { NavLink, useSearchParams } from "react-router-dom";
+import AllFriendsList from "../all-friends-list/all-friends-list";
+import OnlineFriendsList from "../online-friends-list/online-friends-list";
+
+type Section = "all" | "online";
+
+const TAB_CONFIG: Record<Section, { label: string }> = {
+    all: {
+        label: "All",
+    },
+    online: {
+        label: "Online",
+    },
+};
 
 export default function FriendsSection() {
-    const [friends, setFriends] = useState<PageResponse<FriendshipResponse>>();
+    const [searchParams] = useSearchParams();
+    const section = searchParams.get("section");
 
-    useEffect(() => {
-        friendshipService.getMyFriends().then((data) => {
-            setFriends(data);
-        });
-    }, []);
-    
     return (
-        <div>
-            {friends &&
-                friends.content.map((friend) => <div>{friend.username}</div>)}
+        <div className="friends-container">
+            {section === "all" && <AllFriendsList />}
+            {section === "online" && <OnlineFriendsList />}
+            <aside className="friends-switches-sidebar">
+                <nav className="friends-switches-sidebar-nav">
+                    {Object.entries(TAB_CONFIG).map(([key, value]) => (
+                        <NavLink
+                            key={key}
+                            to={`/friends?section=${key}`}
+                            className={() =>
+                                `friendship-sidebar-btn ${section === key ? "active" : ""}`
+                            }
+                        >
+                            {value.label}
+                        </NavLink>
+                    ))}
+                </nav>
+            </aside>
         </div>
     );
 }
