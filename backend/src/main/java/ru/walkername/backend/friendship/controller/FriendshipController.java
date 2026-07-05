@@ -75,22 +75,13 @@ public class FriendshipController {
         return new ResponseEntity<>(friendship, HttpStatus.OK);
     }
 
-//    @PostMapping("/accept/{id}")
-//    public ResponseEntity<Friendship> acceptAsFriend(
-//            @PathVariable("id") Long targetId,
-//            @AuthenticationPrincipal UserPrincipal userPrincipal
-//    ) {
-//        Friendship friendship = friendshipService.inviteAsFriend(userPrincipal, targetId);
-//        return new ResponseEntity<>(friendship, HttpStatus.OK);
-//    }
-
     @DeleteMapping("/me/remove/{id}")
-    public ResponseEntity<String> removeFromFriends(
+    public ResponseEntity<HttpStatus> removeFromFriends(
             @PathVariable("id") Long targetId,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         friendshipService.removeFromFriends(userPrincipal, targetId);
-        return new ResponseEntity<>("", HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

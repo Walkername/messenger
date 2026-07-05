@@ -151,12 +151,8 @@ public class FriendshipService {
             friendshipByTargetGet.setUpdatedAt(Instant.now());
         }
 
-        boolean result = friendshipRepository.deleteBySubscriberIdAndTargetId(principal.accountId(), targetId);
-        if (result) {
-            log.info("Friendship by subscriber ({}) with target ({}) was deleted", principal.accountId(), targetId);
-        } else {
-            log.warn("There is no friendship by subscriber ({}) with target ({}) in order to delete", principal.accountId(), targetId);
-        }
+        friendshipRepository.deleteBySubscriberIdAndTargetId(principal.accountId(), targetId);
+        log.info("Friendship by subscriber ({}) with target ({}) was deleted", principal.accountId(), targetId);
     }
 
 }

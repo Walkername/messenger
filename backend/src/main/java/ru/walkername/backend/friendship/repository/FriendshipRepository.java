@@ -16,7 +16,7 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
     Optional<Friendship> findBySubscriberIdAndTargetId(Long subscriberId, Long targetId);
 
-    boolean deleteBySubscriberIdAndTargetId(Long subscriberId, Long targetId);
+    void deleteBySubscriberIdAndTargetId(Long subscriberId, Long targetId);
 
     @Query("""
             SELECT new ru.walkername.backend.friendship.view.FriendshipView(
@@ -58,6 +58,6 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
             AND f.status = :status
             ORDER BY a.username ASC
 """)
-    Page<FriendshipView> findByTargetIdAndStatus(Long subscriberId, FriendshipStatus status, Pageable pageable);
+    Page<FriendshipView> findByTargetIdAndStatus(Long targetId, FriendshipStatus status, Pageable pageable);
 
 }
