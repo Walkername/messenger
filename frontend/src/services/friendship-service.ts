@@ -1,14 +1,11 @@
 import { apiClient } from "../api/client";
 import type { PageResponse } from "../types/common/page-response";
 import type { FriendshipResponse } from "../types/friendship/friendship-response";
-import type { ProfileResponse } from "../types/profile/profile-response";
 
 export const friendshipService = {
-    getOnlineUsers: async (): Promise<ProfileResponse[]> => {
+    getMyOnlineFriends: async (): Promise<PageResponse<FriendshipResponse>> => {
         try {
-            return await apiClient.get<ProfileResponse[]>(
-                "/calls/active-users",
-            );
+            return await apiClient.get<PageResponse<FriendshipResponse>>("/friendship/me/online");
         } catch (error) {
             console.error("Get online users error:", error);
             throw error;
@@ -18,7 +15,7 @@ export const friendshipService = {
     getMyFriends: async (): Promise<PageResponse<FriendshipResponse>> => {
         try {
             return await apiClient.get<PageResponse<FriendshipResponse>>(
-                "/friendship/me"
+                "/friendship/me",
             );
         } catch (error) {
             console.error("Getting friends error:", error);
@@ -26,10 +23,12 @@ export const friendshipService = {
         }
     },
 
-    getMyOutgoingInvites: async (): Promise<PageResponse<FriendshipResponse>> => {
+    getMyOutgoingInvites: async (): Promise<
+        PageResponse<FriendshipResponse>
+    > => {
         try {
             return await apiClient.get<PageResponse<FriendshipResponse>>(
-                "/friendship/me/invitations/outgoing"
+                "/friendship/me/invitations/outgoing",
             );
         } catch (error) {
             console.error("Getting outgoing invitations error:", error);
@@ -37,10 +36,12 @@ export const friendshipService = {
         }
     },
 
-    getMyIncomingInvites: async (): Promise<PageResponse<FriendshipResponse>> => {
+    getMyIncomingInvites: async (): Promise<
+        PageResponse<FriendshipResponse>
+    > => {
         try {
             return await apiClient.get<PageResponse<FriendshipResponse>>(
-                "/friendship/me/invitations/incoming"
+                "/friendship/me/invitations/incoming",
             );
         } catch (error) {
             console.error("Getting incoming invitations error:", error);
@@ -48,10 +49,12 @@ export const friendshipService = {
         }
     },
 
-    inviteAsFriendByUsername: async (username: string): Promise<FriendshipResponse> => {
+    inviteAsFriendByUsername: async (
+        username: string,
+    ): Promise<FriendshipResponse> => {
         try {
             return apiClient.post<FriendshipResponse>(
-                `/friendship/me/invite/usr?username=${username}`
+                `/friendship/me/invite/usr?username=${username}`,
             );
         } catch (error) {
             console.error("Inviting as friend error:", error);
@@ -62,7 +65,7 @@ export const friendshipService = {
     inviteAsFriend: async (accountId: number): Promise<FriendshipResponse> => {
         try {
             return apiClient.post<FriendshipResponse>(
-                `/friendship/me/invite?id=${accountId}`
+                `/friendship/me/invite?id=${accountId}`,
             );
         } catch (error) {
             console.error("Inviting as friend error:", error);
@@ -72,9 +75,7 @@ export const friendshipService = {
 
     removeFromFriend: async (accountId: number) => {
         try {
-            return apiClient.delete(
-                `/friendship/me/remove/${accountId}`
-            );
+            return apiClient.delete(`/friendship/me/remove/${accountId}`);
         } catch (error) {
             console.error("Inviting as friend error:", error);
             throw error;

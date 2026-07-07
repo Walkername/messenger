@@ -51,7 +51,6 @@ const VideoCall: React.FC<VideoCallProps> = ({
                 await signalingService.connect(
                     accountId,
                     (message: SignalingMessage) => {
-                        console.log("gfdh");
                         handleSignalingMessage(message);
                     },
                 );

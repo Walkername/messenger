@@ -19,6 +19,7 @@ import { useEffect } from "react";
 import { useAuthStore } from "./auth/store";
 import { apiClient } from "./api/client";
 import FriendsPage from "./pages/friendship/friendship-page";
+import websocketService from "./services/websocket-service";
 
 function App() {
     const setAccessToken = useAuthStore((state) => state.setAccessToken);
@@ -35,6 +36,7 @@ function App() {
             })
             .finally(() => {
                 setLoading(false);
+                websocketService.connect();
             });
     }, [setAccessToken, setLoading]);
 

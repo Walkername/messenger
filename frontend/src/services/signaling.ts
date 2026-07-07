@@ -2,6 +2,7 @@
 import { Client, type Message } from "@stomp/stompjs";
 import type { SignalingMessage } from "../types/call/webrtc";
 import { authService } from "./auth-service";
+import websocketService from "./websocket-service";
 
 class SignalingService {
     private stompClient: Client | null = null;
@@ -12,6 +13,12 @@ class SignalingService {
         accountId: string,
         onMessage: (message: SignalingMessage) => void,
     ): Promise<void> {
+        // return websocketService.connect()
+        //     .then(() => {
+        //         console.log("✅ Signaling connected");
+        //         websocketService.registerSignalingHandler(onMessage);
+        //     })
+        
         return new Promise((resolve, reject) => {
             this.onMessageCallback = onMessage;
             const token = authService.getToken();
@@ -57,7 +64,6 @@ class SignalingService {
     private handleIncomingMessage(message: Message) {
         try {
             const data: SignalingMessage = JSON.parse(message.body);
-            console.log(data);
             if (this.onMessageCallback) {
                 this.onMessageCallback(data);
             }
@@ -82,7 +88,9 @@ class SignalingService {
     }
 
     sendSignalingMessage(message: SignalingMessage) {
-        console.log(`/video-call/${message.type}`);
+        // const destination = `/app/video-call/${message.type}`;
+        // websocketService.sendMessage(destination, message);
+        
         const destination = `/app/video-call/${message.type}`;
         this.sendMessage(destination, message);
     }
@@ -93,6 +101,7 @@ class SignalingService {
     }
 
     get isConnected(): boolean {
+        // return websocketService.connected;
         return this.stompClient?.connected || false;
     }
 }
