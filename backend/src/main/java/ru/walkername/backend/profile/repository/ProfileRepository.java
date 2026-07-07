@@ -8,6 +8,7 @@ import ru.walkername.backend.profile.entity.Profile;
 import ru.walkername.backend.profile.view.ProfileView;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
@@ -32,4 +33,20 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
     Optional<Profile> findByAccountId(Long accountId);
 
     boolean existsByAccount(Account account);
+
+    @Query("""
+            SELECT new ru.walkername.backend.profile.view.ProfileView(
+                a.id,
+                p.id,
+                a.username,
+                p.firstName,
+                p.createdAt,
+                p.updatedAt
+            )
+            FROM Profile p
+            JOIN Account a
+            ON p.account.id = a.id
+            WHERE a.id IN :accountIds
+""")
+    Set<ProfileView> findOnlineFriendsBySubscriberId(Long accountId, Set<Long> accountIds);
 }

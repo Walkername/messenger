@@ -16,6 +16,9 @@ import ru.walkername.backend.common.security.UserPrincipal;
 import ru.walkername.backend.friendship.dto.FriendshipResponse;
 import ru.walkername.backend.friendship.entity.Friendship;
 import ru.walkername.backend.friendship.service.FriendshipService;
+import ru.walkername.backend.profile.controller.ProfileStatusController;
+
+import java.util.Set;
 
 @RequiredArgsConstructor
 @RestController
@@ -23,6 +26,7 @@ import ru.walkername.backend.friendship.service.FriendshipService;
 public class FriendshipController {
 
     private final FriendshipService friendshipService;
+    private final ProfileStatusController  profileStatusController;
 
     @GetMapping("/me")
     public ResponseEntity<PageResponse<FriendshipResponse>> getMyFriends(
@@ -33,6 +37,23 @@ public class FriendshipController {
         PageResponse<FriendshipResponse> response = friendshipService
                 .findFriendsBySubscriberId(userPrincipal.accountId(), page, limit);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/me/online")
+    public ResponseEntity<PageResponse<FriendshipResponse>> getMyOnlineFriends(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "limit", defaultValue = "20") Integer limit,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        Set<Long> onlineProfiles = profileStatusController.getSessions().keySet();
+        PageResponse<FriendshipResponse> onlineFriends = friendshipService
+                .findOnlineFriendsBySubscriberId(
+                        userPrincipal.accountId(),
+                        onlineProfiles,
+                        page,
+                        limit
+                );
+        return new ResponseEntity<>(onlineFriends, HttpStatus.OK);
     }
 
     @GetMapping("/me/invitations/incoming")

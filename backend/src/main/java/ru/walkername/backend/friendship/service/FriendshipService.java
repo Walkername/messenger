@@ -20,6 +20,8 @@ import ru.walkername.backend.friendship.repository.FriendshipRepository;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,6 +31,44 @@ public class FriendshipService {
     private final FriendshipRepository friendshipRepository;
     private final AuthRepository authRepository;
     private final FriendshipMapper friendshipMapper;
+
+    public Set<FriendshipResponse> findOnlineFriendsBySubscriberId(Long accountId, Set<Long> onlineAccountIds){
+        return friendshipRepository
+                .findOnlineFriendsBySubscriberIdAndStatus(
+                        accountId,
+                        FriendshipStatus.FRIENDSHIP,
+                        onlineAccountIds
+                )
+                .stream()
+                .map(friendshipMapper::toFriendshipResponse)
+                .collect(Collectors.toSet());
+    }
+
+    public PageResponse<FriendshipResponse> findOnlineFriendsBySubscriberId(
+            Long subscriberId,
+            Set<Long> onlineProfiles,
+            int page,
+            int limit
+    ) {
+        Pageable pageable = PageRequest.of(page, limit);
+
+        Page<FriendshipResponse> friendships = friendshipRepository
+                .findOnlineFriendsBySubscriberIdAndStatus(
+                        subscriberId,
+                        onlineProfiles,
+                        FriendshipStatus.FRIENDSHIP,
+                        pageable
+                )
+                .map(friendshipMapper::toFriendshipResponse);
+
+        return new PageResponse<>(
+                friendships.getContent(),
+                page,
+                limit,
+                friendships.getTotalElements(),
+                friendships.getTotalPages()
+        );
+    }
 
     public PageResponse<FriendshipResponse> findFriendsBySubscriberId(Long subscriberId, int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
