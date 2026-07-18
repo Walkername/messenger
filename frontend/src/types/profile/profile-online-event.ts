@@ -1,7 +1,6 @@
-import type { FriendshipResponse } from "../friendship/friendship-response";
+import type { FriendResponse } from "../friendship/friendship";
 
 export type ProfileOnlineEvent = {
-    accountId: number;
-    profile: FriendshipResponse;
+    friend: FriendResponse;
     isOnline: boolean;
 }

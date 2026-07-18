@@ -1,20 +1,20 @@
 import { apiClient } from "../api/client";
 import type { PageResponse } from "../types/common/page-response";
-import type { FriendshipResponse } from "../types/friendship/friendship-response";
+import type { FriendResponse, IncomingRequestResponse, OutgoingRequestResponse } from "../types/friendship/friendship";
 
 export const friendshipService = {
-    getMyOnlineFriends: async (): Promise<PageResponse<FriendshipResponse>> => {
+    getMyOnlineFriends: async (): Promise<PageResponse<FriendResponse>> => {
         try {
-            return await apiClient.get<PageResponse<FriendshipResponse>>("/friendship/me/online");
+            return await apiClient.get<PageResponse<FriendResponse>>("/friendship/me/online");
         } catch (error) {
             console.error("Get online users error:", error);
             throw error;
         }
     },
 
-    getMyFriends: async (): Promise<PageResponse<FriendshipResponse>> => {
+    getMyFriends: async (): Promise<PageResponse<FriendResponse>> => {
         try {
-            return await apiClient.get<PageResponse<FriendshipResponse>>(
+            return await apiClient.get<PageResponse<FriendResponse>>(
                 "/friendship/me",
             );
         } catch (error) {
@@ -24,10 +24,10 @@ export const friendshipService = {
     },
 
     getMyOutgoingInvites: async (): Promise<
-        PageResponse<FriendshipResponse>
+        PageResponse<OutgoingRequestResponse>
     > => {
         try {
-            return await apiClient.get<PageResponse<FriendshipResponse>>(
+            return await apiClient.get<PageResponse<OutgoingRequestResponse>>(
                 "/friendship/me/invitations/outgoing",
             );
         } catch (error) {
@@ -37,10 +37,10 @@ export const friendshipService = {
     },
 
     getMyIncomingInvites: async (): Promise<
-        PageResponse<FriendshipResponse>
+        PageResponse<IncomingRequestResponse>
     > => {
         try {
-            return await apiClient.get<PageResponse<FriendshipResponse>>(
+            return await apiClient.get<PageResponse<IncomingRequestResponse>>(
                 "/friendship/me/invitations/incoming",
             );
         } catch (error) {
@@ -51,9 +51,9 @@ export const friendshipService = {
 
     inviteAsFriendByUsername: async (
         username: string,
-    ): Promise<FriendshipResponse> => {
+    ): Promise<FriendResponse> => {
         try {
-            return apiClient.post<FriendshipResponse>(
+            return apiClient.post<FriendResponse>(
                 `/friendship/me/invite/usr?username=${username}`,
             );
         } catch (error) {
@@ -62,9 +62,9 @@ export const friendshipService = {
         }
     },
 
-    inviteAsFriend: async (accountId: number): Promise<FriendshipResponse> => {
+    inviteAsFriend: async (accountId: number): Promise<FriendResponse> => {
         try {
-            return apiClient.post<FriendshipResponse>(
+            return apiClient.post<FriendResponse>(
                 `/friendship/me/invite?id=${accountId}`,
             );
         } catch (error) {

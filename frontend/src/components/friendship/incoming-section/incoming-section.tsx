@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import type { FriendshipResponse } from "../../../types/friendship/friendship-response";
 import type { PageResponse } from "../../../types/common/page-response";
 import { friendshipService } from "../../../services/friendship-service";
 import "./incoming-section.css";
 import { formatTimeLong } from "../../../utils/validation-time";
+import type { IncomingRequestResponse } from "../../../types/friendship/friendship";
 
 export default function IncomingSection() {
     const [incomingInvitations, setIncomingInvitations] =
-        useState<PageResponse<FriendshipResponse>>();
+        useState<PageResponse<IncomingRequestResponse>>();
 
     useEffect(() => {
         friendshipService.getMyIncomingInvites().then((data) => {

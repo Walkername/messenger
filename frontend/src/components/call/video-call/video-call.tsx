@@ -42,14 +42,13 @@ const VideoCall: React.FC<VideoCallProps> = ({
         onCallEnded,
     });
 
-    // Подключение к WebSocket
     useEffect(() => {
         const connectWebSocket = async () => {
             try {
                 window.__signalingService = signalingService;
 
                 await signalingService.connect(
-                    accountId,
+                    // accountId,
                     (message: SignalingMessage) => {
                         handleSignalingMessage(message);
                     },

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import type { PageResponse } from "../../../types/common/page-response";
-import type { FriendshipResponse } from "../../../types/friendship/friendship-response";
 import { friendshipService } from "../../../services/friendship-service";
 import "./outgoing-section.css";
 import { formatTimeLong } from "../../../utils/validation-time";
+import type { OutgoingRequestResponse } from "../../../types/friendship/friendship";
 
 export default function OutgoingSection() {
     const [outgoingInvitations, setOutgoingInvitations] =
-        useState<PageResponse<FriendshipResponse>>();
+        useState<PageResponse<OutgoingRequestResponse>>();
     useEffect(() => {
         friendshipService.getMyOutgoingInvites().then((data) => {
             setOutgoingInvitations(data);

@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import "./online-friends-list.css";
 import type { PageResponse } from "../../../types/common/page-response";
-import type { FriendshipResponse } from "../../../types/friendship/friendship-response";
 import websocketService from "../../../services/websocket-service";
 import { friendshipService } from "../../../services/friendship-service";
 import { formatTimeLong } from "../../../utils/validation-time";
 import type { ProfileOnlineEvent } from "../../../types/profile/profile-online-event";
+import type { FriendResponse } from "../../../types/friendship/friendship";
 
 export default function OnlineFriendsList() {
     const [onlineFriends, setOnlineFriends] =
-        useState<PageResponse<FriendshipResponse>>();
+        useState<PageResponse<FriendResponse>>();
 
     const handleNewProfileOnline = (event: ProfileOnlineEvent) => {
         setOnlineFriends((prev) => {
@@ -20,7 +20,7 @@ export default function OnlineFriendsList() {
             // Пользователь стал онлайн
             if (event.isOnline) {
                 const alreadyExists = prev.content.some(
-                    (friend) => friend.targetId === event.accountId,
+                    (friend) => friend.friendId === event.friend.friendId,
                 );
 
                 if (alreadyExists) {
@@ -29,7 +29,7 @@ export default function OnlineFriendsList() {
 
                 return {
                     ...prev,
-                    content: [...prev.content, event.profile],
+                    content: [...prev.content, event.friend],
                     totalElements: prev.totalElements + 1,
                 };
             }
@@ -38,7 +38,7 @@ export default function OnlineFriendsList() {
             return {
                 ...prev,
                 content: prev.content.filter(
-                    (friend) => friend.targetId !== event.accountId,
+                    (friend) => friend.friendId !== event.friend.friendId,
                 ),
                 totalElements: Math.max(0, prev.totalElements - 1),
             };
@@ -62,7 +62,7 @@ export default function OnlineFriendsList() {
                                 {friend.firstname !== null ? friend.firstname : ""}
                             </span>
                             <span className="friend-card-username">
-                                @{friend.username}
+                                @{friend.username} <span className="online-status-icon"></span>
                             </span>
                             <span className="friend-card-sent-at">
                                 {formatTimeLong(friend.createdAt)}

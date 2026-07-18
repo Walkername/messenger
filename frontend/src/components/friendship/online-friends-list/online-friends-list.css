@@ -6,7 +6,6 @@
     gap: 10px;
 }
 
-
 .online-friend-card {
     display: flex;
     justify-content: space-between;
@@ -66,4 +65,56 @@
     background-color: rgba(255, 255, 255, 0.3);
     transform: translateX(2px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.online-status-icon {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #4caf50; /* Зеленый цвет для онлайн */
+    border-radius: 50%;
+    margin-left: 6px;
+    position: relative;
+    animation: pulse 2s infinite;
+    box-shadow: 0 0 6px rgba(76, 175, 80, 0.4);
+}
+
+/* Анимация пульсации для активного онлайн статуса */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 6px rgba(76, 175, 80, 0.4);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 12px rgba(76, 175, 80, 0.6);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 6px rgba(76, 175, 80, 0.4);
+    }
+}
+
+/* Вариант с внешним кольцом (более заметный) */
+.online-status-icon::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border-radius: 50%;
+    border: 2px solid rgba(76, 175, 80, 0.2);
+    animation: ring-pulse 2s infinite;
+}
+
+@keyframes ring-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
 }

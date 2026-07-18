@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { friendshipService } from "../../../services/friendship-service";
 import type { PageResponse } from "../../../types/common/page-response";
-import type { FriendshipResponse } from "../../../types/friendship/friendship-response";
 import { formatTimeLong } from "../../../utils/validation-time";
 import "./all-friends-list.css";
+import type { FriendResponse } from "../../../types/friendship/friendship";
 
 export default function AllFriendsList() {
-    const [friends, setFriends] = useState<PageResponse<FriendshipResponse>>();
+    const [friends, setFriends] = useState<PageResponse<FriendResponse>>();
 
     useEffect(() => {
         friendshipService.getMyFriends().then((data) => {
@@ -39,7 +39,7 @@ export default function AllFriendsList() {
                             <button
                                 className="friend-card-remove"
                                 onClick={() =>
-                                    handleRemoveFromFriend(friend.targetId)
+                                    handleRemoveFromFriend(friend.friendId)
                                 }
                             >
                                 Remove
