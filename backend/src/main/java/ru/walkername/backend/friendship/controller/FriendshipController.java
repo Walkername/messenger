@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.walkername.backend.common.dto.PageResponse;
 import ru.walkername.backend.common.security.UserPrincipal;
-import ru.walkername.backend.friendship.dto.FriendshipResponse;
+import ru.walkername.backend.friendship.dto.FriendResponse;
+import ru.walkername.backend.friendship.dto.IncomingRequestResponse;
+import ru.walkername.backend.friendship.dto.OutgoingRequestResponse;
 import ru.walkername.backend.friendship.entity.Friendship;
+import ru.walkername.backend.friendship.mapper.FriendMapper;
 import ru.walkername.backend.friendship.service.FriendshipService;
 import ru.walkername.backend.profile.controller.ProfileStatusController;
 
@@ -27,27 +30,28 @@ public class FriendshipController {
 
     private final FriendshipService friendshipService;
     private final ProfileStatusController  profileStatusController;
+    private final FriendMapper friendMapper;
 
     @GetMapping("/me")
-    public ResponseEntity<PageResponse<FriendshipResponse>> getMyFriends(
+    public ResponseEntity<PageResponse<FriendResponse>> getMyFriends(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "limit", defaultValue = "20") Integer limit,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        PageResponse<FriendshipResponse> response = friendshipService
-                .findFriendsBySubscriberId(userPrincipal.accountId(), page, limit);
+        PageResponse<FriendResponse> response = friendshipService
+                .findFriendsByAccountId(userPrincipal.accountId(), page, limit);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/me/online")
-    public ResponseEntity<PageResponse<FriendshipResponse>> getMyOnlineFriends(
+    public ResponseEntity<PageResponse<FriendResponse>> getMyOnlineFriends(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "limit", defaultValue = "20") Integer limit,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         Set<Long> onlineProfiles = profileStatusController.getSessions().keySet();
-        PageResponse<FriendshipResponse> onlineFriends = friendshipService
-                .findOnlineFriendsBySubscriberId(
+        PageResponse<FriendResponse> onlineFriends = friendshipService
+                .findOnlineFriendsByAccountId(
                         userPrincipal.accountId(),
                         onlineProfiles,
                         page,
@@ -57,43 +61,45 @@ public class FriendshipController {
     }
 
     @GetMapping("/me/invitations/incoming")
-    public ResponseEntity<PageResponse<FriendshipResponse>> getMyIncomingInvitations(
+    public ResponseEntity<PageResponse<IncomingRequestResponse>> getMyIncomingInvitations(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "limit", defaultValue = "20") Integer limit,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        PageResponse<FriendshipResponse> response = friendshipService
-                .findSubscriptionsOnTargetId(userPrincipal.accountId(), page, limit);
+        PageResponse<IncomingRequestResponse> response = friendshipService
+                .findSubscribersByAccountId(userPrincipal.accountId(), page, limit);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/me/invitations/outgoing")
-    public ResponseEntity<PageResponse<FriendshipResponse>> getMyOutgoingInvitations(
+    public ResponseEntity<PageResponse<OutgoingRequestResponse>> getMyOutgoingInvitations(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "limit", defaultValue = "20") Integer limit,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        PageResponse<FriendshipResponse> response = friendshipService
-                .findSubscriptionsBySubscriberId(userPrincipal.accountId(), page, limit);
+        PageResponse<OutgoingRequestResponse> response = friendshipService
+                .findSubscriptionsByAccountId(userPrincipal.accountId(), page, limit);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/me/invite")
-    public ResponseEntity<Friendship> inviteAsFriend(
+    public ResponseEntity<FriendResponse> inviteAsFriend(
             @RequestParam("id") Long targetId,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         Friendship friendship = friendshipService.inviteAsFriend(userPrincipal, targetId);
-        return new ResponseEntity<>(friendship, HttpStatus.OK);
+        FriendResponse response = friendMapper.toFriendResponse(friendship);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/me/invite/usr")
-    public ResponseEntity<Friendship> inviteAsFriend(
+    public ResponseEntity<FriendResponse> inviteAsFriend(
             @RequestParam String username,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         Friendship friendship = friendshipService.inviteAsFriend(userPrincipal, username);
-        return new ResponseEntity<>(friendship, HttpStatus.OK);
+        FriendResponse response = friendMapper.toFriendResponse(friendship);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/me/remove/{id}")

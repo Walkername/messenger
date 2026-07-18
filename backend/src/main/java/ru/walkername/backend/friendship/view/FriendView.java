@@ -1,11 +1,10 @@
-package ru.walkername.backend.friendship.dto;
+package ru.walkername.backend.friendship.view;
 
 import java.time.Instant;
 
-public record FriendshipResponse(
+public record FriendView(
         Long id,
-        Long subscriberId,
-        Long targetId,
+        Long friendId,
         String username,
         String firstname,
         Instant createdAt,

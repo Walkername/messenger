@@ -6,7 +6,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import ru.walkername.backend.friendship.dto.FriendshipResponse;
+import ru.walkername.backend.friendship.dto.OnlineFriendNotificationResponse;
 import ru.walkername.backend.friendship.service.FriendshipService;
 import ru.walkername.backend.profile.events.ProfileStatusChangeEvent;
 
@@ -28,7 +28,6 @@ public class ProfileStatusController {
 
     @MessageMapping("/profile/register")
     public void registerUser(@Payload Long accountId, SimpMessageHeaderAccessor headerAccessor) {
-        System.out.println("registerUser");
         String sessionId = headerAccessor.getSessionId();
         headerAccessor.getSessionAttributes().put("accountId", accountId);
 
@@ -47,21 +46,20 @@ public class ProfileStatusController {
     }
 
     private void notifyFriendsAboutUserOnline(Long accountId) {
-        Set<FriendshipResponse> usersOnlineFriends = friendshipService
-                .findOnlineFriendsBySubscriberId(accountId, getSessions().keySet());
+        Set<OnlineFriendNotificationResponse> usersOnlineFriends = friendshipService
+                .findOnlineFriendsByAccountIdForNotification(accountId, getSessions().keySet());
 
         if (usersOnlineFriends.isEmpty()) {
             return;
         }
 
-        for (FriendshipResponse friendship : usersOnlineFriends) {
+        for (OnlineFriendNotificationResponse notification : usersOnlineFriends) {
             ProfileStatusChangeEvent event = new ProfileStatusChangeEvent(
-                    accountId,
-                    friendship,
+                    notification.friend(),
                     true
             );
             messagingTemplate.convertAndSendToUser(
-                    friendship.targetId().toString(),
+                    notification.targetAccountId().toString(),
                     "/queue/friend-status-change",
                     event
             );
@@ -88,22 +86,21 @@ public class ProfileStatusController {
     }
 
     private void notifyFriendsAboutUserOffline(Long accountId) {
-        Set<FriendshipResponse> usersOnlineFriends = friendshipService
-                .findOnlineFriendsBySubscriberId(accountId, getSessions().keySet());
+        Set<OnlineFriendNotificationResponse> usersOnlineFriends = friendshipService
+                .findOnlineFriendsByAccountIdForNotification(accountId, getSessions().keySet());
 
         if (usersOnlineFriends.isEmpty()) {
             return;
         }
 
-        for (FriendshipResponse friendship : usersOnlineFriends) {
+        for (OnlineFriendNotificationResponse notification : usersOnlineFriends) {
             ProfileStatusChangeEvent event = new ProfileStatusChangeEvent(
-                    accountId,
-                    friendship,
+                    notification.friend(),
                     false
             );
 
             messagingTemplate.convertAndSendToUser(
-                    friendship.targetId().toString(),
+                    notification.targetAccountId().toString(),
                     "/queue/friend-status-change",
                     event
             );

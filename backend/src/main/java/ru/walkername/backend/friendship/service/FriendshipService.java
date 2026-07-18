@@ -12,10 +12,13 @@ import ru.walkername.backend.auth.exception.AccountNotFoundException;
 import ru.walkername.backend.auth.repository.AuthRepository;
 import ru.walkername.backend.common.dto.PageResponse;
 import ru.walkername.backend.common.security.UserPrincipal;
-import ru.walkername.backend.friendship.dto.FriendshipResponse;
+import ru.walkername.backend.friendship.dto.FriendResponse;
+import ru.walkername.backend.friendship.dto.IncomingRequestResponse;
+import ru.walkername.backend.friendship.dto.OnlineFriendNotificationResponse;
+import ru.walkername.backend.friendship.dto.OutgoingRequestResponse;
 import ru.walkername.backend.friendship.entity.Friendship;
 import ru.walkername.backend.friendship.entity.FriendshipStatus;
-import ru.walkername.backend.friendship.mapper.FriendshipMapper;
+import ru.walkername.backend.friendship.mapper.FriendMapper;
 import ru.walkername.backend.friendship.repository.FriendshipRepository;
 
 import java.time.Instant;
@@ -30,36 +33,34 @@ public class FriendshipService {
 
     private final FriendshipRepository friendshipRepository;
     private final AuthRepository authRepository;
-    private final FriendshipMapper friendshipMapper;
+    private final FriendMapper friendMapper;
 
-    public Set<FriendshipResponse> findOnlineFriendsBySubscriberId(Long accountId, Set<Long> onlineAccountIds){
+    public Set<OnlineFriendNotificationResponse> findOnlineFriendsByAccountIdForNotification(Long accountId, Set<Long> onlineAccountIds){
         return friendshipRepository
-                .findOnlineFriendsBySubscriberIdAndStatus(
+                .findOnlineFriendsForNotification(
                         accountId,
-                        FriendshipStatus.FRIENDSHIP,
                         onlineAccountIds
                 )
                 .stream()
-                .map(friendshipMapper::toFriendshipResponse)
+                .map(friendMapper::toOnlineFriendNotificationResponse)
                 .collect(Collectors.toSet());
     }
 
-    public PageResponse<FriendshipResponse> findOnlineFriendsBySubscriberId(
-            Long subscriberId,
-            Set<Long> onlineProfiles,
+    public PageResponse<FriendResponse> findOnlineFriendsByAccountId(
+            Long accountId,
+            Set<Long> onlineAccountIds,
             int page,
             int limit
     ) {
         Pageable pageable = PageRequest.of(page, limit);
 
-        Page<FriendshipResponse> friendships = friendshipRepository
-                .findOnlineFriendsBySubscriberIdAndStatus(
-                        subscriberId,
-                        onlineProfiles,
-                        FriendshipStatus.FRIENDSHIP,
+        Page<FriendResponse> friendships = friendshipRepository
+                .findOnlineFriendsByAccountId(
+                        accountId,
+                        onlineAccountIds,
                         pageable
                 )
-                .map(friendshipMapper::toFriendshipResponse);
+                .map(friendMapper::toFriendResponse);
 
         return new PageResponse<>(
                 friendships.getContent(),
@@ -70,16 +71,15 @@ public class FriendshipService {
         );
     }
 
-    public PageResponse<FriendshipResponse> findFriendsBySubscriberId(Long subscriberId, int page, int limit) {
+    public PageResponse<FriendResponse> findFriendsByAccountId(Long accountId, int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
 
-        Page<FriendshipResponse> friendships = friendshipRepository
-                .findBySubscriberIdAndStatus(
-                        subscriberId,
-                        FriendshipStatus.FRIENDSHIP,
+        Page<FriendResponse> friendships = friendshipRepository
+                .findFriendsByAccountId(
+                        accountId,
                         pageable
                 )
-                .map(friendshipMapper::toFriendshipResponse);
+                .map(friendMapper::toFriendResponse);
 
         return new PageResponse<>(
                 friendships.getContent(),
@@ -90,16 +90,15 @@ public class FriendshipService {
         );
     }
 
-    public PageResponse<FriendshipResponse> findSubscriptionsBySubscriberId(Long subscriberId, int page, int limit) {
+    public PageResponse<OutgoingRequestResponse> findSubscriptionsByAccountId(Long accountId, int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
 
-        Page<FriendshipResponse> friendships = friendshipRepository
-                .findBySubscriberIdAndStatus(
-                        subscriberId,
-                        FriendshipStatus.SUBSCRIPTION,
+        Page<OutgoingRequestResponse> friendships = friendshipRepository
+                .findSubscriptionsByAccountId(
+                        accountId,
                         pageable
                 )
-                .map(friendshipMapper::toFriendshipResponse);
+                .map(friendMapper::toOutgoingRequestResponse);
 
         return new PageResponse<>(
                 friendships.getContent(),
@@ -110,16 +109,15 @@ public class FriendshipService {
         );
     }
 
-    public PageResponse<FriendshipResponse> findSubscriptionsOnTargetId(Long targetId, int page, int limit) {
+    public PageResponse<IncomingRequestResponse> findSubscribersByAccountId(Long accountId, int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
 
-        Page<FriendshipResponse> friendships = friendshipRepository
-                .findByTargetIdAndStatus(
-                        targetId,
-                        FriendshipStatus.SUBSCRIPTION,
+        Page<IncomingRequestResponse> friendships = friendshipRepository
+                .findSubscribersByAccountId(
+                        accountId,
                         pageable
                 )
-                .map(friendshipMapper::toFriendshipResponse);
+                .map(friendMapper::toIncomingRequestResponse);
 
         return new PageResponse<>(
                 friendships.getContent(),
