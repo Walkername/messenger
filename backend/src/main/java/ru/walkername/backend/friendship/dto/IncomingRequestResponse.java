@@ -8,6 +8,7 @@ public record IncomingRequestResponse(
         String username,
         String firstname,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        boolean online
 ) {
 }

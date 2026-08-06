@@ -7,6 +7,6 @@ import ru.walkername.backend.chat.view.ChatParticipantView;
 @Mapper(componentModel = "spring")
 public interface ChatParticipantMapper {
 
-    ChatParticipantResponse toChatParticipantResponse(ChatParticipantView chatParticipantView);
+    ChatParticipantResponse toChatParticipantResponse(ChatParticipantView chatParticipantView, boolean online);
 
 }

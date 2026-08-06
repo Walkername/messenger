@@ -14,7 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import ru.walkername.backend.chat.service.ChatService;
+import ru.walkername.backend.chat.service.ChatAccessService;
 import ru.walkername.backend.common.exception.InvalidJWTException;
 import ru.walkername.backend.common.exception.WebSocketAccessDeniedException;
 
@@ -26,7 +26,7 @@ import java.util.List;
 public class WebSocketChannelInterceptor implements ChannelInterceptor {
 
     private final TokenService tokenService;
-    private final ChatService chatService;
+    private final ChatAccessService chatAccessService;
 
     @Override
     public @Nullable Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -78,7 +78,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
 
             UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 
-            if (!chatService.canAccessChat(chatId, principal)) {
+            if (!chatAccessService.canAccessChat(chatId, principal)) {
                 throw new WebSocketAccessDeniedException("User not authenticated");
             }
         }

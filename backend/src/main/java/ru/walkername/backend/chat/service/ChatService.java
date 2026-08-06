@@ -21,11 +21,16 @@ import ru.walkername.backend.chat.mapper.ChatMapper;
 import ru.walkername.backend.chat.mapper.ChatParticipantMapper;
 import ru.walkername.backend.chat.repository.ChatParticipantRepository;
 import ru.walkername.backend.chat.repository.ChatRepository;
+import ru.walkername.backend.chat.view.ChatParticipantView;
 import ru.walkername.backend.common.dto.PageResponse;
 import ru.walkername.backend.common.security.UserPrincipal;
+import ru.walkername.backend.profile.service.PresenceService;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,6 +43,8 @@ public class ChatService {
     private final ChatMapper chatMapper;
     private final AuthRepository authRepository;
     private final ChatParticipantMapper chatParticipantMapper;
+    private final PresenceService presenceService;
+    private final ChatAccessService chatAccessService;
 
     public ChatResponse findOne(Long chatId, Long accountId) {
         Chat chat = chatRepository.findOneByChatIdAndAccountId(chatId, accountId).orElseThrow(
@@ -67,7 +74,7 @@ public class ChatService {
     }
 
     public PageResponse<ChatParticipantResponse> getChatParticipants(Long chatId, UserPrincipal userPrincipal, int page, int limit) {
-        if (!canAccessChat(chatId, userPrincipal)) {
+        if (!chatAccessService.canAccessChat(chatId, userPrincipal)) {
             log.warn(
                     "Getting chat participants attempt when user (accountID: {}) does not have access to chat with id {}",
                     userPrincipal.accountId(), chatId
@@ -78,15 +85,26 @@ public class ChatService {
         Sort sorting = Sort.by(Sort.Direction.DESC, "joinedAt");
         Pageable pageable = PageRequest.of(page, limit, sorting);
 
-        Page<ChatParticipantResponse> participants = chatParticipantRepository.findByChatId(chatId, pageable)
-                .map(chatParticipantMapper::toChatParticipantResponse);
+        Page<ChatParticipantView> views = chatParticipantRepository.findByChatId(chatId, pageable);
+
+        Set<Long> accountIds = views.stream()
+                .map(ChatParticipantView::accountId)
+                .collect(Collectors.toSet());
+        Map<Long, Boolean> onlineStatuses = presenceService.areUsersOnline(accountIds);
+
+        List<ChatParticipantResponse> responses = views.getContent().stream()
+                .map(view -> {
+                    boolean online = onlineStatuses.getOrDefault(view.accountId(), false);
+                    return chatParticipantMapper.toChatParticipantResponse(view, online);
+                })
+                .toList();
 
         return new PageResponse<>(
-                participants.getContent(),
+                responses,
                 page,
                 limit,
-                participants.getTotalElements(),
-                participants.getTotalPages()
+                views.getTotalElements(),
+                views.getTotalPages()
         );
     }
 
@@ -114,17 +132,17 @@ public class ChatService {
         chatParticipantRepository.save(chatParticipant);
     }
 
-    public boolean canAccessChat(Long chatId, UserPrincipal userPrincipal) {
-        if (!chatRepository.existsById(chatId)) {
-            return false;
-        }
-
-        if (userPrincipal.role().equals("ADMIN")) {
-            return true;
-        }
-
-        return chatParticipantRepository.existsByChatIdAndAccountId(chatId, userPrincipal.accountId());
-    }
+//    public boolean canAccessChat(Long chatId, UserPrincipal userPrincipal) {
+//        if (!chatRepository.existsById(chatId)) {
+//            return false;
+//        }
+//
+//        if (userPrincipal.role().equals("ADMIN")) {
+//            return true;
+//        }
+//
+//        return chatParticipantRepository.existsByChatIdAndAccountId(chatId, userPrincipal.accountId());
+//    }
 
     @Transactional
     public Chat update(Long id, Chat updatedChat) {
@@ -159,7 +177,7 @@ public class ChatService {
             throw new ChatNotFoundException("Chat not found");
         }
 
-        if (!canAccessChat(chatId, inviterPrincipal)) {
+        if (!chatAccessService.canAccessChat(chatId, inviterPrincipal)) {
             log.warn("Invite user attempt when user (accountID: {}) does not have access to chat with id {}", inviterPrincipal.accountId(), chatId);
             throw new ChatNotFoundException("Chat not found");
         }

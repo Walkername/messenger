@@ -8,6 +8,7 @@ public record ProfileResponse(
         String username,
         String firstName,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        boolean online
 ) {
 }

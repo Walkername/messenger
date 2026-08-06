@@ -16,11 +16,17 @@ public interface FriendMapper {
 
     FriendResponse toFriendResponse(FriendView view);
 
+    FriendResponse toFriendResponse(FriendView view, boolean online);
+
     FriendResponse toFriendResponse(Friendship entity);
 
     OutgoingRequestResponse toOutgoingRequestResponse(OutgoingRequestView view);
 
+    OutgoingRequestResponse toOutgoingRequestResponse(OutgoingRequestView view, boolean online);
+
     IncomingRequestResponse toIncomingRequestResponse(IncomingRequestView view);
+
+    IncomingRequestResponse toIncomingRequestResponse(IncomingRequestView view, boolean online);
 
     OnlineFriendNotificationResponse toOnlineFriendNotificationResponse(OnlineFriendNotificationView view);
 

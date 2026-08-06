@@ -33,7 +33,7 @@ public class MessageService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    private final ChatService chatService;
+    private final ChatAccessService chatAccessService;
     private final MessageMapper messageMapper;
 
     @Transactional
@@ -46,7 +46,7 @@ public class MessageService {
         );
 
         // Check If user has access to chat
-        if (!chatService.canAccessChat(chatId, userPrincipal)) {
+        if (!chatAccessService.canAccessChat(chatId, userPrincipal)) {
             log.warn("Access attempt by accountId={} to chatId={}", userPrincipal.accountId(), chatId);
             throw new ChatNotFoundException("Chat not found");
         }

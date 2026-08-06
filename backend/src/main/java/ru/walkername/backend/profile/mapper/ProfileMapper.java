@@ -12,4 +12,6 @@ public interface ProfileMapper {
 
     ProfileResponse toProfileResponse(ProfileView profileView);
 
+    ProfileResponse toProfileResponse(ProfileView view, boolean online);
+
 }

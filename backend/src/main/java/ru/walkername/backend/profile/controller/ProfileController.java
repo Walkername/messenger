@@ -15,7 +15,6 @@ import ru.walkername.backend.common.security.UserPrincipal;
 import ru.walkername.backend.profile.dto.ProfileResponse;
 import ru.walkername.backend.profile.dto.UpdateFirstNameRequest;
 import ru.walkername.backend.profile.dto.UpdateUsernameRequest;
-import ru.walkername.backend.profile.entity.Profile;
 import ru.walkername.backend.profile.mapper.ProfileMapper;
 import ru.walkername.backend.profile.view.ProfileView;
 import ru.walkername.backend.profile.service.ProfileService;
@@ -31,11 +30,10 @@ public class ProfileController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProfileResponse> get(
-            @PathVariable Long id
+            @PathVariable("id") Long accountId
     ) {
-        Profile profile = profileService.findOne(id);
-        ProfileResponse profileResponse = profileMapper.toProfileResponse(profile);
-        return new ResponseEntity<>(profileResponse, HttpStatus.OK);
+        ProfileResponse response = profileService.findOne(accountId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/me")

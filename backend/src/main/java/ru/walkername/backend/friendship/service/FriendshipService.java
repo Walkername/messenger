@@ -14,14 +14,19 @@ import ru.walkername.backend.common.dto.PageResponse;
 import ru.walkername.backend.common.security.UserPrincipal;
 import ru.walkername.backend.friendship.dto.FriendResponse;
 import ru.walkername.backend.friendship.dto.IncomingRequestResponse;
-import ru.walkername.backend.friendship.dto.OnlineFriendNotificationResponse;
 import ru.walkername.backend.friendship.dto.OutgoingRequestResponse;
 import ru.walkername.backend.friendship.entity.Friendship;
 import ru.walkername.backend.friendship.entity.FriendshipStatus;
 import ru.walkername.backend.friendship.mapper.FriendMapper;
 import ru.walkername.backend.friendship.repository.FriendshipRepository;
+import ru.walkername.backend.friendship.view.FriendView;
+import ru.walkername.backend.friendship.view.IncomingRequestView;
+import ru.walkername.backend.friendship.view.OutgoingRequestView;
+import ru.walkername.backend.profile.service.PresenceService;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,17 +39,7 @@ public class FriendshipService {
     private final FriendshipRepository friendshipRepository;
     private final AuthRepository authRepository;
     private final FriendMapper friendMapper;
-
-    public Set<OnlineFriendNotificationResponse> findOnlineFriendsByAccountIdForNotification(Long accountId, Set<Long> onlineAccountIds){
-        return friendshipRepository
-                .findOnlineFriendsForNotification(
-                        accountId,
-                        onlineAccountIds
-                )
-                .stream()
-                .map(friendMapper::toOnlineFriendNotificationResponse)
-                .collect(Collectors.toSet());
-    }
+    private final PresenceService presenceService;
 
     public PageResponse<FriendResponse> findOnlineFriendsByAccountId(
             Long accountId,
@@ -74,57 +69,90 @@ public class FriendshipService {
     public PageResponse<FriendResponse> findFriendsByAccountId(Long accountId, int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
 
-        Page<FriendResponse> friendships = friendshipRepository
+        Page<FriendView> views = friendshipRepository
                 .findFriendsByAccountId(
                         accountId,
                         pageable
-                )
-                .map(friendMapper::toFriendResponse);
+                );
+
+        Set<Long> accountIds = views.stream()
+                .map(FriendView::friendId)
+                .collect(Collectors.toSet());
+        Map<Long, Boolean> onlineStatuses = presenceService.areUsersOnline(accountIds);
+
+        List<FriendResponse> responses = views.getContent().stream()
+                .map(view -> {
+                    boolean online = onlineStatuses.getOrDefault(view.friendId(), false);
+                    return friendMapper.toFriendResponse(view, online);
+                })
+                .toList();
 
         return new PageResponse<>(
-                friendships.getContent(),
+                responses,
                 page,
                 limit,
-                friendships.getTotalElements(),
-                friendships.getTotalPages()
+                views.getTotalElements(),
+                views.getTotalPages()
         );
     }
 
     public PageResponse<OutgoingRequestResponse> findSubscriptionsByAccountId(Long accountId, int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
 
-        Page<OutgoingRequestResponse> friendships = friendshipRepository
+        Page<OutgoingRequestView> views = friendshipRepository
                 .findSubscriptionsByAccountId(
                         accountId,
                         pageable
-                )
-                .map(friendMapper::toOutgoingRequestResponse);
+                );
+
+        Set<Long> accountIds = views.stream()
+                .map(OutgoingRequestView::targetId)
+                .collect(Collectors.toSet());
+        Map<Long, Boolean> onlineStatuses = presenceService.areUsersOnline(accountIds);
+
+        List<OutgoingRequestResponse> responses = views.getContent().stream()
+                .map(view -> {
+                    boolean online = onlineStatuses.getOrDefault(view.targetId(), false);
+                    return friendMapper.toOutgoingRequestResponse(view, online);
+                })
+                .toList();
 
         return new PageResponse<>(
-                friendships.getContent(),
+                responses,
                 page,
                 limit,
-                friendships.getTotalElements(),
-                friendships.getTotalPages()
+                views.getTotalElements(),
+                views.getTotalPages()
         );
     }
 
     public PageResponse<IncomingRequestResponse> findSubscribersByAccountId(Long accountId, int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
 
-        Page<IncomingRequestResponse> friendships = friendshipRepository
+        Page<IncomingRequestView> views = friendshipRepository
                 .findSubscribersByAccountId(
                         accountId,
                         pageable
-                )
-                .map(friendMapper::toIncomingRequestResponse);
+                );
+
+        Set<Long> accountIds = views.stream()
+                .map(IncomingRequestView::subscriberId)
+                .collect(Collectors.toSet());
+        Map<Long, Boolean> onlineStatuses = presenceService.areUsersOnline(accountIds);
+
+        List<IncomingRequestResponse> responses = views.getContent().stream()
+                .map(view -> {
+                    boolean online = onlineStatuses.getOrDefault(view.subscriberId(), false);
+                    return friendMapper.toIncomingRequestResponse(view, online);
+                })
+                .toList();
 
         return new PageResponse<>(
-                friendships.getContent(),
+                responses,
                 page,
                 limit,
-                friendships.getTotalElements(),
-                friendships.getTotalPages()
+                views.getTotalElements(),
+                views.getTotalPages()
         );
     }
 

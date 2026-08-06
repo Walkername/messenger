@@ -19,7 +19,7 @@ import ru.walkername.backend.friendship.dto.OutgoingRequestResponse;
 import ru.walkername.backend.friendship.entity.Friendship;
 import ru.walkername.backend.friendship.mapper.FriendMapper;
 import ru.walkername.backend.friendship.service.FriendshipService;
-import ru.walkername.backend.profile.controller.ProfileStatusController;
+import ru.walkername.backend.profile.service.PresenceService;
 
 import java.util.Set;
 
@@ -29,8 +29,8 @@ import java.util.Set;
 public class FriendshipController {
 
     private final FriendshipService friendshipService;
-    private final ProfileStatusController  profileStatusController;
     private final FriendMapper friendMapper;
+    private final PresenceService presenceService;
 
     @GetMapping("/me")
     public ResponseEntity<PageResponse<FriendResponse>> getMyFriends(
@@ -49,11 +49,11 @@ public class FriendshipController {
             @RequestParam(value = "limit", defaultValue = "20") Integer limit,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        Set<Long> onlineProfiles = profileStatusController.getSessions().keySet();
+        Set<Long> onlineAccountIds = presenceService.getSessions().keySet();
         PageResponse<FriendResponse> onlineFriends = friendshipService
                 .findOnlineFriendsByAccountId(
                         userPrincipal.accountId(),
-                        onlineProfiles,
+                        onlineAccountIds,
                         page,
                         limit
                 );
