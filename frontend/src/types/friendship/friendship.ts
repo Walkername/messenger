@@ -6,6 +6,7 @@ export type FriendResponse = {
     firstname: string;
     createdAt: string;
     updatedAt: string;
+    online: boolean;
 };
 
 export type IncomingRequestResponse = {

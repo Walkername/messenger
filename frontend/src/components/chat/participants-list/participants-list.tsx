@@ -8,6 +8,8 @@ import {
 import ModalWindow from "../../modal-window/modal-window";
 import "./participants-list.css";
 import { chatService } from "../../../services/chat-service";
+import presenceService from "../../../services/presence-service";
+import type { PresenceEvent } from "../../../types/presence/presence";
 
 interface ParticipantsListProps {
     isOpen: boolean;
@@ -33,6 +35,36 @@ export default function ParticipantsList({
         }
     }, [isOpen, chatId]);
 
+    useEffect(() => {
+        const accountIds: number[] =
+            participants?.content.map((p) => p.accountId) ?? [];
+        if (accountIds.length === 0) return;
+        presenceService.subscribeToAccounts(accountIds);
+
+        const handlePresenceUpdate = (event: PresenceEvent) => {
+            setParticipants((prev) => {
+                if (!prev) return prev;
+
+                const updatedContent = prev.content.map((participant) =>
+                    participant.accountId === event.accountId
+                        ? { ...participant, online: event.online }
+                        : participant,
+                );
+
+                return {
+                    ...prev,
+                    content: updatedContent,
+                };
+            });
+        };
+
+        presenceService.registerMessageHandler(handlePresenceUpdate);
+
+        return () => {
+            presenceService.unsubscribeFromAccounts(accountIds);
+        };
+    });
+
     return (
         <ModalWindow isOpen={isOpen} onClose={onClose}>
             <div
@@ -46,7 +78,9 @@ export default function ParticipantsList({
                                 {participant.firstName}
                             </span>
                             <span className="chat-participant-card-username">
-                                @{participant.username}
+                                @{participant.username} {participant.online && (
+                                    <span className="chat-participant-status-icon"></span>
+                                )}
                             </span>
                         </div>
                         {participant.accountId === ownerId && (

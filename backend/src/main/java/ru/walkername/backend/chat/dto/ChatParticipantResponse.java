@@ -8,6 +8,7 @@ public record ChatParticipantResponse(
         Long profileId,
         String username,
         String firstName,
-        Instant joinedAt
+        Instant joinedAt,
+        boolean online
 ) {
 }

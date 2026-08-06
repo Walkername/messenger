@@ -4,6 +4,8 @@ import type { PageResponse } from "../../../types/common/page-response";
 import { formatTimeLong } from "../../../utils/validation-time";
 import "./all-friends-list.css";
 import type { FriendResponse } from "../../../types/friendship/friendship";
+import presenceService from "../../../services/presence-service";
+import type { PresenceEvent } from "../../../types/presence/presence";
 
 export default function AllFriendsList() {
     const [friends, setFriends] = useState<PageResponse<FriendResponse>>();
@@ -13,12 +15,36 @@ export default function AllFriendsList() {
             setFriends(data);
         });
     }, []);
-    
+
+    useEffect(() => {
+        const handlePresenceUpdate = (event: PresenceEvent) => {
+            setFriends((prev) => {
+                if (!prev) return prev;
+
+                const updatedContent = prev.content.map((participant) =>
+                    participant.friendId === event.accountId
+                        ? { ...participant, online: event.online }
+                        : participant,
+                );
+
+                return {
+                    ...prev,
+                    content: updatedContent,
+                };
+            });
+        };
+
+        const accountIds: number[] =
+            friends?.content.map((f) => f.friendId) ?? [];
+        presenceService.subscribeToAccounts(accountIds);
+        presenceService.registerMessageHandler(handlePresenceUpdate);
+    }, [friends?.content]);
+
     const handleRemoveFromFriend = (accountId: number) => {
         friendshipService.removeFromFriend(accountId);
         window.location.reload();
     };
-    
+
     return (
         <div className="friends-list">
             {friends &&
@@ -30,6 +56,9 @@ export default function AllFriendsList() {
                             </span>
                             <span className="friend-card-username">
                                 @{friend.username}
+                                {friend.online && (
+                                    <span className="online-status-icon"></span>
+                                )}
                             </span>
                             <span className="friend-card-sent-at">
                                 {formatTimeLong(friend.createdAt)}

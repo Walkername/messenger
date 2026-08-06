@@ -71,7 +71,7 @@
     display: inline-block;
     width: 8px;
     height: 8px;
-    background-color: #4caf50; /* Зеленый цвет для онлайн */
+    background-color: #4caf50;
     border-radius: 50%;
     margin-left: 6px;
     position: relative;
@@ -79,7 +79,6 @@
     box-shadow: 0 0 6px rgba(76, 175, 80, 0.4);
 }
 
-/* Анимация пульсации для активного онлайн статуса */
 @keyframes pulse {
     0% {
         transform: scale(1);

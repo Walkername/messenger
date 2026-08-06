@@ -79,3 +79,15 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     pointer-events: none;
 }
+
+.chat-participant-status-icon {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #4caf50; /* Зеленый цвет для онлайн */
+    border-radius: 50%;
+    margin-left: 6px;
+    position: relative;
+    animation: pulse 2s infinite;
+    box-shadow: 0 0 6px rgba(76, 175, 80, 0.4);
+}

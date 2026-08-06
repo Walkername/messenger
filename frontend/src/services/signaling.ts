@@ -2,15 +2,21 @@ import type { SignalingMessage } from "../types/call/webrtc";
 import websocketService from "./websocket-service";
 
 class SignalingService {
-    
-    connect(
+    private isHandlerRegistered = false;
+
+    async connect(
         onMessage: (message: SignalingMessage) => void,
     ): Promise<void> {
-        return websocketService.connect()
-            .then(() => {
-                console.log("✅ Signaling connected");
-                websocketService.registerSignalingHandler(onMessage);
-            })
+        await websocketService.connect();
+
+        console.log("✅ Signaling connected");
+
+        if (!this.isHandlerRegistered) {
+            websocketService.registerSignalingHandler(onMessage);
+            this.isHandlerRegistered = true;
+        } else {
+            websocketService.registerSignalingHandler(onMessage);
+        }
     }
 
     sendSignalingMessage(message: SignalingMessage) {
@@ -18,8 +24,7 @@ class SignalingService {
         websocketService.sendMessage(destination, message);
     }
 
-    disconnect() {
-    }
+    disconnect() {}
 
     get isConnected(): boolean {
         return websocketService.connected;

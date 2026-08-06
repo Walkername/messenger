@@ -6,4 +6,5 @@ export type ParticipantResponse = {
     username: string;
     firstName: string;
     joinedAt: string;
+    online: boolean;
 };

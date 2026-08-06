@@ -20,6 +20,7 @@ import { useAuthStore } from "./auth/store";
 import { apiClient } from "./api/client";
 import FriendsPage from "./pages/friendship/friendship-page";
 import websocketService from "./services/websocket-service";
+import presenceService from "./services/presence-service";
 
 function App() {
     const setAccessToken = useAuthStore((state) => state.setAccessToken);
@@ -36,7 +37,9 @@ function App() {
             })
             .finally(() => {
                 setLoading(false);
-                websocketService.connect();
+                websocketService.connect().then(() => {
+                    presenceService.connect();
+                });
             });
     }, [setAccessToken, setLoading]);
 
