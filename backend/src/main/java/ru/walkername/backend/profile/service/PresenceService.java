@@ -43,7 +43,6 @@ public class PresenceService {
             Long observerId,
             Set<Long> accountIds
     ) {
-        System.out.println("Observer#" + observerId + " is watching: " + accountIds);
         for (Long accountId : accountIds) {
             observers
                     .computeIfAbsent(accountId, _ -> ConcurrentHashMap.newKeySet())
@@ -71,19 +70,16 @@ public class PresenceService {
     }
 
     public void userOnline(Long accountId, String sessionId) {
-        System.out.println("userOnline#" + accountId + ". His subscribers: " + observers.get(accountId));
         Set<String> userSessions = sessions.computeIfAbsent(
                 accountId,
                 _ -> ConcurrentHashMap.newKeySet()
         );
         userSessions.add(sessionId);
-        System.out.println("His sessions: " + userSessions);
 
         sendPresenceEvent(accountId, true);
     }
 
     public void userOffline(Long accountId, String sessionId) {
-        System.out.println("userOffline#" + accountId + " His subscribers: " + observers.get(accountId));
         Set<String> userSessions = sessions.get(accountId);
         if (userSessions == null) {
             return;
@@ -92,7 +88,6 @@ public class PresenceService {
         userSessions.remove(sessionId);
 
         if (userSessions.isEmpty()) {
-            System.out.println("All sessions has been closed");
             sessions.remove(accountId);
 
             sendPresenceEvent(accountId, false);
@@ -103,7 +98,6 @@ public class PresenceService {
             Long accountId,
             boolean online
     ) {
-        System.out.println("sendPresenceEvent#" + accountId + " online: " + online);
         PresenceEvent event =
                 new PresenceEvent(accountId, online);
 
