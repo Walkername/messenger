@@ -38,10 +38,10 @@ export const chatService = {
         }
     },
 
-    getMessagesFromChat: async (id: number): Promise<PageResponse<MessageResponse>> => {
+    getMessagesFromChat: async (id: number, page: number = 0, limit: number = 30): Promise<PageResponse<MessageResponse>> => {
         try {
             return await apiClient.get<PageResponse<MessageResponse>>(
-                `/chats/${id}/messages`
+                `/chats/${id}/messages?page=${page}&limit=${limit}`
             );
         } catch (error) {
             console.error("Getting messages from chat error:", error);

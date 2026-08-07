@@ -143,7 +143,7 @@ export default function ChatList({
                                         </>
                                     ) : (
                                         <span className="no-messages">
-                                            Создан{" "}
+                                            Created{" "}
                                             {new Date(
                                                 chat.createdAt,
                                             ).toLocaleDateString("ru-RU")}
