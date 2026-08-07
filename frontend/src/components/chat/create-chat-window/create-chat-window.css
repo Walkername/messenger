@@ -1,0 +1,113 @@
+.create-chat-modal-window {
+    background: white;
+    border-radius: 12px;
+    min-width: 400px;
+    max-width: 500px;
+    animation: slideIn 0.3s ease-in-out;
+    text-align: start;
+    position: relative;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    text-align: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.create-chat-window-description {
+    font-size: 15px;
+}
+
+.create-chat-name-label {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.create-chat-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 10px;
+
+    gap: 10px;
+}
+
+.create-chat-input {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    background: white;
+
+    flex-shrink: 0;
+
+    padding: 10px 20px;
+
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+
+    align-items: end;
+
+    font-size: 15px;
+
+    outline: none;
+}
+
+.create-chat-submit-button {
+    border: none;
+    width: auto;
+    min-width: 100px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    font-size: 14px;
+    align-self: center;
+    transition: all 0.2s;
+}
+
+.create-chat-submit-button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.create-chat-status {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.create-chat-status.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.create-chat-status.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
