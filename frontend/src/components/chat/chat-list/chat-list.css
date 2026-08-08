@@ -60,6 +60,11 @@
     transform: translateX(4px);
 }
 
+.chat-item:hover .chat-exit-button {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 .chat-item.active {
     background: #e3e3e3;
 }
@@ -131,6 +136,29 @@
     font-style: italic;
     color: #adb5bd;
     font-size: 11px;
+}
+
+/* Exit Button - появляется только при наведении */
+.chat-exit-button {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.chat-exit-button svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+.chat-exit-button:hover {
+    background-color: rgba(108, 117, 125, 0.1);
 }
 
 /* Badge */

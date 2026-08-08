@@ -79,5 +79,16 @@ export const chatService = {
             console.error("Get participants from chat error:", error);
             throw error;
         }
+    },
+
+    exitChat: async (chatId: number) => {
+        try {
+            return await apiClient.delete(
+                `/chats/${chatId}/exit`
+            );
+        } catch (error) {
+            console.error("Exit chat error:", error);
+            throw error;
+        }
     }
 };
