@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,14 +70,23 @@ public class ChatController {
         return new ResponseEntity<>(chatResponse, HttpStatus.CREATED);
     }
 
-    @PostMapping("/{id}/invite")
+    @PostMapping("/{chatId}/invite")
     public ResponseEntity<HttpStatus> invite(
-            @PathVariable Long id,
+            @PathVariable Long chatId,
             @RequestParam String username,
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        chatService.inviteByUsername(id, userPrincipal, username);
+        chatService.inviteByUsername(chatId, userPrincipal, username);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{chatId}/exit")
+    public ResponseEntity<HttpStatus> exit(
+            @PathVariable Long chatId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        chatService.exitChat(chatId, userPrincipal.accountId());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

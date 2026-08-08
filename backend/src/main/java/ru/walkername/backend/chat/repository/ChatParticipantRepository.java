@@ -33,4 +33,6 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
             """)
     Page<ChatParticipantView> findByChatId(Long chatId, Pageable pageable);
 
+    void deleteByChatIdAndAccountId(Long chatId, Long accountId);
+
 }

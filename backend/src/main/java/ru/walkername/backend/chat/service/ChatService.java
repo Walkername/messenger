@@ -132,18 +132,6 @@ public class ChatService {
         chatParticipantRepository.save(chatParticipant);
     }
 
-//    public boolean canAccessChat(Long chatId, UserPrincipal userPrincipal) {
-//        if (!chatRepository.existsById(chatId)) {
-//            return false;
-//        }
-//
-//        if (userPrincipal.role().equals("ADMIN")) {
-//            return true;
-//        }
-//
-//        return chatParticipantRepository.existsByChatIdAndAccountId(chatId, userPrincipal.accountId());
-//    }
-
     @Transactional
     public Chat update(Long id, Chat updatedChat) {
         Chat chat = chatRepository.findById(id).orElseThrow(
@@ -190,6 +178,14 @@ public class ChatService {
         );
 
         createChatParticipant(chatId, invitedAccount.getId());
+    }
+
+    @Transactional
+    public void exitChat(Long chatId, Long accountId) {
+        chatRepository.findById(chatId).orElseThrow(
+                () -> new ChatNotFoundException("Chat not found")
+        );
+        chatParticipantRepository.deleteByChatIdAndAccountId(chatId, accountId);
     }
 
 }
