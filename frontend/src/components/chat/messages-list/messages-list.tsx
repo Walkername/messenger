@@ -30,8 +30,6 @@ export default function MessagesList({
     const token = useAuthStore.getState().accessToken!;
     const myAccountId = parseInt(getClaimFromToken(token, "id"));
 
-    // const containerRef = useRef<HTMLDivElement>(null);
-
     const previousScrollHeight = useRef<number | null>(null);
 
     const initialLoad = useRef(true);
@@ -58,19 +56,6 @@ export default function MessagesList({
             onLoadMore();
         }
     };
-
-    // const scrollToBottom = () => {
-    //     const container = containerRef.current;
-
-    //     if (!container) {
-    //         return;
-    //     }
-
-    //     container.scrollTo({
-    //         top: container.scrollHeight,
-    //         behavior: "smooth",
-    //     });
-    // };
 
     useLayoutEffect(() => {
         const container = containerRef.current;

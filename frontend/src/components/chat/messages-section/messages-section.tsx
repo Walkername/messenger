@@ -108,7 +108,6 @@ export default function MessagesSection({ chatId }: MessagesSectionProps) {
     }, [chatId, hasMore, messages.page]);
 
     const handleNewMessage = useCallback((received: MessageResponse) => {
-        console.log("MESSAGE");
         setMessages((prev) => ({
             ...prev,
             content: [...prev.content, received],
