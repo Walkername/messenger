@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import getClaimFromToken from "../../../utils/token-validation";
 import {
     formatMessageTimeShort,
@@ -15,6 +15,8 @@ interface MessagesListProps {
     onLoadMore: () => void;
     hasMore: boolean;
     isLoadingMore: boolean;
+    containerRef: React.RefObject<HTMLDivElement | null>;
+    scrollToBottom: () => void;
 }
 
 export default function MessagesList({
@@ -22,11 +24,13 @@ export default function MessagesList({
     onLoadMore,
     hasMore,
     isLoadingMore,
+    containerRef,
+    scrollToBottom,
 }: MessagesListProps) {
     const token = useAuthStore.getState().accessToken!;
     const myAccountId = parseInt(getClaimFromToken(token, "id"));
 
-    const containerRef = useRef<HTMLDivElement>(null);
+    // const containerRef = useRef<HTMLDivElement>(null);
 
     const previousScrollHeight = useRef<number | null>(null);
 
@@ -55,18 +59,18 @@ export default function MessagesList({
         }
     };
 
-    const scrollToBottom = () => {
-        const container = containerRef.current;
+    // const scrollToBottom = () => {
+    //     const container = containerRef.current;
 
-        if (!container) {
-            return;
-        }
+    //     if (!container) {
+    //         return;
+    //     }
 
-        container.scrollTo({
-            top: container.scrollHeight,
-            behavior: "smooth",
-        });
-    };
+    //     container.scrollTo({
+    //         top: container.scrollHeight,
+    //         behavior: "smooth",
+    //     });
+    // };
 
     useLayoutEffect(() => {
         const container = containerRef.current;
@@ -91,9 +95,9 @@ export default function MessagesList({
 
             previousScrollHeight.current = null;
         }
-    }, [messages.content]);
+    }, [messages.content, containerRef]);
 
-    const groupMessagesByDay = () => {
+    const groupedMessages = useMemo(() => {
         const groups: {
             date: string;
             messages: MessageResponse[];
@@ -116,9 +120,7 @@ export default function MessagesList({
         });
 
         return groups;
-    };
-
-    const groupedMessages = groupMessagesByDay();
+    }, [messages.content]);
 
     return (
         <div className="messages-wrapper">
@@ -181,11 +183,11 @@ export default function MessagesList({
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                     >
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                         <g
                             id="SVGRepo_tracerCarrier"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                         ></g>
                         <g id="SVGRepo_iconCarrier">
                             {" "}

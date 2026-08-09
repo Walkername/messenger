@@ -1,4 +1,3 @@
-// ChatWindow.tsx
 import { useState, useEffect } from "react";
 import "./chat-window.css";
 import type { ChatResponse } from "../../../types/chat/chat-response";
@@ -23,7 +22,7 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
         chat &&
         <div className="chat-window">
             <ChatHeader chat={chat} />
-            <MessagesSection chatId={chat?.id} />
+            <MessagesSection key={chatId} chatId={chat?.id} />
         </div>
     );
 }

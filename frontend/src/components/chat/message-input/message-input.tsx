@@ -5,9 +5,10 @@ import { chatService } from "../../../services/chat-service";
 
 interface MessageInputProps {
     chatId: number;
+    scrollToBottom: () => void;
 }
 
-export default function MessageInput({ chatId }: MessageInputProps) {
+export default function MessageInput({ chatId, scrollToBottom }: MessageInputProps) {
     const [newMessage, setNewMessage] = useState("");
 
     const sendMessage = async (e: React.FormEvent) => {
@@ -20,6 +21,7 @@ export default function MessageInput({ chatId }: MessageInputProps) {
 
         chatService.sendMessageToChat(chatId, message).then(() => {
             setNewMessage("");
+            scrollToBottom();
         });
     };
 

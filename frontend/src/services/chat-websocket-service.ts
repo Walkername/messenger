@@ -2,7 +2,7 @@ import type { MessageResponse } from "../types/chat/message-response";
 import websocketService from "./websocket-service";
 
 class ChatWebsocketService {
-    private subscriptionId: string = "";
+    private subscriptionId: string | null = null;
     private messageHandler: (message: MessageResponse) => void = () => {};
 
     async connect(
@@ -32,8 +32,10 @@ class ChatWebsocketService {
     }
 
     unsubscribe() {
-        websocketService.unsubscribeFromTopic(this.subscriptionId);
-        console.log("Chat unsubscribed");
+        if (this.subscriptionId !== null) {
+            websocketService.unsubscribeFromTopic(this.subscriptionId);
+            this.subscriptionId = null;
+        }
     }
 
     registerMessageHandler(handler: (message: MessageResponse) => void) {

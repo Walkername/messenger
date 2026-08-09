@@ -11,6 +11,7 @@ class WebSocketService {
         {
             subscription: any;
             handler: MessageHandler;
+            destination: string;
         }
     > = new Map();
 
@@ -95,9 +96,30 @@ class WebSocketService {
         }
     }
 
+    private findExistingSubscription(destination: string): string | null {
+        for (const [id, sub] of this.subscriptions.entries()) {
+            if (sub.destination === destination) {
+                return id;
+            }
+        }
+        return null;
+    }
+
     private doSubscribe(destination: string, handler: MessageHandler): string {
         if (!this.stompClient?.connected) {
             throw new Error("WebSocket not connected");
+        }
+
+        const existingId = this.findExistingSubscription(destination);
+        if (existingId) {
+            console.log(
+                `ℹ️ Already subscribed to ${destination}, reusing existing subscription`,
+            );
+            const existing = this.subscriptions.get(existingId);
+            if (existing) {
+                existing.handler = handler;
+            }
+            return existingId;
         }
 
         const subscription = this.stompClient.subscribe(destination, handler);
@@ -106,19 +128,17 @@ class WebSocketService {
         this.subscriptions.set(subscriptionId, {
             subscription,
             handler,
+            destination,
         });
+
+        console.log(
+            `✅ Subscription done (ID: ${subscriptionId})`,
+        );
 
         return subscriptionId;
     }
 
     private subscribeToGlobalTopics() {
-        // this.subscribeToTopic("/user/queue/friend-status-change", (message) => {
-        //     if (this.handlers.newOnlineProfile) {
-        //         const profile = JSON.parse(message.body);
-        //         this.handlers.newOnlineProfile(profile);
-        //     }
-        // });
-
         const accountId = authService.getAccountId();
         this.subscribeToTopic(`/topic/call/${accountId}`, (message) => {
             try {
@@ -150,6 +170,21 @@ class WebSocketService {
                 return;
             }
 
+            const pendingExists = this.pendingSubscriptions.some(
+                (sub) => sub.destination === destination,
+            );
+            if (pendingExists) {
+                console.log(
+                    `ℹ️ Subscription to ${destination} already pending`,
+                );
+                const pending = this.pendingSubscriptions.find(
+                    (sub) => sub.destination === destination,
+                );
+                if (pending) {
+                    pending.handler = handler;
+                }
+            }
+
             this.pendingSubscriptions.push({
                 destination,
                 handler,
@@ -179,7 +214,7 @@ class WebSocketService {
         if (subscription) {
             this.stompClient.unsubscribe(subscription.subscription.id);
             this.subscriptions.delete(subscriptionId);
-            console.log(`Unsubscribed from: ${subscriptionId}`);
+            console.log(`✅ Unsubscribed from: ${subscriptionId}`);
         } else {
             console.warn(`Subscription ${subscriptionId} not found`);
         }

@@ -21,6 +21,21 @@ export default function MessagesSection({ chatId }: MessagesSectionProps) {
         totalPages: 0,
     });
 
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        const container = containerRef.current;
+
+        if (!container) {
+            return;
+        }
+
+        container.scrollTo({
+            top: container.scrollHeight,
+            behavior: "smooth",
+        });
+    };
+
     const [hasMore, setHasMore] = useState(true);
 
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -93,6 +108,7 @@ export default function MessagesSection({ chatId }: MessagesSectionProps) {
     }, [chatId, hasMore, messages.page]);
 
     const handleNewMessage = useCallback((received: MessageResponse) => {
+        console.log("MESSAGE");
         setMessages((prev) => ({
             ...prev,
             content: [...prev.content, received],
@@ -116,9 +132,11 @@ export default function MessagesSection({ chatId }: MessagesSectionProps) {
                 onLoadMore={loadMoreMessages}
                 hasMore={hasMore}
                 isLoadingMore={isLoadingMore}
+                containerRef={containerRef}
+                scrollToBottom={scrollToBottom}
             />
 
-            <MessageInput chatId={chatId} />
+            <MessageInput chatId={chatId} scrollToBottom={scrollToBottom} />
         </>
     );
 }

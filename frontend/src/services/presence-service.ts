@@ -2,12 +2,10 @@ import type { PresenceEvent } from "../types/presence/presence";
 import websocketService from "./websocket-service";
 
 class PresenceService {
-    // private subscriptionId: string = "";
     private messageHandler: (message: PresenceEvent) => void = () => {};
 
     async connect(): Promise<void> {
         await websocketService.connect();
-        console.log("✅ Presence websocket connected");
         await this.subcribeToQueue();
     }
 
