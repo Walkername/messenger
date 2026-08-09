@@ -105,4 +105,24 @@ public class AuthService {
         return profileService.getFullInfoByAccountId(accountId);
     }
 
+    @Transactional
+    public void updatePassword(Long accountId, String oldPassword, String newPassword) {
+        Account account = authRepository.findById(accountId).orElseThrow(
+                () -> {
+                    log.warn("Update password attempt for non-existing account: {}", accountId);
+                    return new AccountNotFoundException("Account with such username does not exist");
+                }
+        );
+
+        if (!passwordEncoder.matches(oldPassword, account.getPasswordHash())) {
+            log.warn("Invalid update password attempt for username: {}, #{}", account.getUsername(), account.getId());
+            throw new InvalidCredentialsException("Wrong credentials");
+        }
+
+        String newPasswordHash = passwordEncoder.encode(newPassword);
+        account.setPasswordHash(newPasswordHash);
+
+        log.debug("Account's password updated successfully: {}, #{}", account.getUsername(), account.getId());
+    }
+
 }

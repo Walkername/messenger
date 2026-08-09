@@ -36,7 +36,6 @@ public class GlobalExceptionHandler {
                         FieldError::getDefaultMessage,
                         (existing, replacement) -> existing + "; " + replacement
                 ));
-        System.out.println(errors);
         ValidationErrorResponse response = new ValidationErrorResponse(
                 "Validation error",
                 errors,
