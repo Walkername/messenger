@@ -55,8 +55,8 @@ function App() {
             <WebRTCProvider>
                 <Navigation />
                 <Routes>
-                    <Route element={<PageContent />}>
-                        <Route element={<PrivateRoute />}>
+                    <Route element={<PrivateRoute />}>
+                        <Route element={<PageContent />}>
                             <Route path="/" element={<MessengerPage />} />
                             <Route path="/profile" element={<ProfilePage />}>
                                 <Route
@@ -92,12 +92,13 @@ function App() {
                                 path="/chats/:id"
                                 element={<MessengerPage />}
                             />
-                            <Route path="/call" element={<CallPage />} />
+
                             <Route path="/friends" element={<FriendsPage />} />
                         </Route>
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/register" element={<RegisterPage />} />
                     </Route>
+                    <Route path="/call" element={<CallPage />} />
                 </Routes>
 
                 <CallSystem />

@@ -29,7 +29,7 @@ export default function ModalWindow({
 
         if (isOpen) {
             document.addEventListener("keydown", handleEscape);
-            document.body.style.overflow = "hidden"; // Блокируем скролл
+            document.body.style.overflow = "hidden";
         }
 
         return () => {

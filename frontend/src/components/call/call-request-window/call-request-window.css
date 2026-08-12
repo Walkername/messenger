@@ -1,34 +1,112 @@
+.call-request-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
 .call-request-modal-window {
-    background: white;
-    border-radius: 12px;
-    min-width: 400px;
+    background-color: #37383b;
+    border-radius: 30px;
+    min-height: 200px;
+    min-width: 300px;
     max-width: 500px;
     animation: slideIn 0.3s ease-in-out;
-    text-align: start;
-    position: relative;
-}
-
-.modal-close-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #666;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    align-content: center;
     text-align: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s;
+    position: relative;
+    color: white;
+    box-shadow: 0 0 15px black;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
 }
 
-.modal-close-btn:hover {
-    background-color: #f0f0f0;
-    color: #333;
+.caller-username {
+    margin: 0px;
+}
+
+.ringing-animation {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.ringing-animation .dot {
+  width: 8px;
+  height: 8px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  animation: pulse-wave 1.2s ease-in-out infinite; 
+}
+
+.ringing-animation .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.ringing-animation .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse-wave {
+  0%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4; /* Точки затенены в спокойном состоянии */
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1; /* Точка увеличивается и становится яркой */
+  }
+}
+
+.call-request-actions {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 40px;
+}
+
+.call-request-reject-button {
+    background-color: #d12424;
+    cursor: pointer;
+
+    border: 0px;
+    border-radius: 50%;
+
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.call-request-reject-button:hover {
+    background-color: darkred;
+}
+
+.call-request-accept-button {
+    background-color: #29b314;
+    cursor: pointer;
+
+    border: 0px;
+    border-radius: 50%;
+
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.call-request-accept-button:hover {
+    background-color: darkgreen;
 }

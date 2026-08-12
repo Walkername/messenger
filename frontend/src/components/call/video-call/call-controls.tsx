@@ -23,35 +23,17 @@ const CallControls: React.FC<CallControlsProps> = ({
 }) => {
     return (
         <div className="call-controls">
-            {isInCall ? (
-                <>
-                    <button className="control-btn" onClick={onToggleMute}>
-                        {isMuted ? <MicOff size={24} /> : <Mic size={24} />}
-                    </button>
+            <button className="control-btn" onClick={onToggleMute}>
+                {isMuted ? <MicOff size={24} /> : <Mic size={24} />}
+            </button>
 
-                    <button className="control-btn" onClick={onToggleVideo}>
-                        {isVideoOn ? (
-                            <Video size={24} />
-                        ) : (
-                            <VideoOff size={24} />
-                        )}
-                    </button>
+            <button className="control-btn" onClick={onToggleVideo}>
+                {isVideoOn ? <Video size={24} /> : <VideoOff size={24} />}
+            </button>
 
-                    <button
-                        className="control-btn end-call"
-                        onClick={onEndCall}
-                    >
-                        <PhoneOff size={24} />
-                    </button>
-                </>
-            ) : (
-                <button
-                    className="control-btn start-call"
-                    onClick={onStartCall}
-                >
-                    <Phone size={24} />
-                </button>
-            )}
+            <button className="control-btn end-call" onClick={onEndCall}>
+                <PhoneOff size={24} />
+            </button>
         </div>
     );
 };

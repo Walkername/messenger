@@ -1,11 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import VideoCall from "../../components/call/video-call/video-call";
 import getClaimFromToken from "../../utils/token-validation";
 import { authService } from "../../services/auth-service";
 import { useSearchParams } from "react-router-dom";
-import type { PageResponse } from "../../types/common/page-response";
-import type { FriendResponse } from "../../types/friendship/friendship";
-import { friendshipService } from "../../services/friendship-service";
 import "./call-page.css";
 
 export default function CallPage() {
@@ -18,27 +15,17 @@ export default function CallPage() {
         withParam || undefined,
     );
 
-    
-
     const handleCallEnded = useCallback(() => {
         setCallWith(undefined);
     }, []);
 
     return (
         <div className="call-page-layout">
-
-            <h1>Call-messenger</h1>
-            <p>
-                Your id: <strong>{accountId}</strong>
-            </p>
-
-            <div className="call-container">
-                <VideoCall
-                    accountId={accountId}
-                    remoteUserId={callWith}
-                    onCallEnded={handleCallEnded}
-                />
-            </div>
+            <VideoCall
+                accountId={accountId}
+                remoteUserId={callWith}
+                onCallEnded={handleCallEnded}
+            />
         </div>
     );
 }
