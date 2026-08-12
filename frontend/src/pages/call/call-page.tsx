@@ -1,10 +1,12 @@
-// App.tsx
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import VideoCall from "../../components/call/video-call/video-call";
 import getClaimFromToken from "../../utils/token-validation";
 import { authService } from "../../services/auth-service";
 import { useSearchParams } from "react-router-dom";
-import AllFriendsList from "../../components/friendship/all-friends-list/all-friends-list";
+import type { PageResponse } from "../../types/common/page-response";
+import type { FriendResponse } from "../../types/friendship/friendship";
+import { friendshipService } from "../../services/friendship-service";
+import "./call-page.css";
 
 export default function CallPage() {
     const [searchParams] = useSearchParams();
@@ -16,14 +18,15 @@ export default function CallPage() {
         withParam || undefined,
     );
 
+    
+
     const handleCallEnded = useCallback(() => {
         setCallWith(undefined);
     }, []);
 
     return (
-        <div className="app">
-            <AllFriendsList />
-            
+        <div className="call-page-layout">
+
             <h1>Call-messenger</h1>
             <p>
                 Your id: <strong>{accountId}</strong>

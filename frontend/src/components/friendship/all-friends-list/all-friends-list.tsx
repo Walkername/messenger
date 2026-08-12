@@ -40,25 +40,13 @@ export default function AllFriendsList() {
         presenceService.registerMessageHandler(handlePresenceUpdate);
     }, [friends?.content]);
 
-    const handleRemoveFromFriend = (accountId: number) => {
-        friendshipService.removeFromFriend(accountId);
-        window.location.reload();
-    };
+    
 
     return (
         <div className="friends-list">
             {friends &&
                 friends.content.map((friend, index) => (
-                    <FriendCard key={index} profile={friend}>
-                        <button
-                            className="friend-card-remove"
-                            onClick={() =>
-                                handleRemoveFromFriend(friend.friendId)
-                            }
-                        >
-                            Remove
-                        </button>
-                    </FriendCard>
+                    <FriendCard key={index} profile={friend} />
                 ))}
         </div>
     );
