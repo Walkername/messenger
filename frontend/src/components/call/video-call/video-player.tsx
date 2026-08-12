@@ -17,7 +17,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const videoRef = useRef<HTMLVideoElement>(null);
 
     useEffect(() => {
-        console.log("VideoPlayer stream:", stream);
         if (videoRef.current && stream) {
             videoRef.current.srcObject = stream;
             const videoPlay = async () => {

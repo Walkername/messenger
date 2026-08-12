@@ -1,0 +1,34 @@
+.call-request-modal-window {
+    background: white;
+    border-radius: 12px;
+    min-width: 400px;
+    max-width: 500px;
+    animation: slideIn 0.3s ease-in-out;
+    text-align: start;
+    position: relative;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    text-align: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+    background-color: #f0f0f0;
+    color: #333;
+}

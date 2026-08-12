@@ -14,6 +14,8 @@ export const authService = {
             );
 
             useAuthStore.getState().setAccessToken(response.accessToken);
+            const accountId = getClaimFromToken(response.accessToken, "id");
+            useAuthStore.getState().setAccountId(accountId);
 
             return response;
         } catch (error) {
@@ -59,7 +61,6 @@ export const authService = {
     },
 
     getAccountId: (): number | null => {
-        const token = useAuthStore.getState().accessToken!;
-        return getClaimFromToken(token, "id");
+        return useAuthStore.getState().accountId;
     },
 };

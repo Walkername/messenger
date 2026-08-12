@@ -3,12 +3,17 @@ import { useCallback, useState } from "react";
 import VideoCall from "../../components/call/video-call/video-call";
 import getClaimFromToken from "../../utils/token-validation";
 import { authService } from "../../services/auth-service";
+import { useSearchParams } from "react-router-dom";
 
 export default function CallPage() {
+    const [searchParams] = useSearchParams();
+    const withParam = searchParams.get("with");
+
     const token = authService.getToken()!;
     const accountId: string = String(getClaimFromToken(token, "id"));
-    const [idToCall, setIdToCall] = useState<string>("");
-    const [callWith, setCallWith] = useState<string | undefined>(undefined);
+    const [callWith, setCallWith] = useState<string | undefined>(
+        withParam || undefined,
+    );
 
     const handleCallEnded = useCallback(() => {
         setCallWith(undefined);
@@ -27,24 +32,6 @@ export default function CallPage() {
                     remoteUserId={callWith}
                     onCallEnded={handleCallEnded}
                 />
-            </div>
-
-            <div className="call-actions">
-                <input
-                    type="text"
-                    placeholder="Type ID to call"
-                    onChange={(e) => setIdToCall(e.target.value)}
-                />
-                <button
-                    onClick={() => {
-                        const id = (
-                            document.querySelector("input") as HTMLInputElement
-                        )?.value;
-                        if (id) setCallWith(idToCall);
-                    }}
-                >
-                    Call
-                </button>
             </div>
         </div>
     );

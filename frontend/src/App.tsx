@@ -21,9 +21,13 @@ import { apiClient } from "./api/client";
 import FriendsPage from "./pages/friendship/friendship-page";
 import websocketService from "./services/websocket-service";
 import presenceService from "./services/presence-service";
+import CallSystem from "./components/call/call-system/call-system";
+import getClaimFromToken from "./utils/token-validation";
+import { WebRTCProvider } from "./contexts/webrtc-context";
 
 function App() {
     const setAccessToken = useAuthStore((state) => state.setAccessToken);
+    const setAccountId = useAuthStore((state) => state.setAccountId);
     const setLoading = useAuthStore((state) => state.setLoading);
 
     useEffect(() => {
@@ -31,9 +35,12 @@ function App() {
             .refreshToken()
             .then((token) => {
                 setAccessToken(token);
+                const accountId = getClaimFromToken(token, "id");
+                setAccountId(accountId);
             })
             .catch(() => {
                 setAccessToken(null);
+                setAccountId(null);
             })
             .finally(() => {
                 setLoading(false);
@@ -41,53 +48,60 @@ function App() {
                     presenceService.connect();
                 });
             });
-    }, [setAccessToken, setLoading]);
+    }, [setAccessToken, setLoading, setAccountId]);
 
     return (
         <Router>
-            <Navigation />
-            <Routes>
-                <Route element={<PageContent />}>
-                    <Route element={<PrivateRoute />}>
-                        <Route path="/" element={<MessengerPage />} />
-                        <Route path="/profile" element={<ProfilePage />}>
-                            <Route
-                                index
-                                element={
-                                    <Navigate
-                                        to="/profile/information"
-                                        replace
-                                    />
-                                }
-                            />
+            <WebRTCProvider>
+                <Navigation />
+                <Routes>
+                    <Route element={<PageContent />}>
+                        <Route element={<PrivateRoute />}>
+                            <Route path="/" element={<MessengerPage />} />
+                            <Route path="/profile" element={<ProfilePage />}>
+                                <Route
+                                    index
+                                    element={
+                                        <Navigate
+                                            to="/profile/information"
+                                            replace
+                                        />
+                                    }
+                                />
 
-                            <Route
-                                path="information"
-                                element={<InformationSection />}
-                            />
-                            <Route
-                                path="security"
-                                element={<SecuritySection />}
-                            />
+                                <Route
+                                    path="information"
+                                    element={<InformationSection />}
+                                />
+                                <Route
+                                    path="security"
+                                    element={<SecuritySection />}
+                                />
 
+                                <Route
+                                    path="*"
+                                    element={
+                                        <Navigate
+                                            to="/profile/information"
+                                            replace
+                                        />
+                                    }
+                                />
+                            </Route>
                             <Route
-                                path="*"
-                                element={
-                                    <Navigate
-                                        to="/profile/information"
-                                        replace
-                                    />
-                                }
+                                path="/chats/:id"
+                                element={<MessengerPage />}
                             />
+                            <Route path="/call" element={<CallPage />} />
+                            <Route path="/friends" element={<FriendsPage />} />
                         </Route>
-                        <Route path="/chats/:id" element={<MessengerPage />} />
-                        <Route path="/call" element={<CallPage />} />
-                        <Route path="/friends" element={<FriendsPage />} />
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<RegisterPage />} />
                     </Route>
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
-                </Route>
-            </Routes>
+                </Routes>
+
+                <CallSystem />
+            </WebRTCProvider>
         </Router>
     );
 }

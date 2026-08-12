@@ -1,12 +1,12 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import type { CallState, SignalingMessage } from "../types/call/webrtc";
+import signaling from "../services/signaling";
 
 interface UseWebRTCProps {
     accountId: string;
-    onCallEnded?: () => void;
 }
 
-export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
+export function useWebRTC({ accountId }: UseWebRTCProps) {
     const [callState, setCallState] = useState<CallState>({
         isInCall: false,
         isMuted: false,
@@ -19,6 +19,8 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
     const remoteStreamRef = useRef<MediaStream | null>(null);
     const currentPeerRef = useRef<string | null>(null);
     const pendingIceRef = useRef<RTCIceCandidateInit[]>([]);
+    const pendingOfferRef = useRef<SignalingMessage | null>(null);
+    const isCleaningUpRef = useRef(false);
 
     const [remoteStream, setRemoteStream] = useState<MediaStream>();
     const [localStream, setLocalStream] = useState<MediaStream>();
@@ -35,22 +37,32 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
         [],
     );
 
+    const onCallEndedRef = useRef<(() => void) | undefined>(null);
+    const onIncomingCallRef = useRef<
+        ((fromUserId: string) => void) | undefined
+    >(null);
+
+    const setOnIncomingCall = useCallback(
+        (callback?: (fromUserId: string) => void) => {
+            onIncomingCallRef.current = callback;
+        },
+        [],
+    );
+
+    const setOnCallEnded = useCallback((callback?: () => void) => {
+        onCallEndedRef.current = callback;
+    }, []);
+
     // ---------------------------
     // MEDIA
     // ---------------------------
     const initLocalStream = useCallback(async () => {
         if (localStreamRef.current) return localStreamRef.current;
 
-        // console.log("📷 Getting user media...");
         const stream = await navigator.mediaDevices.getUserMedia({
             video: true,
             audio: true,
         });
-
-        // console.log("✅ Local stream acquired:", {
-        //     videoTracks: stream.getVideoTracks().length,
-        //     audioTracks: stream.getAudioTracks().length,
-        // });
 
         localStreamRef.current = stream;
         setLocalStream(stream);
@@ -61,7 +73,13 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
     // CLEANUP
     // ---------------------------
     const cleanupCall = useCallback(() => {
-        // console.log("🧹 Cleaning up call");
+        if (isCleaningUpRef.current) {
+            console.log("🧹 Cleanup already in progress");
+            return;
+        }
+        isCleaningUpRef.current = true;
+
+        console.log("🧹 Cleaning up call");
 
         if (pcRef.current) {
             pcRef.current.close();
@@ -77,6 +95,7 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
 
         currentPeerRef.current = null;
         pendingIceRef.current = [];
+        pendingOfferRef.current = null;
 
         setCallState({
             isInCall: false,
@@ -87,24 +106,20 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
             remoteStream: undefined,
         });
 
-        onCallEnded?.();
-    }, [onCallEnded]);
+        if (onCallEndedRef.current) {
+            onCallEndedRef.current?.();
+        }
+
+        setTimeout(() => {
+            isCleaningUpRef.current = false;
+        }, 100);
+    }, []);
 
     // ---------------------------
     // SIGNALING SEND
     // ---------------------------
     const sendMessage = useCallback((msg: SignalingMessage) => {
-        // console.log(`📤 Sending message: ${msg.type}`, {
-        //     from: msg.from,
-        //     to: msg.to,
-        //     hasPayload: !!msg.payload,
-        // });
-
-        if (window.__signalingService) {
-            window.__signalingService.sendSignalingMessage(msg);
-        } else {
-            console.warn("⚠️ Signaling service not available");
-        }
+        signaling.sendSignalingMessage(msg);
     }, []);
 
     // ---------------------------
@@ -123,9 +138,7 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
             pcRef.current = pc;
             currentPeerRef.current = remoteUserId;
 
-            // Логируем ICE соединение
             pc.oniceconnectionstatechange = () => {
-                console.log("ice:", pc.iceConnectionState);
                 console.log(
                     `🧊 ICE connection state: ${pc.iceConnectionState}`,
                 );
@@ -139,19 +152,16 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
                 }
             };
 
-            // Логируем состояние сигнализации
             pc.onsignalingstatechange = () => {
                 console.log(`🔔 Signaling state: ${pc.signalingState}`);
             };
 
-            // local tracks
             console.log("➕ Adding local tracks to PeerConnection");
             localStreamRef.current?.getTracks().forEach((track) => {
                 console.log(`  ➕ Adding track: ${track.kind} (${track.id})`);
                 pc.addTrack(track, localStreamRef.current!);
             });
 
-            // remote stream
             const remoteStream = new MediaStream();
 
             pc.ontrack = (event) => {
@@ -176,7 +186,6 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
                         remoteStream,
                     }));
                 } else {
-                    // Fallback: добавляем только один трек
                     remoteStream.addTrack(event.track);
                     remoteStreamRef.current = remoteStream;
                     setCallState((p) => ({
@@ -186,13 +195,10 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
                 }
             };
 
-            // ICE
-            // В createPeerConnection
             pc.onicecandidate = (event) => {
                 if (!event.candidate) {
                     console.log("✅ ICE gathering complete");
 
-                    // Отправляем специальное сообщение о завершении сбора ICE
                     sendMessage({
                         from: accountId,
                         to: remoteUserId,
@@ -209,7 +215,6 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
                     sdpMid: event.candidate.sdpMid,
                 });
 
-                // Отправляем каждый кандидат отдельно
                 sendMessage({
                     from: accountId,
                     to: remoteUserId,
@@ -222,45 +227,16 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
                 });
             };
 
-            // STATE
             pc.onconnectionstatechange = () => {
                 const state = pc.connectionState;
-                // console.log(`🔗 Connection state: ${state}`);
 
                 if (state === "connected") {
-                    // console.log("🎉 PeerConnection connected!");
                     setCallState((p) => ({
                         ...p,
                         isInCall: true,
                         callStatus: "connected",
                     }));
                 }
-
-                // if (state === "checking") {
-                //     console.log("🔄 Checking connection...");
-                // }
-
-                // if (state === "new") {
-                //     console.log("🆕 Connection state: new");
-                // }
-
-                // if (state === "connecting") {
-                //     console.log("🔄 Connecting...");
-                // }
-
-                // if (state === "disconnected") {
-                //     console.warn("⚠️ Connection disconnected");
-                //     cleanupCall();
-                // }
-
-                // if (state === "failed") {
-                //     console.error("❌ Connection failed");
-                //     cleanupCall();
-                // }
-
-                // if (state === "closed") {
-                //     console.log("🔒 Connection closed");
-                // }
             };
 
             return pc;
@@ -325,76 +301,110 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
     const handleOffer = useCallback(
         async (msg: SignalingMessage) => {
             console.log("📞 Incoming offer from:", msg.from);
-            console.log(
-                "📋 Offer SDP:",
-                msg.payload.sdp?.substring(0, 100) + "...",
-            );
 
-            try {
-                await initLocalStream();
-                console.log("✅ Local stream ready");
-
-                const pc = createPeerConnection(msg.from);
-                console.log("✅ PeerConnection created");
-
-                console.log("📝 Setting remote description (offer)...");
-                await pc.setRemoteDescription(
-                    new RTCSessionDescription(msg.payload),
-                );
-                console.log("✅ Remote description set");
-
-                // flush ICE
-                if (pendingIceRef.current.length > 0) {
-                    console.log(
-                        `📦 Flushing ${pendingIceRef.current.length} pending ICE candidates`,
-                    );
-                    for (const c of pendingIceRef.current) {
-                        try {
-                            await pc.addIceCandidate(c);
-                            console.log("✅ ICE candidate added from pending");
-                        } catch (error) {
-                            console.warn(
-                                "⚠️ Failed to add pending ICE candidate:",
-                                error,
-                            );
-                        }
-                    }
-                    pendingIceRef.current = [];
-                }
-
-                console.log("📝 Creating answer...");
-                const answer = await pc.createAnswer();
-                console.log("✅ Answer created");
-
-                await pc.setLocalDescription(answer);
-                console.log("✅ Local description set");
-
+            if (callState.isInCall) {
+                console.log("⚠️ Already in a call, rejecting");
                 sendMessage({
                     from: accountId,
                     to: msg.from,
-                    type: "answer",
-                    payload: answer,
+                    type: "hangup",
+                    payload: { reason: "busy" },
                 });
-                console.log("📤 Answer sent");
+                return;
+            }
 
-                setCallState((p) => ({
-                    ...p,
-                    isInCall: true,
-                    callStatus: "connected",
-                }));
-            } catch (error) {
-                console.error("❌ Failed to handle offer:", error);
-                cleanupCall();
+            pendingOfferRef.current = msg;
+
+            setCallState((p) => ({
+                ...p,
+                callStatus: "ringing",
+                isInCall: true,
+            }));
+
+            if (onIncomingCallRef.current) {
+                onIncomingCallRef.current?.(msg.from);
             }
         },
-        [
-            accountId,
-            initLocalStream,
-            createPeerConnection,
-            cleanupCall,
-            sendMessage,
-        ],
+        [accountId, callState.isInCall, sendMessage],
     );
+
+    const acceptCall = useCallback(async () => {
+        if (!pendingOfferRef.current) {
+            console.warn("⚠️ No pending offer to accept");
+            return;
+        }
+
+        const msg = pendingOfferRef.current;
+        console.log("✅ Accepting call from:", msg.from);
+
+        try {
+            await initLocalStream();
+            const pc = createPeerConnection(msg.from);
+
+            await pc.setRemoteDescription(
+                new RTCSessionDescription(msg.payload),
+            );
+
+            if (pendingIceRef.current.length > 0) {
+                console.log(
+                    `📦 Flushing ${pendingIceRef.current.length} pending ICE candidates`,
+                );
+                for (const c of pendingIceRef.current) {
+                    try {
+                        await pc.addIceCandidate(c);
+                    } catch (error) {
+                        console.warn(
+                            "⚠️ Failed to add pending ICE candidate:",
+                            error,
+                        );
+                    }
+                }
+                pendingIceRef.current = [];
+            }
+
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+
+            sendMessage({
+                from: accountId,
+                to: msg.from,
+                type: "answer",
+                payload: answer,
+            });
+
+            pendingOfferRef.current = null;
+
+            setCallState((p) => ({
+                ...p,
+                callStatus: "connected",
+            }));
+
+            return msg.from;
+        } catch (error) {
+            console.error("❌ Failed to accept call:", error);
+            cleanupCall();
+            throw error;
+        }
+    }, [
+        accountId,
+        initLocalStream,
+        createPeerConnection,
+        sendMessage,
+        cleanupCall,
+    ]);
+
+    const rejectCall = useCallback(() => {
+        if (pendingOfferRef.current) {
+            sendMessage({
+                from: accountId,
+                to: pendingOfferRef.current.from,
+                type: "hangup",
+                payload: { reason: "rejected" },
+            });
+        }
+        pendingOfferRef.current = null;
+        cleanupCall();
+    }, [accountId, sendMessage, cleanupCall]);
 
     // ---------------------------
     // ANSWER
@@ -413,7 +423,6 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
             );
             console.log("✅ Remote description set");
 
-            // Проверяем, есть ли уже треки
             if (remoteStreamRef.current) {
                 console.log(
                     `📊 Remote stream has ${remoteStreamRef.current.getTracks().length} tracks`,
@@ -450,7 +459,6 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
             return;
         }
 
-        // Проверяем, есть ли remote description
         if (!pc.remoteDescription) {
             console.log("📦 No remote description yet, storing ICE candidate");
             pendingIceRef.current.push(candidate);
@@ -463,8 +471,6 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
             console.log("✅ ICE candidate added successfully");
         } catch (error) {
             console.error("❌ Failed to add ICE candidate:", error);
-            // Если ошибка, возможно кандидат уже добавлен или невалидный
-            // Пробуем добавить позже
             if (
                 error instanceof DOMException &&
                 error.name === "InvalidStateError"
@@ -543,7 +549,6 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
         [accountId, handleOffer, handleAnswer, handleIce, cleanupCall],
     );
 
-    // ... остальные методы без изменений ...
     const toggleMute = useCallback(() => {
         const track = localStreamRef.current?.getAudioTracks()[0];
         if (!track) return;
@@ -577,5 +582,11 @@ export function useWebRTC({ accountId, onCallEnded }: UseWebRTCProps) {
         handleSignalingMessage,
         localStream,
         remoteStream,
+        acceptCall,
+        rejectCall,
+        isRinging: callState.callStatus === "ringing",
+
+        setOnIncomingCall,
+        setOnCallEnded
     };
 }
