@@ -14,37 +14,27 @@ public class SignallingController {
     private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/video-call/offer")
-//    @SendTo("/topic/call")
     public void handleOffer(@Payload SignalingMessage message) {
         messagingTemplate.convertAndSend(
                 "/topic/call/" + message.to(),
                 message
         );
-        System.out.println("Offered: " + message.to());
-//        return message;
     }
 
     @MessageMapping("/video-call/answer")
-//    @SendTo("/topic/call")
     public void handleAnswer(@Payload SignalingMessage message) {
         messagingTemplate.convertAndSend(
                 "/topic/call/" + message.to(),
                 message
         );
-        System.out.println("Answered: " + message.to());
-//        return message;
     }
 
     @MessageMapping("/video-call/ice-candidate")
-//    @SendTo("/topic/call")
     public void handleIceCandidate(@Payload SignalingMessage message) {
-        System.out.println("Ice Candidate: " + message.to());
         messagingTemplate.convertAndSend(
                 "/topic/call/" + message.to(),
                 message
         );
-        System.out.println("Ice Candidate: " + message.to());
-//        return message;
     }
 
 }
