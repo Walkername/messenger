@@ -4,6 +4,7 @@ import VideoCall from "../../components/call/video-call/video-call";
 import getClaimFromToken from "../../utils/token-validation";
 import { authService } from "../../services/auth-service";
 import { useSearchParams } from "react-router-dom";
+import AllFriendsList from "../../components/friendship/all-friends-list/all-friends-list";
 
 export default function CallPage() {
     const [searchParams] = useSearchParams();
@@ -21,6 +22,8 @@ export default function CallPage() {
 
     return (
         <div className="app">
+            <AllFriendsList />
+            
             <h1>Call-messenger</h1>
             <p>
                 Your id: <strong>{accountId}</strong>

@@ -1,0 +1,39 @@
+.friend-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+
+    padding: 12px;
+
+    font-size: 15px;
+}
+
+.friend-card-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+}
+
+.friend-card-username {
+    color: #adb5bd;
+    font-style: italic;
+}
+
+.friend-card-firstname {
+    font-weight: 600;
+}
+
+.friend-card-sent-at {
+    color: #adb5bd;
+    font-size: 11px;
+}
+
+.friend-card-functions {
+    display: flex;
+    align-self: center;
+    gap: 10px;
+}
