@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import "./modal-window.css";
+import { X } from "lucide-react";
 
 interface ModalWindowProps {
     isOpen: boolean;
@@ -54,7 +55,7 @@ export default function ModalWindow({
                     onClick={onClose}
                     aria-label="Close modal"
                 >
-                    ×
+                    <X />
                 </button>
                 {children}
             </div>
