@@ -10,6 +10,7 @@ import "./participants-list.css";
 import { chatService } from "../../../services/chat-service";
 import presenceService from "../../../services/presence-service";
 import type { PresenceEvent } from "../../../types/presence/presence";
+import { ShieldUser } from "lucide-react";
 
 interface ParticipantsListProps {
     isOpen: boolean;
@@ -85,7 +86,7 @@ export default function ParticipantsList({
                         </div>
                         {participant.accountId === ownerId && (
                             <span className="chat-participant-card-admin">
-                                Administrator
+                                <ShieldUser color="orange" />
                             </span>
                         )}
                         <span
