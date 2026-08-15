@@ -14,8 +14,30 @@
 }
 
 .chat-window-header-name {
+    font-weight: 600;
     font-size: 15px;
+    margin-top: 0.6em;
     margin-bottom: 0px;
+}
+
+.chat-window-header-interlocutor-names {
+    margin-top: 0.6em;
+    margin-bottom: 0px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.chat-window-header-interlocutor-name {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.chat-window-header-interlocutor-username {
+    font-size: 15px;
+    font-style: italic;
+    color: #adb5bd;
 }
 
 .chat-window-participants-number {

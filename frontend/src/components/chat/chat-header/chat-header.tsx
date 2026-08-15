@@ -7,6 +7,7 @@ import {
 import "./chat-header.css";
 import ParticipantsList from "../participants-list/participants-list";
 import InviteUserWindow from "../invite-user-window/invite-user-window";
+import { UserRoundPlus } from "lucide-react";
 
 interface ChatHeaderProps {
     chat: ChatResponse;
@@ -20,13 +21,30 @@ export default function ChatHeader({ chat }: ChatHeaderProps) {
     return (
         <div className="chat-window-header">
             <div className="chat-window-header-info">
-                <h3 className="chat-window-header-name">{chat.name}</h3>
-                <span
-                    className="chat-window-participants-number"
-                    onClick={() => setIsParticipantsModalOpen(true)}
-                >
-                    {chat.participantsNumber} members
-                </span>
+                {chat.type === "GROUP" && (
+                    <div className="chat-window-header-name">{chat.name}</div>
+                )}
+                {chat.type === "PRIVATE" && (
+                    <div className="chat-window-header-interlocutor-names">
+                        {chat.name.split(":")[0] && (
+                            <span className="chat-window-header-interlocutor-name">
+                                {chat.name.split(":")[0]}
+                            </span>
+                        )}
+                        <span className="chat-window-header-interlocutor-username">
+                            @{chat.name.split(":")[1]}
+                        </span>
+                    </div>
+                )}
+
+                {chat.type === "GROUP" && (
+                    <span
+                        className="chat-window-participants-number"
+                        onClick={() => setIsParticipantsModalOpen(true)}
+                    >
+                        {chat.participantsNumber} members
+                    </span>
+                )}
                 <span
                     className="chat-window-header-created-at"
                     data-full-date={formatTimeLong(chat.createdAt)}
@@ -34,38 +52,32 @@ export default function ChatHeader({ chat }: ChatHeaderProps) {
                     Created: {formatTimeShort(chat.createdAt)}
                 </span>
             </div>
-            <div className="chat-window-header-functions">
-                <button
-                    className="chat-invite-button"
-                    onClick={() => {
-                        setIsInviteModalOpen(true);
-                    }}
-                >
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                    >
-                        <path d="M12 5v14M5 12h14"></path>
-                    </svg>
-                    Invite
-                </button>
-            </div>
+            {chat.type === "GROUP" && (
+                <>
+                    <div className="chat-window-header-functions">
+                        <button
+                            className="chat-invite-button"
+                            onClick={() => {
+                                setIsInviteModalOpen(true);
+                            }}
+                        >
+                            <UserRoundPlus size={22} color="gray" /> Invite
+                        </button>
+                    </div>
 
-            <ParticipantsList
-                isOpen={isParticipantsModalOpen}
-                onClose={() => setIsParticipantsModalOpen(false)}
-                chatId={chat.id}
-                ownerId={chat.ownerAccountId}
-            />
-            <InviteUserWindow
-                isOpen={isInviteModalOpen}
-                onClose={() => setIsInviteModalOpen(false)}
-                chatId={chat.id}
-            />
+                    <ParticipantsList
+                        isOpen={isParticipantsModalOpen}
+                        onClose={() => setIsParticipantsModalOpen(false)}
+                        chatId={chat.id}
+                        ownerId={chat.ownerAccountId}
+                    />
+                    <InviteUserWindow
+                        isOpen={isInviteModalOpen}
+                        onClose={() => setIsInviteModalOpen(false)}
+                        chatId={chat.id}
+                    />
+                </>
+            )}
         </div>
     );
 }

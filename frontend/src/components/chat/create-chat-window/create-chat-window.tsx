@@ -35,7 +35,8 @@ export default function CreateChatWindow({
         e.preventDefault();
         const request: CreateChatRequest = {
             name: name,
-            type: "PRIVATE",
+            type: "GROUP",
+            participantsIds: []
         };
         chatService
             .createChat(request)
