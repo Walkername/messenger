@@ -8,6 +8,7 @@
     border: 1px solid #e9ecef;
     border-radius: 12px;
     background-color: white;
+    overflow: visible;
 }
 
 .friendship-page-sidebar {
@@ -48,5 +49,4 @@
     flex-direction: column;
     flex: 1;
     min-width: 0;
-    overflow: hidden;
 }

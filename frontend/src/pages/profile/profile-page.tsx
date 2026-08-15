@@ -1,15 +1,27 @@
 import { NavLink, Outlet } from "react-router-dom";
 import "./profile-page.css";
+import type { ReactElement } from "react";
+import { Info, ShieldCheck } from "lucide-react";
 
 type TabOption = "information" | "security";
 
-const TAB_CONFIG: Record<TabOption, { label: string; path: string }> = {
+const TAB_CONFIG: Record<TabOption, { label: ReactElement; path: string }> = {
     information: {
-        label: "Information",
+        label: (
+            <>
+                <Info />
+                Information
+            </>
+        ),
         path: "information",
     },
     security: {
-        label: "Security",
+        label: (
+            <>
+                <ShieldCheck />
+                Security
+            </>
+        ),
         path: "security",
     },
 };

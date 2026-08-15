@@ -4,18 +4,32 @@ import InviteAsFriend from "../../components/friendship/invite-as-friend/invite-
 import FriendsSection from "../../components/friendship/friends-section/friends-section";
 import IncomingSection from "../../components/friendship/incoming-section/incoming-section";
 import OutgoingSection from "../../components/friendship/outgoing-section/outgoing-section";
+import type { ReactElement } from "react";
+import { UserCheck, UserCog, Users } from "lucide-react";
 
 type Section = "all" | "incoming" | "outgoing";
 
-const TAB_CONFIG: Record<Section, { label: string }> = {
+const TAB_CONFIG: Record<Section, { label: ReactElement }> = {
     all: {
-        label: "Friends",
+        label: (
+            <>
+                <Users /> Friends
+            </>
+        ),
     },
     incoming: {
-        label: "Incoming invitations",
+        label: (
+            <>
+                <UserCheck /> Incoming
+            </>
+        ),
     },
     outgoing: {
-        label: "Outgoing invitations",
+        label: (
+            <>
+                <UserCog /> Outgoing
+            </>
+        ),
     },
 };
 

@@ -22,6 +22,8 @@
     font-size: 15px;
     font-weight: bold;
     color: inherit;
+    display: flex;
+    gap: 4px;
 }
 
 .nav-bar-element:hover {
