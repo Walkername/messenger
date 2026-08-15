@@ -29,6 +29,7 @@ import ru.walkername.backend.common.security.UserPrincipal;
 import ru.walkername.backend.profile.service.PresenceService;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,28 +57,33 @@ public class ChatService {
         long participantsNumber = chatParticipantRepository.countByChatId(chatId);
 
         if (chat.getType().equals(ChatType.PRIVATE)) {
-            ChatParticipantView interlocutor = chatParticipantRepository
-                    .findInterlocutorNameByChatId(chat.getId(), accountId).orElseThrow(
-                            () -> new ChatParticipantNotFoundException("Chat participant not found")
-                    );
-
-            String interlocutorName = interlocutor.firstName() + ":" + interlocutor.username();
-
-            return new ChatResponse(
-                    chat.getId(),
-                    interlocutorName,
-                    accountId,
-                    ChatType.PRIVATE,
-                    interlocutor.accountId(),
-                    participantsNumber,
-                    chat.getCreatedAt(),
-                    chat.getLastMessage(),
-                    chat.getLastMessageAt()
-            );
+            return createPrivateChatResponse(chat, accountId, participantsNumber);
         }
 
         return chatMapper.toChatResponse(chat, participantsNumber);
     }
+
+    private ChatResponse createPrivateChatResponse(Chat chat, Long accountId, long participantsNumber) {
+        ChatParticipantView interlocutor = chatParticipantRepository
+                .findInterlocutorNameByChatId(chat.getId(), accountId).orElseThrow(
+                        () -> new ChatParticipantNotFoundException("Chat participant not found")
+                );
+
+        String interlocutorName = interlocutor.firstName() + ":" + interlocutor.username();
+
+        return new ChatResponse(
+                chat.getId(),
+                interlocutorName,
+                accountId,
+                ChatType.PRIVATE,
+                interlocutor.accountId(),
+                participantsNumber,
+                chat.getCreatedAt(),
+                chat.getLastMessage(),
+                chat.getLastMessageAt()
+        );
+    }
+
 
     public ChatResponse getByInterlocutorId(Long firstId, Long secondId) {
         Chat chat = chatRepository.findByFirstIdAndSecondIdInPrivateChat(firstId, secondId).orElseThrow(
@@ -93,7 +99,15 @@ public class ChatService {
 
         Page<Chat> chats = chatRepository.findByAccountId(accountId, pageable);
 
-        List<ChatResponse> content = chats.getContent().stream().map(chatMapper::toChatResponse).toList();
+        List<ChatResponse> content = new ArrayList<>();
+        for (Chat chat : chats) {
+            if (chat.getType().equals(ChatType.PRIVATE)) {
+                ChatResponse response = createPrivateChatResponse(chat, accountId, 2);
+                content.add(response);
+            } else {
+                content.add(chatMapper.toChatResponse(chat));
+            }
+        }
 
         return new PageResponse<>(
                 content,
