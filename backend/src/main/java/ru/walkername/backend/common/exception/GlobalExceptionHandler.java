@@ -15,6 +15,7 @@ import ru.walkername.backend.auth.exception.InvalidRefreshTokenException;
 import ru.walkername.backend.auth.exception.RefreshTokenCookieNotFoundException;
 import ru.walkername.backend.chat.exception.ChatNotFoundException;
 import ru.walkername.backend.chat.exception.ChatParticipantAlreadyExistsException;
+import ru.walkername.backend.chat.exception.ChatParticipantNotFoundException;
 import ru.walkername.backend.common.dto.ErrorResponse;
 import ru.walkername.backend.common.dto.ValidationErrorResponse;
 import ru.walkername.backend.profile.exception.ProfileExistsException;
@@ -147,6 +148,15 @@ public class GlobalExceptionHandler {
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException(ChatParticipantNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
 }

@@ -23,6 +23,8 @@ import ru.walkername.backend.common.security.UserPrincipal;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
+import java.util.Collections;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -76,6 +78,7 @@ public class ChatControllerTest extends BaseControllerTest {
                 chat.getName(),
                 userPrincipal.accountId(),
                 chat.getType(),
+                null,
                 0L,
                 chat.getCreatedAt(),
                 "",
@@ -118,7 +121,7 @@ public class ChatControllerTest extends BaseControllerTest {
     @DisplayName("Create 201: should return chat response")
     public void shouldReturnChatResponseByCreate() throws Exception {
         Long chatId = 1L;
-        ChatRequest request = new ChatRequest("Chat123", ChatType.PRIVATE);
+        ChatRequest request = new ChatRequest("Chat123", ChatType.PRIVATE, Collections.emptyList());
 
         Chat newChat = new Chat();
         newChat.setName(request.name());
@@ -136,6 +139,7 @@ public class ChatControllerTest extends BaseControllerTest {
                 savedChat.getName(),
                 userPrincipal.accountId(),
                 savedChat.getType(),
+                null,
                 0L,
                 savedChat.getCreatedAt(),
                 "",
@@ -143,7 +147,7 @@ public class ChatControllerTest extends BaseControllerTest {
         );
 
         when(chatMapper.toChat(request)).thenReturn(newChat);
-        when(chatService.save(newChat, userPrincipal.accountId())).thenReturn(savedChat);
+        when(chatService.save(newChat, userPrincipal.accountId(), Collections.emptyList())).thenReturn(savedChat);
         when(chatMapper.toChatResponse(savedChat)).thenReturn(response);
 
         mockMvc.perform(post("/chats")
@@ -160,7 +164,7 @@ public class ChatControllerTest extends BaseControllerTest {
                 );
 
         verify(chatMapper).toChat(request);
-        verify(chatService).save(newChat, userPrincipal.accountId());
+        verify(chatService).save(newChat, userPrincipal.accountId(), Collections.emptyList());
         verify(chatMapper).toChatResponse(savedChat);
     }
 

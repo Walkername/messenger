@@ -15,8 +15,10 @@ import ru.walkername.backend.chat.dto.ChatResponse;
 import ru.walkername.backend.chat.dto.ChatParticipantResponse;
 import ru.walkername.backend.chat.entity.Chat;
 import ru.walkername.backend.chat.entity.ChatParticipant;
+import ru.walkername.backend.chat.entity.ChatType;
 import ru.walkername.backend.chat.exception.ChatNotFoundException;
 import ru.walkername.backend.chat.exception.ChatParticipantAlreadyExistsException;
+import ru.walkername.backend.chat.exception.ChatParticipantNotFoundException;
 import ru.walkername.backend.chat.mapper.ChatMapper;
 import ru.walkername.backend.chat.mapper.ChatParticipantMapper;
 import ru.walkername.backend.chat.repository.ChatParticipantRepository;
@@ -53,7 +55,36 @@ public class ChatService {
 
         long participantsNumber = chatParticipantRepository.countByChatId(chatId);
 
+        if (chat.getType().equals(ChatType.PRIVATE)) {
+            ChatParticipantView interlocutor = chatParticipantRepository
+                    .findInterlocutorNameByChatId(chat.getId(), accountId).orElseThrow(
+                            () -> new ChatParticipantNotFoundException("Chat participant not found")
+                    );
+
+            String interlocutorName = interlocutor.firstName() + interlocutor.username();
+
+            return new ChatResponse(
+                    chat.getId(),
+                    interlocutorName,
+                    accountId,
+                    ChatType.PRIVATE,
+                    interlocutor.accountId(),
+                    participantsNumber,
+                    chat.getCreatedAt(),
+                    chat.getLastMessage(),
+                    chat.getLastMessageAt()
+            );
+        }
+
         return chatMapper.toChatResponse(chat, participantsNumber);
+    }
+
+    public ChatResponse getByInterlocutorId(Long firstId, Long secondId) {
+        Chat chat = chatRepository.findByFirstIdAndSecondIdInPrivateChat(firstId, secondId).orElseThrow(
+                () -> new ChatNotFoundException("Chat not found")
+        );
+
+        return chatMapper.toChatResponse(chat, 2);
     }
 
     public PageResponse<ChatResponse> getChatsByAccountId(Long accountId, int page, int limit) {
@@ -109,13 +140,17 @@ public class ChatService {
     }
 
     @Transactional
-    public Chat save(Chat chat, Long ownerId) {
+    public Chat save(Chat chat, Long ownerId, List<Long> participantsIds) {
         chat.setCreatedAt(Instant.now());
         chat.setLastMessageAt(Instant.now());
         chat.setOwnerAccountId(ownerId);
         Chat savedChat = chatRepository.save(chat);
 
         createChatParticipant(savedChat.getId(), ownerId);
+
+        for (Long participantId : participantsIds) {
+            createChatParticipant(savedChat.getId(), participantId);
+        }
 
         return savedChat;
     }

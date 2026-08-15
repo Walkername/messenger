@@ -24,4 +24,14 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     @Modifying
     void updateLastMessageById(Long id, String lastMessage, Instant lastMessageAt);
 
+    @Query("""
+            SELECT c FROM Chat c
+            JOIN ChatParticipant cp ON c.id = cp.chatId
+            WHERE c.type = ru.walkername.backend.chat.entity.ChatType.PRIVATE
+            AND cp.accountId IN (:firstId, :secondId)
+            GROUP BY c.id
+            HAVING COUNT(DISTINCT cp.accountId) = 2
+""")
+    Optional<Chat> findByFirstIdAndSecondIdInPrivateChat(Long firstId, Long secondId);
+
 }

@@ -9,6 +9,7 @@ public record ChatResponse(
         String name,
         Long ownerAccountId,
         ChatType type,
+        Long interlocutorId,
         Long participantsNumber,
         Instant createdAt,
         String lastMessage,

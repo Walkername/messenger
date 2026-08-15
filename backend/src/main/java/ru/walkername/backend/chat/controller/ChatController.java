@@ -48,6 +48,15 @@ public class ChatController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/interlocutor/{interlocutorId}")
+    public ResponseEntity<ChatResponse> getByInterlocutorId(
+            @PathVariable Long interlocutorId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        ChatResponse response = chatService.getByInterlocutorId(interlocutorId, userPrincipal.accountId());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @GetMapping("/{chatId}/participants")
     public ResponseEntity<PageResponse<ChatParticipantResponse>> getParticipants(
             @PathVariable Long chatId,
@@ -65,7 +74,7 @@ public class ChatController {
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         Chat chat = chatMapper.toChat(chatRequest);
-        Chat savedChat = chatService.save(chat, userPrincipal.accountId());
+        Chat savedChat = chatService.save(chat, userPrincipal.accountId(), chatRequest.participantsIds());
         ChatResponse chatResponse = chatMapper.toChatResponse(savedChat);
         return new ResponseEntity<>(chatResponse, HttpStatus.CREATED);
     }
