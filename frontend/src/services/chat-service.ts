@@ -9,9 +9,7 @@ import type { PageResponse } from "../types/common/page-response";
 export const chatService = {
     getMyChats: async (): Promise<PageResponse<ChatResponse>> => {
         try {
-            return await apiClient.get<PageResponse<ChatResponse>>(
-                "/chats/me"
-            );
+            return await apiClient.get<PageResponse<ChatResponse>>("/chats/me");
         } catch (error) {
             console.error("Getting my chats error:", error);
             throw error;
@@ -20,8 +18,19 @@ export const chatService = {
 
     getChat: async (id: number): Promise<ChatResponse> => {
         try {
+            return await apiClient.get<ChatResponse>(`/chats/${id}`);
+        } catch (error) {
+            console.error("Getting chat error:", error);
+            throw error;
+        }
+    },
+
+    getChatWithInterlocutorId: async (
+        interlocutorId: number,
+    ): Promise<ChatResponse> => {
+        try {
             return await apiClient.get<ChatResponse>(
-                `/chats/${id}`
+                `/chats/interlocutor/${interlocutorId}`,
             );
         } catch (error) {
             console.error("Getting chat error:", error);
@@ -38,10 +47,14 @@ export const chatService = {
         }
     },
 
-    getMessagesFromChat: async (id: number, page: number = 0, limit: number = 30): Promise<PageResponse<MessageResponse>> => {
+    getMessagesFromChat: async (
+        id: number,
+        page: number = 0,
+        limit: number = 30,
+    ): Promise<PageResponse<MessageResponse>> => {
         try {
             return await apiClient.get<PageResponse<MessageResponse>>(
-                `/chats/${id}/messages?page=${page}&limit=${limit}`
+                `/chats/${id}/messages?page=${page}&limit=${limit}`,
             );
         } catch (error) {
             console.error("Getting messages from chat error:", error);
@@ -49,11 +62,14 @@ export const chatService = {
         }
     },
 
-    sendMessageToChat: async (id: number, request: MessageRequest): Promise<MessageResponse> => {
+    sendMessageToChat: async (
+        id: number,
+        request: MessageRequest,
+    ): Promise<MessageResponse> => {
         try {
             return await apiClient.post<MessageResponse>(
                 `/chats/${id}/messages`,
-                request
+                request,
             );
         } catch (error) {
             console.error("Send message to chat error:", error);
@@ -64,7 +80,7 @@ export const chatService = {
     inviteUserToChat: async (id: number, username: string) => {
         try {
             return await apiClient.post(
-                `/chats/${id}/invite?username=${username}`
+                `/chats/${id}/invite?username=${username}`,
             );
         } catch (error) {
             console.error("Invite user to chat error:", error);
@@ -72,7 +88,9 @@ export const chatService = {
         }
     },
 
-    getParticipantsFromChat: async (id: number): Promise<PageResponse<ParticipantResponse>> => {
+    getParticipantsFromChat: async (
+        id: number,
+    ): Promise<PageResponse<ParticipantResponse>> => {
         try {
             return await apiClient.get(`/chats/${id}/participants`);
         } catch (error) {
@@ -83,12 +101,10 @@ export const chatService = {
 
     exitChat: async (chatId: number) => {
         try {
-            return await apiClient.delete(
-                `/chats/${chatId}/exit`
-            );
+            return await apiClient.delete(`/chats/${chatId}/exit`);
         } catch (error) {
             console.error("Exit chat error:", error);
             throw error;
         }
-    }
+    },
 };

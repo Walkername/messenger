@@ -31,6 +31,8 @@
     text-align: left;
     border-radius: 0.5rem;
     transition: all 0.2s;
+    display: flex;
+    gap: 4px;
 }
 
 .friendship-sidebar-btn:hover {

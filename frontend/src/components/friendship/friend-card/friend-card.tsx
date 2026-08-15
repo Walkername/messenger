@@ -5,6 +5,8 @@ import { formatTimeLong } from "../../../utils/validation-time";
 import "./friend-card.css";
 import { friendshipService } from "../../../services/friendship-service";
 import { useNavigate } from "react-router-dom";
+import { Ellipsis, MessageCircle, Phone, UserX } from "lucide-react";
+import StartPrivateChatWindow from "../../chat/start-private-chat-window/start-private-chat-window";
 
 interface FriendCardProps {
     profile: FriendResponse;
@@ -34,7 +36,13 @@ export default function FriendCard({ profile, children }: FriendCardProps) {
         navigate("/call");
     };
 
-    const handleMessageToFriend = () => {};
+    const [isStartChatModalOpen, setIsStartChatModalOpen] =
+        useState<boolean>(false);
+
+    const handleMessageToFriend = () => {
+        setIsStartChatModalOpen(true);
+        setIsMoreOpen(false);
+    };
 
     const handleTogglePopup = () => {
         setIsMoreOpen(!isMoreOpen);
@@ -85,68 +93,43 @@ export default function FriendCard({ profile, children }: FriendCardProps) {
                         className="friend-card-more"
                         onClick={handleTogglePopup}
                     >
-                        <svg
-                            width="22"
-                            height="22"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                            <g
-                                id="SVGRepo_tracerCarrier"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            ></g>
-                            <g id="SVGRepo_iconCarrier">
-                                {" "}
-                                <circle
-                                    cx="18"
-                                    cy="12"
-                                    r="1.5"
-                                    transform="rotate(90 18 12)"
-                                    fill="#080341"
-                                ></circle>{" "}
-                                <circle
-                                    cx="12"
-                                    cy="12"
-                                    r="1.5"
-                                    transform="rotate(90 12 12)"
-                                    fill="#080341"
-                                ></circle>{" "}
-                                <circle
-                                    cx="6"
-                                    cy="12"
-                                    r="1.5"
-                                    transform="rotate(90 6 12)"
-                                    fill="#080341"
-                                ></circle>{" "}
-                            </g>
-                        </svg>
+                        <Ellipsis size={18} />
                     </button>
                     {isMoreOpen && (
                         <div ref={popupRef} className="friend-card-more-popup">
-                            <button onClick={handleMessageToFriend}>
-                                Message
+                            <button
+                                onClick={() =>
+                                    handleMessageToFriend(profile.friendId)
+                                }
+                            >
+                                <MessageCircle size={22} color="gray" /> Message
                             </button>
                             <button
                                 onClick={() =>
                                     handleCallToFriend(profile.friendId)
                                 }
                             >
-                                Call
+                                <Phone size={22} color="gray" /> Call
                             </button>
                             <button
                                 onClick={() =>
                                     handleRemoveFromFriend(profile.friendId)
                                 }
+                                style={{ color: "red" }}
                             >
-                                Remove from friend
+                                <UserX size={22} color="red" /> Remove from
+                                friend
                             </button>
                         </div>
                     )}
                 </div>
             </div>
+
+            <StartPrivateChatWindow
+                interlocutorId={profile.friendId}
+                isOpen={isStartChatModalOpen}
+                onClose={() => setIsStartChatModalOpen(false)}
+            />
         </div>
     );
 }
