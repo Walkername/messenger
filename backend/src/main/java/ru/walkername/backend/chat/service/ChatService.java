@@ -61,7 +61,7 @@ public class ChatService {
                             () -> new ChatParticipantNotFoundException("Chat participant not found")
                     );
 
-            String interlocutorName = interlocutor.firstName() + interlocutor.username();
+            String interlocutorName = interlocutor.firstName() + ":" + interlocutor.username();
 
             return new ChatResponse(
                     chat.getId(),
