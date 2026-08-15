@@ -68,8 +68,12 @@ public class ChatService {
                 .findInterlocutorNameByChatId(chat.getId(), accountId).orElseThrow(
                         () -> new ChatParticipantNotFoundException("Chat participant not found")
                 );
-
-        String interlocutorName = interlocutor.firstName() + ":" + interlocutor.username();
+        String firstName = interlocutor.firstName();
+        String interlocutorName = "";
+        if (firstName != null) {
+            interlocutorName = firstName;
+        }
+        interlocutorName += ":" + interlocutor.username();
 
         return new ChatResponse(
                 chat.getId(),
