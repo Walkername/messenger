@@ -13,16 +13,13 @@ import ru.walkername.backend.chat.exception.ChatNotFoundException;
 import ru.walkername.backend.chat.mapper.ChatMapper;
 import ru.walkername.backend.chat.repository.ChatParticipantRepository;
 import ru.walkername.backend.chat.repository.ChatRepository;
-import ru.walkername.backend.common.security.UserPrincipal;
 
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
