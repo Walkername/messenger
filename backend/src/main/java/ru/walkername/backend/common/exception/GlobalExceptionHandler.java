@@ -16,6 +16,9 @@ import ru.walkername.backend.auth.exception.RefreshTokenCookieNotFoundException;
 import ru.walkername.backend.chat.exception.ChatNotFoundException;
 import ru.walkername.backend.chat.exception.ChatParticipantAlreadyExistsException;
 import ru.walkername.backend.chat.exception.ChatParticipantNotFoundException;
+import ru.walkername.backend.chat.exception.PrivateChatAlreadyExistsException;
+import ru.walkername.backend.chat.exception.PrivateChatTooFewParticipantsException;
+import ru.walkername.backend.chat.exception.PrivateChatTooManyParticipantsException;
 import ru.walkername.backend.common.dto.ErrorResponse;
 import ru.walkername.backend.common.dto.ValidationErrorResponse;
 import ru.walkername.backend.profile.exception.ProfileExistsException;
@@ -157,6 +160,33 @@ public class GlobalExceptionHandler {
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException(PrivateChatTooManyParticipantsException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException(PrivateChatTooFewParticipantsException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException(PrivateChatAlreadyExistsException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
 }

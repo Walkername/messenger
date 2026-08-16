@@ -19,6 +19,9 @@ import ru.walkername.backend.chat.entity.ChatType;
 import ru.walkername.backend.chat.exception.ChatNotFoundException;
 import ru.walkername.backend.chat.exception.ChatParticipantAlreadyExistsException;
 import ru.walkername.backend.chat.exception.ChatParticipantNotFoundException;
+import ru.walkername.backend.chat.exception.PrivateChatAlreadyExistsException;
+import ru.walkername.backend.chat.exception.PrivateChatTooFewParticipantsException;
+import ru.walkername.backend.chat.exception.PrivateChatTooManyParticipantsException;
 import ru.walkername.backend.chat.mapper.ChatMapper;
 import ru.walkername.backend.chat.mapper.ChatParticipantMapper;
 import ru.walkername.backend.chat.repository.ChatParticipantRepository;
@@ -32,6 +35,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -159,6 +163,10 @@ public class ChatService {
 
     @Transactional
     public Chat save(Chat chat, Long ownerId, List<Long> participantsIds) {
+        if (chat.getType().equals(ChatType.PRIVATE)) {
+            validatePrivateChatConditions(ownerId, participantsIds);
+        }
+
         chat.setCreatedAt(Instant.now());
         chat.setLastMessageAt(Instant.now());
         chat.setOwnerAccountId(ownerId);
@@ -167,10 +175,31 @@ public class ChatService {
         createChatParticipant(savedChat.getId(), ownerId);
 
         for (Long participantId : participantsIds) {
+            if (participantId.equals(ownerId)) {
+                continue;
+            }
             createChatParticipant(savedChat.getId(), participantId);
         }
 
         return savedChat;
+    }
+
+    private void validatePrivateChatConditions(Long ownerId, List<Long> participantsIds) {
+        if (participantsIds.size() > 1) {
+            throw new PrivateChatTooManyParticipantsException("Only one participant can be saved for a private chat (besides the owner)");
+        }
+        if (participantsIds.isEmpty()) {
+            throw new PrivateChatTooFewParticipantsException("One participant is required for a private chat (besides the owner)");
+        }
+
+        Optional<Chat> existingChat = chatRepository
+                .findByFirstIdAndSecondIdInPrivateChat(
+                        ownerId,
+                        participantsIds.getFirst()
+                );
+        if (existingChat.isPresent()) {
+            throw new PrivateChatAlreadyExistsException("Private chat with these participants already exists");
+        }
     }
 
     private void createChatParticipant(Long chatId, Long accountId) {
