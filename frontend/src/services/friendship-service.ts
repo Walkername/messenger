@@ -23,12 +23,12 @@ export const friendshipService = {
         }
     },
 
-    getMyOutgoingInvites: async (): Promise<
+    getMyOutgoingInvites: async (page: number = 0, limit: number = 20): Promise<
         PageResponse<OutgoingRequestResponse>
     > => {
         try {
             return await apiClient.get<PageResponse<OutgoingRequestResponse>>(
-                "/friendship/me/invitations/outgoing",
+                `/friendship/me/invitations/outgoing?page=${page}&limit=${limit}`,
             );
         } catch (error) {
             console.error("Getting outgoing invitations error:", error);
@@ -36,12 +36,12 @@ export const friendshipService = {
         }
     },
 
-    getMyIncomingInvites: async (): Promise<
+    getMyIncomingInvites: async (page: number = 0, limit: number = 20): Promise<
         PageResponse<IncomingRequestResponse>
     > => {
         try {
             return await apiClient.get<PageResponse<IncomingRequestResponse>>(
-                "/friendship/me/invitations/incoming",
+                `/friendship/me/invitations/incoming?page=${page}&limit=${limit}`,
             );
         } catch (error) {
             console.error("Getting incoming invitations error:", error);

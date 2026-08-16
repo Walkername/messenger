@@ -4,8 +4,8 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    overflow-y: auto;
 }
-
 
 .incoming-invitation-card {
     display: flex;
