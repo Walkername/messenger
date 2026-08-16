@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { PageResponse } from "../../../types/common/page-response";
 import type { ChatResponse } from "../../../types/chat/chat-response";
 import "./chat-list.css";
@@ -12,12 +12,25 @@ interface ChatListProps {
     selectedChatId: number | null;
 }
 
+const PAGE_SIZE = 20;
+
 export default function ChatList({
     onSelectChat,
     selectedChatId,
 }: ChatListProps) {
-    const [chats, setChats] = useState<PageResponse<ChatResponse> | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [chats, setChats] = useState<PageResponse<ChatResponse>>({
+        content: [],
+        page: 0,
+        limit: PAGE_SIZE,
+        totalElements: 0,
+        totalPages: 0,
+    });
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+
+    const currentPageRef = useRef(0);
+    const loadingMoreRef = useRef(false);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const [isCreateChatModalOpen, setIsCreateChatModalOpen] = useState(false);
 
@@ -25,15 +38,71 @@ export default function ChatList({
     const [chatIdToExit, setChatIdToExit] = useState<number | null>(null);
 
     useEffect(() => {
-        chatService
-            .getMyChats()
-            .then((data) => {
-                setChats(data);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+        let cancelled = false;
+
+        const load = async () => {
+            const data = await chatService.getMyChats(0, PAGE_SIZE);
+
+            if (cancelled) {
+                return;
+            }
+
+            currentPageRef.current = data.page;
+
+            setChats(data);
+            setHasMore(data.page + 1 < data.totalPages);
+        };
+
+        load();
+
+        return () => {
+            cancelled = true;
+        };
     }, []);
+
+    const loadMoreChats = useCallback(async () => {
+        if (loadingMoreRef.current || !hasMore) {
+            return;
+        }
+
+        loadingMoreRef.current = true;
+        setIsLoadingMore(true);
+
+        try {
+            const nextPage = currentPageRef.current + 1;
+
+            const data = await chatService.getMyChats(nextPage, PAGE_SIZE);
+
+            currentPageRef.current = data.page;
+
+            setChats((prev) => ({
+                ...data,
+                content: [...prev.content, ...data.content],
+            }));
+
+            setHasMore(data.page + 1 < data.totalPages);
+        } finally {
+            loadingMoreRef.current = false;
+            setIsLoadingMore(false);
+        }
+    }, [hasMore]);
+
+    const handleScroll = useCallback(() => {
+        const container = containerRef.current;
+
+        if (!container) {
+            return;
+        }
+
+        const distanceToBottom =
+            container.scrollHeight -
+            container.scrollTop -
+            container.clientHeight;
+
+        if (distanceToBottom < 50 && hasMore && !loadingMoreRef.current) {
+            loadMoreChats();
+        }
+    }, [hasMore, loadMoreChats]);
 
     const handleSelectChat = (chatId: number) => {
         onSelectChat(chatId);
@@ -71,15 +140,6 @@ export default function ChatList({
         }
     };
 
-    if (loading) {
-        return (
-            <div className="chat-list-loading">
-                <div className="loading-spinner"></div>
-                <p>Loading chats...</p>
-            </div>
-        );
-    }
-
     return (
         <div className="chat-list">
             <div className="chat-list-header">
@@ -91,7 +151,11 @@ export default function ChatList({
                     Create chat
                 </button>
             </div>
-            <div className="chat-items">
+            <div
+                className="chat-items"
+                ref={containerRef}
+                onScroll={handleScroll}
+            >
                 {chats?.content.length === 0 ? (
                     <div className="no-chats">
                         <p>You don't have any chats yet</p>

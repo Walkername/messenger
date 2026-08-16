@@ -7,9 +7,9 @@ import type { ParticipantResponse } from "../types/chat/participant-response";
 import type { PageResponse } from "../types/common/page-response";
 
 export const chatService = {
-    getMyChats: async (): Promise<PageResponse<ChatResponse>> => {
+    getMyChats: async (page: number = 0, limit: number = 20): Promise<PageResponse<ChatResponse>> => {
         try {
-            return await apiClient.get<PageResponse<ChatResponse>>("/chats/me");
+            return await apiClient.get<PageResponse<ChatResponse>>(`/chats/me?page=${page}&limit=${limit}`);
         } catch (error) {
             console.error("Getting my chats error:", error);
             throw error;
