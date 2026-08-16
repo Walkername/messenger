@@ -43,7 +43,7 @@ export default function FriendCard({ profile, children }: FriendCardProps) {
         setIsStartChatModalOpen(true);
         setIsMoreOpen(false);
     };
-
+    
     const handleTogglePopup = () => {
         setIsMoreOpen(!isMoreOpen);
     };
@@ -97,11 +97,7 @@ export default function FriendCard({ profile, children }: FriendCardProps) {
                     </button>
                     {isMoreOpen && (
                         <div ref={popupRef} className="friend-card-more-popup">
-                            <button
-                                onClick={() =>
-                                    handleMessageToFriend(profile.friendId)
-                                }
-                            >
+                            <button onClick={handleMessageToFriend}>
                                 <MessageCircle size={22} color="gray" /> Message
                             </button>
                             <button

@@ -25,7 +25,6 @@ export default function ChatList({
         totalElements: 0,
         totalPages: 0,
     });
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
 
     const currentPageRef = useRef(0);
@@ -66,7 +65,6 @@ export default function ChatList({
         }
 
         loadingMoreRef.current = true;
-        setIsLoadingMore(true);
 
         try {
             const nextPage = currentPageRef.current + 1;
@@ -83,7 +81,6 @@ export default function ChatList({
             setHasMore(data.page + 1 < data.totalPages);
         } finally {
             loadingMoreRef.current = false;
-            setIsLoadingMore(false);
         }
     }, [hasMore]);
 

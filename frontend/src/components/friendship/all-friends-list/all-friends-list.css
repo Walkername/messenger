@@ -1,7 +1,29 @@
 .friends-list {
     padding: 10px;
-    display: flex;
+    padding-top: 0px;
+    padding-bottom: 0px;
     flex: 1;
     flex-direction: column;
     gap: 10px;
+
+    max-height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.friends-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.friends-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.friends-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.friends-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }

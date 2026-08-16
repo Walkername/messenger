@@ -8,7 +8,6 @@
     border: 1px solid #e9ecef;
     border-radius: 12px;
     background-color: white;
-    overflow: visible;
 }
 
 .friendship-page-sidebar {
@@ -45,6 +44,8 @@
 }
 
 .current-friendship-option {
+    height: 100%;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     flex: 1;

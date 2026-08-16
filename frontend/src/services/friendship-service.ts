@@ -12,10 +12,10 @@ export const friendshipService = {
         }
     },
 
-    getMyFriends: async (): Promise<PageResponse<FriendResponse>> => {
+    getMyFriends: async (page: number = 0, limit: number = 20): Promise<PageResponse<FriendResponse>> => {
         try {
             return await apiClient.get<PageResponse<FriendResponse>>(
-                "/friendship/me",
+                `/friendship/me?page=${page}&limit=${limit}`,
             );
         } catch (error) {
             console.error("Getting friends error:", error);

@@ -1,5 +1,7 @@
 
 .friends-container {
+    height: 100%;
+    min-height: 0;
     display: flex;
     flex: 1;
     width: 100%;
