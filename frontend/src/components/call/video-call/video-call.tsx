@@ -1,23 +1,17 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import VideoPlayer from "./video-player";
 import CallControls from "./call-controls";
-import { useWebRTCContext } from "../../../contexts/webrtc-context";
 import "./video-call.css";
+import type { ProfileResponse } from "../../../types/profile/profile-response";
+import { useWebRTCContext } from "../../../contexts/webrtc-context";
 
 interface VideoCallProps {
-    accountId: string;
-    remoteUserId?: string;
-    onCallEnded?: () => void;
+    profile?: ProfileResponse;
 }
 
-const VideoCall: React.FC<VideoCallProps> = ({
-    accountId,
-    remoteUserId,
-    onCallEnded,
-}) => {
+const VideoCall = ({ profile }: VideoCallProps) => {
     const {
         callState,
-        startCall,
         localStream,
         remoteStream,
         endCall,
@@ -25,56 +19,85 @@ const VideoCall: React.FC<VideoCallProps> = ({
         toggleVideo,
     } = useWebRTCContext();
 
-    const [callTarget, setCallTarget] = useState<string | undefined>(
-        remoteUserId,
+    const [focusedVideo, setFocusedVideo] = useState<"local" | "remote">(
+        "remote",
     );
+
+    const handleEndCall = () => {
+        endCall();
+    };
+
+    const handleSwitchFocus = (videoType: "local" | "remote") => {
+        setFocusedVideo(videoType);
+    };
 
     return (
         <div className="video-call-container">
             <div className="video-grid">
-                <div className="video-wrapper local">
+                <div className={`video-wrapper main-video`}>
                     <VideoPlayer
-                        stream={localStream || undefined}
-                        muted={true}
-                        label="You"
+                        stream={
+                            focusedVideo === "remote"
+                                ? remoteStream || undefined
+                                : localStream || undefined
+                        }
+                        muted={focusedVideo === "remote" ? false : true}
+                        label={
+                            focusedVideo === "remote" ? `${profile?.username}` : "You"
+                        }
                         className={!callState.isInCall ? "inactive" : ""}
+                        isConnecting={
+                            callState.isInCall &&
+                            callState.callStatus !== "connected"
+                        }
                     />
                 </div>
 
-                {callState.isInCall && (
-                    <div className="video-wrapper remote">
-                        <VideoPlayer
-                            stream={remoteStream}
-                            label="Interlocutor"
-                            className={
-                                callState.callStatus !== "connected"
-                                    ? "connecting"
-                                    : ""
-                            }
-                        />
-                    </div>
-                )}
-            </div>
-
-            <div className="call-status">
-                {callState.callStatus === "calling" && "Calling..."}
-                {callState.callStatus === "connected" && "Speaking"}
-                {callState.callStatus === "ended" && "Call ended"}
-            </div>
-
-            <CallControls
-                isInCall={callState.isInCall}
-                isMuted={callState.isMuted}
-                isVideoOn={callState.isVideoOn}
-                onToggleMute={toggleMute}
-                onToggleVideo={toggleVideo}
-                onEndCall={endCall}
-                onStartCall={() => {
-                    if (callTarget) {
-                        startCall(callTarget);
+                <div
+                    className={`video-wrapper mini-video `}
+                    onClick={() =>
+                        handleSwitchFocus(
+                            focusedVideo === "remote" ? "local" : "remote",
+                        )
                     }
-                }}
-            />
+                >
+                    <VideoPlayer
+                        stream={
+                            focusedVideo === "remote"
+                                ? localStream || undefined
+                                : remoteStream || undefined
+                        }
+                        muted={true}
+                        label={
+                            focusedVideo === "local" ? "You" : `${profile?.username}`
+                        }
+                        className={!callState.isInCall ? "inactive" : ""}
+                        isConnecting={
+                            callState.isInCall &&
+                            callState.callStatus !== "connected"
+                        }
+                        isMini={true}
+                    />
+                </div>
+            </div>
+
+            <div className="controls-overlay">
+                <CallControls
+                    isInCall={callState.isInCall}
+                    isMuted={callState.isMuted}
+                    isVideoOn={callState.isVideoOn}
+                    onToggleMute={toggleMute}
+                    onToggleVideo={toggleVideo}
+                    onEndCall={handleEndCall}
+                    callStatus={callState.callStatus}
+                />
+            </div>
+
+            {callState.isInCall && callState.callStatus !== "connected" && (
+                <div className="call-status">
+                    <span>Connecting...</span>
+                </div>
+            )}
         </div>
     );
 };

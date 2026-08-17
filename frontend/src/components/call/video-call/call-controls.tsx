@@ -1,5 +1,4 @@
-// components/VideoCall/CallControls.tsx
-import { Mic, MicOff, Phone, PhoneOff, Video, VideoOff } from "lucide-react";
+import { Mic, MicOff, PhoneOff, Video, VideoOff } from "lucide-react";
 import React from "react";
 
 interface CallControlsProps {
@@ -9,7 +8,7 @@ interface CallControlsProps {
     onToggleMute: () => void;
     onToggleVideo: () => void;
     onEndCall: () => void;
-    onStartCall: () => void;
+    callStatus?: string;
 }
 
 const CallControls: React.FC<CallControlsProps> = ({
@@ -19,21 +18,43 @@ const CallControls: React.FC<CallControlsProps> = ({
     onToggleMute,
     onToggleVideo,
     onEndCall,
-    onStartCall,
+    callStatus,
 }) => {
     return (
         <div className="call-controls">
-            <button className="control-btn" onClick={onToggleMute}>
-                {isMuted ? <MicOff size={24} /> : <Mic size={24} />}
-            </button>
+            <div className="controls-group">
+                <button
+                    className={`control-btn ${isMuted ? "active" : ""}`}
+                    onClick={onToggleMute}
+                    title={isMuted ? "Включить микрофон" : "Выключить микрофон"}
+                >
+                    {isMuted ? <MicOff size={24} /> : <Mic size={24} />}
+                </button>
 
-            <button className="control-btn" onClick={onToggleVideo}>
-                {isVideoOn ? <Video size={24} /> : <VideoOff size={24} />}
-            </button>
+                <button
+                    className={`control-btn ${!isVideoOn ? "active" : ""}`}
+                    onClick={onToggleVideo}
+                    title={isVideoOn ? "Выключить камеру" : "Включить камеру"}
+                >
+                    {isVideoOn ? <Video size={24} /> : <VideoOff size={24} />}
+                </button>
 
-            <button className="control-btn end-call" onClick={onEndCall}>
-                <PhoneOff size={24} />
-            </button>
+                {isInCall && (
+                    <button
+                        className="control-btn end-call"
+                        onClick={onEndCall}
+                        title="Завершить звонок"
+                    >
+                        <PhoneOff size={24} />
+                    </button>
+                )}
+            </div>
+
+            {callStatus === "connected" && (
+                <div className="call-timer">
+                    <span>●</span> В эфире
+                </div>
+            )}
         </div>
     );
 };

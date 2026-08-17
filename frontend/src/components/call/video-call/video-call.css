@@ -1,158 +1,335 @@
+/* components/VideoCall/video-call.css */
+
 .video-call-container {
-  max-width: 800px;
-  padding: 20px;
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: #1a1a1a;
+    overflow: hidden;
 }
 
 .video-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin: 20px 0;
-  position: relative;
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
+/* Основное видео */
 .video-wrapper {
-  aspect-ratio: 4/3;
-  background: #1a1a1a;
-  border-radius: 12px;
-  overflow: hidden;
-  position: relative;
+    position: absolute;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #2a2a2a;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-.video-wrapper video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.video-wrapper.main-video {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
 }
 
+.video-wrapper.main-video.focused {
+    z-index: 1;
+}
+
+.video-wrapper.main-video.minimized {
+    z-index: 0;
+    opacity: 0.3;
+}
+
+/* Миниатюрное видео */
+.video-wrapper.mini-video {
+    position: absolute;
+    bottom: 100px;
+    right: 20px;
+    width: 200px;
+    height: 150px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.video-wrapper.mini-video:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.02);
+}
+
+/* Видео плеер */
+.video-player {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-player .video-element {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: #1a1a1a;
+}
+
+.video-player.inactive .video-element {
+    filter: grayscale(1) brightness(0.7);
+}
+
+.video-player.mini .video-element {
+    object-fit: cover;
+}
+
+/* Метка видео */
 .video-label {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  color: white;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 14px;
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    padding: 6px 12px;
+    border-radius: 20px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 5;
 }
 
-.video-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #666;
-  font-size: 18px;
-}
-
-.video-wrapper.inactive {
-  opacity: 0.5;
-}
-
-.video-wrapper.connecting {
-  animation: pulse 1s infinite;
+.connecting-dot {
+    color: #ffd700;
+    animation: pulse 1s infinite;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.2;
+    }
 }
 
-.call-status {
-  text-align: center;
-  font-size: 18px;
-  color: #666;
-  margin: 20px 0;
+/* Плейсхолдер */
+.video-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #888;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* Оверлей подключения */
+.connecting-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Элементы управления поверх видео */
+.controls-overlay {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+    padding: 16px 24px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .call-controls {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.controls-group {
+    display: flex;
+    gap: 16px;
+    align-items: center;
 }
 
 .control-btn {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: none;
-  background: #444;
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .control-btn:hover {
-  transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.control-btn:active {
+    transform: scale(0.95);
+}
+
+.control-btn.active {
+    background: rgba(255, 0, 0, 0.3);
+    color: #ff6b6b;
 }
 
 .control-btn.end-call {
-  background: #dc3545;
+    background: #ff4444;
+    color: white;
+}
+
+.control-btn.end-call:hover {
+    background: #ff2222;
 }
 
 .control-btn.start-call {
-  background: #28a745;
-  width: 80px;
-  height: 80px;
+    background: #4caf50;
+    color: white;
 }
 
 .control-btn.start-call:hover {
-  background: #218838;
+    background: #45a049;
 }
 
-.contacts {
-  margin-top: 30px;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.call-timer {
+    color: white;
+    font-size: 14px;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.contacts button {
-  padding: 12px 24px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
+.call-timer span {
+    color: #4caf50;
+    animation: pulse 1.5s infinite;
 }
 
-.contacts button:hover {
-  background: #0056b3;
+/* Статус звонка */
+.call-status {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    padding: 8px 20px;
+    border-radius: 20px;
+    color: white;
+    font-size: 14px;
 }
 
-.call-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-  justify-content: center;
+/* Адаптивность */
+@media (max-width: 768px) {
+    .video-wrapper.mini-video {
+        width: 120px;
+        height: 90px;
+        bottom: 100px;
+        right: 12px;
+    }
+
+    .video-wrapper.mini-video.minimized {
+        width: 120px;
+        height: 90px;
+    }
+
+    .controls-overlay {
+        padding: 12px 16px;
+        bottom: 24px;
+    }
+
+    .control-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .control-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .controls-group {
+        gap: 12px;
+    }
 }
 
-.call-actions input {
-  padding: 10px 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  flex: 1;
-  max-width: 300px;
-}
+@media (max-width: 480px) {
+    .video-wrapper.mini-video {
+        width: 80px;
+        height: 60px;
+        bottom: 80px;
+        right: 8px;
+    }
 
-.call-actions button {
-  padding: 10px 24px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-}
+    .video-wrapper.mini-video.minimized {
+        width: 80px;
+        height: 60px;
+    }
 
-.call-actions button:hover {
-  background: #0056b3;
+    .video-label {
+        font-size: 11px;
+        padding: 4px 8px;
+        bottom: 8px;
+        left: 8px;
+    }
+
+    .controls-overlay {
+        padding: 8px 12px;
+        bottom: 16px;
+    }
+
+    .control-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .control-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .controls-group {
+        gap: 8px;
+    }
 }

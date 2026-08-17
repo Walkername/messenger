@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import CallRequestWindow from "../call-request-window/call-request-window";
 import { useNavigate } from "react-router-dom";
-import { useWebRTCContext } from "../../../contexts/webrtc-context";
 import websocketService from "../../../services/websocket-service";
 import type { SignalingMessage } from "../../../types/call/webrtc";
+import { profileService } from "../../../services/profile-service";
+import type { ProfileResponse } from "../../../types/profile/profile-response";
+import { useWebRTCContext } from "../../../contexts/webrtc-context";
 
 export default function CallSystem() {
     const navigate = useNavigate();
 
+    const [interlocutor, setInterlocutor] = useState<ProfileResponse>();
+
     const [isCallRequestModalOpen, setIsCallRequestModalOpen] = useState(false);
-    
-    const [incomingCallerId, setIncomingCallerId] = useState<string | null>(
-        null,
-    );
 
     const isProcessingRef = useRef(false);
 
@@ -23,6 +23,7 @@ export default function CallSystem() {
         handleSignalingMessage,
         setOnIncomingCall,
         setOnCallEnded,
+        endCall,
     } = useWebRTCContext();
 
     useEffect(() => {
@@ -32,27 +33,28 @@ export default function CallSystem() {
                     handleSignalingMessage(message);
                 },
             );
-
-            // setIsConnected(true);
         };
 
         connectWebSocket();
     }, [handleSignalingMessage]);
 
-    const onIncomingCall = useCallback((fromUserId: string) => {
+    const onIncomingCall = useCallback(async (fromUserId: string) => {
         if (isProcessingRef.current) {
             console.log("⚠️ Already processing a call");
             return;
         }
 
         isProcessingRef.current = true;
-        setIncomingCallerId(fromUserId);
         setIsCallRequestModalOpen(true);
+
+        profileService.getProfile(parseInt(fromUserId)).then((data) => {
+            setInterlocutor(data);
+        });
     }, []);
 
     const onCallEnded = useCallback(() => {
-        // navigate(-1);
-    }, [navigate]);
+        endCall()
+    }, [endCall]);
 
     useEffect(() => {
         setOnIncomingCall(onIncomingCall);
@@ -70,11 +72,11 @@ export default function CallSystem() {
 
     const handleAcceptCall = async () => {
         try {
-            await acceptCall();
+            const accountId = await acceptCall();
             setIsCallRequestModalOpen(false);
-            setIncomingCallerId(null);
+            setInterlocutor(undefined);
 
-            navigate("/call");
+            navigate(`/call?with=${accountId}`);
         } catch (error) {
             console.error("Failed to accept incoming call:", error);
         }
@@ -83,13 +85,13 @@ export default function CallSystem() {
     const handleRejectCall = () => {
         rejectCall();
         setIsCallRequestModalOpen(false);
-        setIncomingCallerId(null);
+        setInterlocutor(undefined);
     };
 
     return (
         <CallRequestWindow
             isOpen={isCallRequestModalOpen}
-            callerId={incomingCallerId || undefined}
+            profile={interlocutor || undefined}
             onAccept={handleAcceptCall}
             onReject={handleRejectCall}
             onClose={() => {

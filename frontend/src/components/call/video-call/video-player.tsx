@@ -1,4 +1,3 @@
-// components/VideoCall/VideoPlayer.tsx
 import React, { useRef, useEffect } from "react";
 
 interface VideoPlayerProps {
@@ -6,6 +5,8 @@ interface VideoPlayerProps {
     muted?: boolean;
     label?: string;
     className?: string;
+    isConnecting?: boolean;
+    isMini?: boolean;
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -13,6 +14,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     muted = false,
     label,
     className = "",
+    isConnecting = false,
+    isMini = false,
 }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -20,19 +23,42 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         if (videoRef.current && stream) {
             videoRef.current.srcObject = stream;
             const videoPlay = async () => {
-                await videoRef?.current?.play().catch(console.error);
+                try {
+                    await videoRef?.current?.play();
+                } catch (error) {
+                    console.error("Video play error:", error);
+                }
             };
             videoPlay();
         }
     }, [stream]);
 
     return (
-        <div className={`video-player ${className}`}>
-            <video ref={videoRef} autoPlay muted={muted} playsInline />
-            {label && <span className="video-label">{label}</span>}
-            {!stream && (
+        <div className={`video-player ${className} ${isMini ? "mini" : ""}`}>
+            <video
+                ref={videoRef}
+                autoPlay
+                muted={muted}
+                playsInline
+                className="video-element"
+            />
+
+            {label && (
+                <div className="video-label">
+                    <span>{label}</span>
+                    {isConnecting && <span className="connecting-dot">●</span>}
+                </div>
+            )}
+
+            {!stream && !isConnecting && (
                 <div className="video-placeholder">
-                    <span>Нет видео</span>
+                    <span>Ожидание видео</span>
+                </div>
+            )}
+
+            {isConnecting && (
+                <div className="connecting-overlay">
+                    <div className="spinner"></div>
                 </div>
             )}
         </div>

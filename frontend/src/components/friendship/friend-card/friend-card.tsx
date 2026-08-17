@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useWebRTCContext } from "../../../contexts/webrtc-context";
 import type { FriendResponse } from "../../../types/friendship/friendship";
 import { formatTimeLong } from "../../../utils/validation-time";
 import "./friend-card.css";
@@ -7,6 +6,7 @@ import { friendshipService } from "../../../services/friendship-service";
 import { useNavigate } from "react-router-dom";
 import { Ellipsis, MessageCircle, Phone, UserX } from "lucide-react";
 import StartPrivateChatWindow from "../../chat/start-private-chat-window/start-private-chat-window";
+import { useWebRTCContext } from "../../../contexts/webrtc-context";
 
 interface FriendCardProps {
     profile: FriendResponse;

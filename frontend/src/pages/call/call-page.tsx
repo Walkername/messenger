@@ -1,31 +1,27 @@
-import { useCallback, useState } from "react";
 import VideoCall from "../../components/call/video-call/video-call";
-import getClaimFromToken from "../../utils/token-validation";
-import { authService } from "../../services/auth-service";
 import { useSearchParams } from "react-router-dom";
 import "./call-page.css";
+import { useEffect, useState } from "react";
+import { profileService } from "../../services/profile-service";
+import type { ProfileResponse } from "../../types/profile/profile-response";
 
 export default function CallPage() {
     const [searchParams] = useSearchParams();
     const withParam = searchParams.get("with");
+    const accountId = parseInt(withParam!);
 
-    const token = authService.getToken()!;
-    const accountId: string = String(getClaimFromToken(token, "id"));
-    const [callWith, setCallWith] = useState<string | undefined>(
-        withParam || undefined,
-    );
-
-    const handleCallEnded = useCallback(() => {
-        setCallWith(undefined);
-    }, []);
+    const [profile, setProfile] = useState<ProfileResponse>();
+    
+    useEffect(() => {
+        profileService.getProfile(accountId)
+            .then((data) => {
+                setProfile(data);
+            });
+    })
 
     return (
         <div className="call-page-layout">
-            <VideoCall
-                accountId={accountId}
-                remoteUserId={callWith}
-                onCallEnded={handleCallEnded}
-            />
+            <VideoCall profile={profile} />
         </div>
     );
 }

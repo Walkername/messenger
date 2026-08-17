@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { useAuthStore } from "../auth/store";
 import { useWebRTC } from "../hooks/use-webrtc";
 
